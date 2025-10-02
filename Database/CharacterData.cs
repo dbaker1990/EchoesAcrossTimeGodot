@@ -12,8 +12,8 @@ namespace EchoesAcrossTime.Database
         NPC,
         Boss
     }
-    
-    public partial class CharacterData
+    [GlobalClass]
+    public partial class CharacterData : Resource
     {
         // Existing properties...
         public string CharacterId { get; set; } = "character_001";
