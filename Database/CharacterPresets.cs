@@ -8,12 +8,13 @@ namespace EchoesAcrossTime.Database
         public static CharacterData CreateDominic(int level = 1)
         {
             level = Mathf.Clamp(level, CharacterStats.MIN_LEVEL, CharacterStats.MAX_LEVEL);
-            
+    
             var dominic = new CharacterData
             {
                 CharacterId = "dominic",
                 DisplayName = "Prince Dominic Valebran",
                 Type = CharacterType.PlayableCharacter,
+                Class = CharacterClass.PrismShadow,
                 Description = "Prince of Valebran with shadow magic abilities",
                 Level = level,
                 MaxHP = 120,
@@ -31,11 +32,16 @@ namespace EchoesAcrossTime.Database
                 MagicDefenseGrowthRate = 0.04f,
                 SpeedGrowthRate = 0.03f
             };
-            
+    
             dominic.ElementAffinities.SetAffinity(ElementType.Dark, ElementAffinity.Absorb);
             dominic.ElementAffinities.SetAffinity(ElementType.Light, ElementAffinity.Weak);
             dominic.ElementAffinities.SetAffinity(ElementType.Ice, ElementAffinity.Resist);
-            
+    
+            // Battle stats
+            dominic.BattleStats.CriticalRate = 15;
+            dominic.BattleStats.EvasionRate = 10;
+            dominic.BattleStats.PreemptiveStrikeRate = 20;
+    
             return dominic;
         }
         
@@ -109,8 +115,8 @@ namespace EchoesAcrossTime.Database
         public static CharacterData CreateBasicEnemy(string name, int level = 1)
         {
             level = Mathf.Clamp(level, CharacterStats.MIN_LEVEL, CharacterStats.MAX_LEVEL);
-            
-            return new CharacterData
+    
+            var enemy = new CharacterData
             {
                 CharacterId = $"enemy_{name.ToLower().Replace(" ", "_")}",
                 DisplayName = name,
@@ -124,13 +130,38 @@ namespace EchoesAcrossTime.Database
                 MagicDefense = 6 + level,
                 Speed = 10 + level
             };
+    
+            // Setup rewards
+            enemy.Rewards = new EnemyRewards
+            {
+                BaseExpReward = 10 + (level * 2),
+                BaseGoldReward = 5 + level,
+                ExpVariance = 0.1f,
+                GoldVariance = 0.2f
+            };
+    
+            // Add common drops
+            var commonDrop = new DropItem
+            {
+                ItemId = "potion",
+                DropChance = 30,
+                MinQuantity = 1,
+                MaxQuantity = 1
+            };
+            enemy.Rewards.CommonDrops.Add(commonDrop);
+    
+            // Battle stats
+            enemy.BattleStats.AccuracyRate = 85;
+            enemy.BattleStats.EvasionRate = 5;
+    
+            return enemy;
         }
         
         public static CharacterData CreateBoss(string name, int level = 10)
         {
             level = Mathf.Clamp(level, CharacterStats.MIN_LEVEL, CharacterStats.MAX_LEVEL);
-            
-            return new CharacterData
+    
+            var boss = new CharacterData
             {
                 CharacterId = $"boss_{name.ToLower().Replace(" ", "_")}",
                 DisplayName = name,
@@ -145,6 +176,45 @@ namespace EchoesAcrossTime.Database
                 MagicDefense = 15 + (level * 2),
                 Speed = 12 + level
             };
+    
+            // Setup boss rewards
+            boss.Rewards = new EnemyRewards
+            {
+                BaseExpReward = 100 + (level * 10),
+                BaseGoldReward = 50 + (level * 5),
+                IsBoss = true,
+                BossExpMultiplier = 5,
+                BossGoldMultiplier = 10
+            };
+    
+            // Boss guaranteed drops
+            boss.Rewards.GuaranteedDrop = new DropItem
+            {
+                ItemId = "boss_key",
+                DropChance = 100,
+                MinQuantity = 1,
+                MaxQuantity = 1
+            };
+    
+            // Rare drops
+            var rareDrop = new DropItem
+            {
+                ItemId = "legendary_sword",
+                DropChance = 10,
+                MinQuantity = 1,
+                MaxQuantity = 1
+            };
+            boss.Rewards.RareDrops.Add(rareDrop);
+    
+            // Battle stats - bosses are tough
+            boss.BattleStats.AccuracyRate = 95;
+            boss.BattleStats.CriticalRate = 20;
+            boss.BattleStats.DeathResistance = 100;  // Immune to instant death
+            boss.BattleStats.ImmuneToInstantDeath = true;
+            boss.BattleStats.ParalysisResistance = 75;
+            boss.BattleStats.SleepResistance = 100;
+    
+            return boss;
         }
     }
 }

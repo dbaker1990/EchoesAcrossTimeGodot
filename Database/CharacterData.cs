@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using System.Collections.Generic;
 using EchoesAcrossTime.Combat;
 using EchoesAcrossTime.Items;
 
@@ -14,11 +13,9 @@ namespace EchoesAcrossTime.Database
         Boss
     }
     
-    /// <summary>
-    /// Simple character data class (not a Resource)
-    /// </summary>
     public partial class CharacterData
     {
+        // Existing properties...
         public string CharacterId { get; set; } = "character_001";
         public string DisplayName { get; set; } = "Character";
         public string PortraitPath { get; set; } = "";
@@ -41,24 +38,36 @@ namespace EchoesAcrossTime.Database
         public float MagicDefenseGrowthRate { get; set; } = 0.03f;
         public float SpeedGrowthRate { get; set; } = 0.02f;
         
-        // Add these properties to CharacterData class
-        public CharacterClass Class { get; set; } = CharacterClass.CourtMage;
-
-        // Add initial equipment
-        public Dictionary<EquipSlot, string> InitialEquipment { get; set; } = new();
-        
         public ElementAffinityData ElementAffinities { get; set; }
         public ExperienceCurve ExpCurve { get; set; }
         
         public CharacterType Type { get; set; } = CharacterType.PlayableCharacter;
         public bool IsBoss { get; set; } = false;
+        public CharacterClass Class { get; set; } = CharacterClass.CourtMage;
         
         public string Description { get; set; } = "";
+        
+        // NEW: Menu Graphics
+        public MenuGraphics Graphics { get; set; }
+        
+        // NEW: Battle-specific stats
+        public BattleStats BattleStats { get; set; }
+        
+        // NEW: Enemy rewards (only for enemies/bosses)
+        public EnemyRewards Rewards { get; set; }
         
         public CharacterData()
         {
             ElementAffinities = new ElementAffinityData();
             ExpCurve = ExperienceCurve.CreateQuadraticCurve();
+            Graphics = new MenuGraphics();
+            BattleStats = new BattleStats();
+            
+            // Only create rewards if this is an enemy
+            if (Type == CharacterType.Enemy || Type == CharacterType.Boss)
+            {
+                Rewards = new EnemyRewards { IsBoss = IsBoss };
+            }
         }
         
         public CharacterStats CreateStatsInstance()
@@ -106,6 +115,16 @@ namespace EchoesAcrossTime.Database
             else
             {
                 stats.ElementAffinities = new ElementAffinityData();
+            }
+            
+            // NEW: Copy battle stats
+            if (this.BattleStats != null)
+            {
+                stats.BattleStats = this.BattleStats.Clone();
+            }
+            else
+            {
+                stats.BattleStats = new BattleStats();
             }
             
             return stats;

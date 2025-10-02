@@ -31,6 +31,8 @@ namespace EchoesAcrossTime.Combat
         public int MagicDefense { get; set; } = 10;
         public int Speed { get; set; } = 10;
         
+        public BattleStats BattleStats { get; set; }
+        
         // Experience system
         public int CurrentExp { get; set; } = 0;
         public int ExpToNextLevel { get; set; } = 100;
@@ -69,7 +71,8 @@ namespace EchoesAcrossTime.Combat
         public CharacterStats()
         {
             ElementAffinities = new ElementAffinityData();
-            ExperienceCurve = ExperienceCurve.CreateQuadraticCurve(); // Default curve
+            ExperienceCurve = ExperienceCurve.CreateQuadraticCurve();
+            BattleStats = new BattleStats();
         }
         
         public bool IsAlive => CurrentHP > 0;
