@@ -45,6 +45,11 @@ namespace EchoesAcrossTime.Database
         public bool IsBoss { get; set; } = false;
         public CharacterClass Class { get; set; } = CharacterClass.CourtMage;
         
+        [ExportGroup("Battle Animations")]
+        [Export] public BattleAnimationData BattleAnimations { get; set; }
+
+        [ExportGroup("AI Behavior")]
+        [Export] public AIPattern AIBehavior { get; set; }
         public string Description { get; set; } = "";
         
         // NEW: Menu Graphics
@@ -55,6 +60,10 @@ namespace EchoesAcrossTime.Database
         
         // NEW: Enemy rewards (only for enemies/bosses)
         public EnemyRewards Rewards { get; set; }
+        
+        [ExportGroup("Skills")]
+        [Export] public Godot.Collections.Array<SkillData> StartingSkills { get; set; }
+        [Export] public Godot.Collections.Dictionary SkillsLearnedAtLevel { get; set; }
         
         public CharacterData()
         {
@@ -68,6 +77,12 @@ namespace EchoesAcrossTime.Database
             {
                 Rewards = new EnemyRewards { IsBoss = IsBoss };
             }
+            
+            StartingSkills = new Godot.Collections.Array<SkillData>();
+            SkillsLearnedAtLevel = new Godot.Collections.Dictionary();
+            
+            BattleAnimations = new BattleAnimationData();
+            AIBehavior = new AIPattern();
         }
         
         public CharacterStats CreateStatsInstance()

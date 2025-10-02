@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using EchoesAcrossTime.Items;
 
 namespace EchoesAcrossTime.Combat
@@ -46,6 +47,8 @@ namespace EchoesAcrossTime.Combat
         public float MagicDefenseGrowthRate { get; set; } = 0.03f;
         public float SpeedGrowthRate { get; set; } = 0.02f;
         
+        public CharacterSkills Skills { get; set; }
+        
         private EquipmentBonuses currentBonuses;
         
         // Experience curve
@@ -68,11 +71,15 @@ namespace EchoesAcrossTime.Combat
         [Signal]
         public delegate void ExpGainedEventHandler(int expGained, int currentExp, int expToNext);
         
+        public List<ActiveStatusEffect> ActiveStatuses { get; set; } = new List<ActiveStatusEffect>();
+        
         public CharacterStats()
         {
             ElementAffinities = new ElementAffinityData();
             ExperienceCurve = ExperienceCurve.CreateQuadraticCurve();
             BattleStats = new BattleStats();
+            Skills = new CharacterSkills("");
+            ActiveStatuses = new List<ActiveStatusEffect>();
         }
         
         public bool IsAlive => CurrentHP > 0;
@@ -194,6 +201,8 @@ namespace EchoesAcrossTime.Combat
             
             // Increase stats
             IncreaseStatsOnLevelUp();
+            
+            CheckLevelUpSkills(Level);
             
             // Heal to full on level up
             FullRestore();
@@ -319,6 +328,13 @@ namespace EchoesAcrossTime.Combat
             MagicAttack -= currentBonuses.MagicAttackBonus;
             MagicDefense -= currentBonuses.MagicDefenseBonus;
             Speed -= currentBonuses.SpeedBonus;
+        }
+        
+        private void CheckLevelUpSkills(int level)
+        {
+            // This would need CharacterData reference
+            // Or you could store skill learn data in CharacterStats
+            GD.Print($"Checking for skills learned at level {level}");
         }
     }
 }
