@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using EchoesAcrossTime.Items;
 
 namespace EchoesAcrossTime.Combat
 {
@@ -42,6 +43,8 @@ namespace EchoesAcrossTime.Combat
         public float MagicAttackGrowthRate { get; set; } = 0.03f;
         public float MagicDefenseGrowthRate { get; set; } = 0.03f;
         public float SpeedGrowthRate { get; set; } = 0.02f;
+        
+        private EquipmentBonuses currentBonuses;
         
         // Experience curve
         public ExperienceCurve ExperienceCurve { get; set; }
@@ -282,6 +285,37 @@ namespace EchoesAcrossTime.Combat
         public int CalculateMagicalDamage(int targetMagicDefense, float powerMultiplier = 1f)
         {
             return Mathf.Max(1, Mathf.RoundToInt((MagicAttack * powerMultiplier) - targetMagicDefense / 2));
+        }
+        
+        public void ApplyEquipmentBonuses(EquipmentBonuses bonuses)
+        {
+            // Remove old bonuses first
+            RemoveEquipmentBonuses();
+    
+            // Apply new bonuses
+            MaxHP += bonuses.MaxHPBonus;
+            MaxMP += bonuses.MaxMPBonus;
+            Attack += bonuses.AttackBonus;
+            Defense += bonuses.DefenseBonus;
+            MagicAttack += bonuses.MagicAttackBonus;
+            MagicDefense += bonuses.MagicDefenseBonus;
+            Speed += bonuses.SpeedBonus;
+    
+            // Store current bonuses
+            currentBonuses = bonuses;
+    
+            GD.Print($"Applied equipment bonuses to {CharacterName}");
+        }
+
+        private void RemoveEquipmentBonuses()
+        {
+            MaxHP -= currentBonuses.MaxHPBonus;
+            MaxMP -= currentBonuses.MaxMPBonus;
+            Attack -= currentBonuses.AttackBonus;
+            Defense -= currentBonuses.DefenseBonus;
+            MagicAttack -= currentBonuses.MagicAttackBonus;
+            MagicDefense -= currentBonuses.MagicDefenseBonus;
+            Speed -= currentBonuses.SpeedBonus;
         }
     }
 }

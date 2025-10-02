@@ -1,6 +1,8 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using EchoesAcrossTime.Combat;
+using EchoesAcrossTime.Items;
 
 namespace EchoesAcrossTime.Database
 {
@@ -38,6 +40,12 @@ namespace EchoesAcrossTime.Database
         public float MagicAttackGrowthRate { get; set; } = 0.03f;
         public float MagicDefenseGrowthRate { get; set; } = 0.03f;
         public float SpeedGrowthRate { get; set; } = 0.02f;
+        
+        // Add these properties to CharacterData class
+        public CharacterClass Class { get; set; } = CharacterClass.CourtMage;
+
+        // Add initial equipment
+        public Dictionary<EquipSlot, string> InitialEquipment { get; set; } = new();
         
         public ElementAffinityData ElementAffinities { get; set; }
         public ExperienceCurve ExpCurve { get; set; }
