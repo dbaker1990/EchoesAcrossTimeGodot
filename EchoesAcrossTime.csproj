@@ -6,5 +6,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Database\CharacterDatabase.tres" />
+    <Content Include="Docs\CompleteIntegrationGuide.md" />
+    <Content Include="Docs\CoreCommandsDocumentation.md" />
+    <Content Include="Docs\LimitBreakDocumentation.md" />
+    <Content Include="Docs\Persona5BattleSystem_Documentation.md" />
+    <Content Include="Docs\Phase2_Documentation.md" />
+    <Content Include="Docs\QuickReference.md" />
   </ItemGroup>
 </Project>
