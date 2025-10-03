@@ -61,6 +61,11 @@ namespace EchoesAcrossTime
                 AddChild(MEPlayer);
             }
             
+            BGMPlayer.Bus = "BGM";
+            SEPlayer.Bus = "SFX";
+            MEPlayer.Bus = "BGM"; 
+            BGSPlayer.Bus = "SFX";
+            
             GD.Print("AudioManager initialized");
         }
         
