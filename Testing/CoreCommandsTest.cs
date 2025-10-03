@@ -55,14 +55,15 @@ namespace EchoesAcrossTime.Testing
         {
             GD.Print("\n═══ CORE COMMANDS DEMO ═══\n");
             
+            // Get dominic reference
+            var dominic = battleManager.GetPlayerParty()[0];
+            
             // Demo 1: GUARD
             GD.Print("─── Demo 1: Guard Command ───");
             GD.Print("Dominic will guard and take reduced damage!\n");
             
             if (battleManager.IsPlayerTurn())
             {
-                var dominic = battleManager.GetPlayerParty()[0];
-                
                 // Guard action
                 var guardAction = new BattleAction(dominic, BattleActionType.Guard);
                 GD.Print(">>> Dominic guards!");
@@ -75,7 +76,7 @@ namespace EchoesAcrossTime.Testing
             
             // Simulate enemy hitting guarding character
             GD.Print(">>> Enemy attacks Dominic (who is guarding)...");
-            if (battleManager.CurrentPhase != BattlePhase.Escaped)
+            if (battleManager.CurrentPhase != BattleManager.BattlePhase.Escaped)
             {
                 // Skip to next turn for demo
                 battleManager.StartNextTurn();
@@ -177,7 +178,7 @@ namespace EchoesAcrossTime.Testing
             }
             
             GD.Print("\n\n═══════════════════════════════════════");
-            GD.Print("   Core Commands Demo Complete!      ");
+            GD.Print("   Core Commands Demo Complete!");
             GD.Print("═══════════════════════════════════════\n");
         }
         
@@ -246,8 +247,7 @@ namespace EchoesAcrossTime.Testing
                 ItemId = "health_potion",
                 DisplayName = "Health Potion",
                 Description = "Restores 50 HP",
-                RestoresHP = 50,
-                ItemType = ItemType.Consumable
+                RestoresHP = 50
             };
         }
         
@@ -258,8 +258,7 @@ namespace EchoesAcrossTime.Testing
                 ItemId = "mana_potion",
                 DisplayName = "Mana Potion",
                 Description = "Restores 30 MP",
-                RestoresMP = 30,
-                ItemType = ItemType.Consumable
+                RestoresMP = 30
             };
         }
         
@@ -272,7 +271,6 @@ namespace EchoesAcrossTime.Testing
                 Description = "Deals 60 Fire damage",
                 DamageAmount = 60,
                 DamageElement = ElementType.Fire,
-                ItemType = ItemType.Consumable,
                 InflictsStatus = new Godot.Collections.Array<StatusEffect> { StatusEffect.Burn },
                 StatusChance = 30,
                 StatusDuration = 3

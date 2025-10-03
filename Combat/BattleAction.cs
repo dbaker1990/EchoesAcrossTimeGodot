@@ -109,9 +109,6 @@ namespace EchoesAcrossTime.Combat
                 case BattleActionType.AllOutAttack:
                     return Actor.CanAllOutAttack;
                     
-                case BattleActionType.Item:
-                    return ItemData != null;
-                    
                 default:
                     return false;
             }

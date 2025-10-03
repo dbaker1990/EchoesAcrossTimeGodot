@@ -106,22 +106,22 @@ namespace EchoesAcrossTime.Combat
             var livingParty = party.Where(p => p.Stats.IsAlive).ToList();
             if (livingParty.Count == 0)
                 return 0;
-            
-            float avgPartySpeed = livingParty.Average(p => p.Stats.Speed);
-            
+    
+            float avgPartySpeed = livingParty.Average(p => (float)p.Stats.Speed); // Cast to float
+    
             // Get average enemy speed
             var livingEnemies = enemies.Where(e => e.Stats.IsAlive).ToList();
             if (livingEnemies.Count == 0)
-                return 100; // All enemies dead = auto escape
-            
-            float avgEnemySpeed = livingEnemies.Average(e => e.Stats.Speed);
-            
+                return 100;
+    
+            float avgEnemySpeed = livingEnemies.Average(e => (float)e.Stats.Speed); // Cast to float
+    
             // Calculate base chance
             int escapeChance = BASE_ESCAPE_CHANCE;
-            
+    
             // Speed difference modifier
             float speedRatio = avgPartySpeed / avgEnemySpeed;
-            
+    
             if (speedRatio > 1.0f)
             {
                 // Party is faster - bonus to escape
@@ -134,10 +134,10 @@ namespace EchoesAcrossTime.Combat
                 int speedPenalty = Mathf.RoundToInt((1.0f - speedRatio) * 30);
                 escapeChance -= speedPenalty;
             }
-            
+    
             // Bonus for each failed attempt
             escapeChance += (escapeAttempts * ESCAPE_CHANCE_INCREMENT);
-            
+    
             // HP penalty - harder to escape when injured
             float avgHPPercent = livingParty.Average(p => p.Stats.HPPercent);
             if (avgHPPercent < 0.5f)
@@ -145,10 +145,10 @@ namespace EchoesAcrossTime.Combat
                 int hpPenalty = Mathf.RoundToInt((0.5f - avgHPPercent) * 40);
                 escapeChance -= hpPenalty;
             }
-            
+    
             // Clamp between 10% and 95%
             escapeChance = Mathf.Clamp(escapeChance, 10, MAX_ESCAPE_CHANCE);
-            
+    
             return escapeChance;
         }
         
