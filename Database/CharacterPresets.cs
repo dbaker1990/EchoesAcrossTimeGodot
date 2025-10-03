@@ -16,6 +16,16 @@ namespace EchoesAcrossTime.Database
                 Type = CharacterType.PlayableCharacter,
                 Class = CharacterClass.PrismShadow,
                 Description = "Prince of Valebran with shadow magic abilities",
+            
+                // Visual Assets
+                OverworldSpriteFrames = GD.Load<SpriteFrames>("res://Characters/Sprites/Dominic_Overworld.tres"),
+                OverworldShadow = GD.Load<Texture2D>("res://Characters/Sprites/shadow.png"),
+                BattleSpriteFrames = GD.Load<SpriteFrames>("res://Characters/Sprites/Dominic_Battle.tres"),
+                BattlePortrait = GD.Load<Texture2D>("res://Characters/Portraits/Dominic_Battle.png"),
+                MenuPortrait = GD.Load<Texture2D>("res://Characters/Portraits/Dominic_Menu.png"),
+                IconSmall = GD.Load<Texture2D>("res://Characters/Icons/Dominic_Small.png"),
+            
+                // Stats
                 Level = level,
                 MaxHP = 120,
                 MaxMP = 60,
@@ -24,6 +34,8 @@ namespace EchoesAcrossTime.Database
                 MagicAttack = 18,
                 MagicDefense = 15,
                 Speed = 14,
+            
+                // Growth rates
                 HPGrowthRate = 0.06f,
                 MPGrowthRate = 0.07f,
                 AttackGrowthRate = 0.03f,
@@ -36,12 +48,11 @@ namespace EchoesAcrossTime.Database
             dominic.ElementAffinities.SetAffinity(ElementType.Dark, ElementAffinity.Absorb);
             dominic.ElementAffinities.SetAffinity(ElementType.Light, ElementAffinity.Weak);
             dominic.ElementAffinities.SetAffinity(ElementType.Ice, ElementAffinity.Resist);
-    
-            // Battle stats
+
             dominic.BattleStats.CriticalRate = 15;
             dominic.BattleStats.EvasionRate = 10;
             dominic.BattleStats.PreemptiveStrikeRate = 20;
-    
+
             return dominic;
         }
         

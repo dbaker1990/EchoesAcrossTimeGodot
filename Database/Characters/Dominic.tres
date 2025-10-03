@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=10 format=3 uid="uid://cyu0ebqc2yodg"]
+
+[ext_resource type="Script" uid="uid://cqhok56saxuo3" path="res://Combat/BattleAnimationData.cs" id="1_errbr"]
+[ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="1_tudx8"]
+[ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="2_nxyxa"]
+[ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="3_vsnjh"]
+[ext_resource type="Script" uid="uid://cg2tuivyyfkte" path="res://Combat/ExperienceCurve.cs" id="4_4frva"]
+
+[sub_resource type="Resource" id="Resource_4pc82"]
+script = ExtResource("1_errbr")
+metadata/_custom_type_script = "uid://cqhok56saxuo3"
+
+[sub_resource type="Resource" id="Resource_4nevw"]
+script = ExtResource("2_nxyxa")
+metadata/_custom_type_script = "uid://cii0v4krf5lb8"
+
+[sub_resource type="Resource" id="Resource_8hh8e"]
+script = ExtResource("3_vsnjh")
+metadata/_custom_type_script = "uid://cr283ljrg7q0d"
+
+[sub_resource type="Resource" id="Resource_ypspe"]
+script = ExtResource("4_4frva")
+metadata/_custom_type_script = "uid://cg2tuivyyfkte"
+
+[resource]
+script = ExtResource("1_tudx8")
+CharacterId = "dominic"
+DisplayName = "Dominic"
+ElementAffinities = SubResource("Resource_8hh8e")
+ExpCurve = SubResource("Resource_ypspe")
+BattleStats = SubResource("Resource_4nevw")
+BattleAnimations = SubResource("Resource_4pc82")
+StartingSkills = Array[Object]([])
+SkillsLearnedAtLevel = {}
+metadata/_custom_type_script = "uid://uxwpgs5c4g7l"

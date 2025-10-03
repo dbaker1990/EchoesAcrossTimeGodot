@@ -1,3 +1,4 @@
+// Database/CharacterData.cs
 using Godot;
 using System;
 using EchoesAcrossTime.Combat;
@@ -24,7 +25,25 @@ namespace EchoesAcrossTime.Database
         [Export] public CharacterClass Class { get; set; } = CharacterClass.CourtMage;
         [Export] public bool IsBoss { get; set; } = false;
         
-        [ExportGroup("Graphics")]
+        [ExportGroup("Visual Assets")]
+        [ExportSubgroup("Overworld")]
+        [Export] public SpriteFrames OverworldSpriteFrames { get; set; }
+        [Export] public Texture2D OverworldShadow { get; set; }
+        [Export] public Vector2 OverworldSpriteOffset { get; set; } = Vector2.Zero;
+        [Export] public float OverworldScale { get; set; } = 1.0f;
+        
+        [ExportSubgroup("Battle")]
+        [Export] public SpriteFrames BattleSpriteFrames { get; set; }
+        [Export] public Texture2D BattlePortrait { get; set; }
+        [Export] public Vector2 BattleSpriteOffset { get; set; } = Vector2.Zero;
+        [Export] public float BattleScale { get; set; } = 1.0f;
+        
+        [ExportSubgroup("UI")]
+        [Export] public Texture2D MenuPortrait { get; set; }
+        [Export] public Texture2D IconSmall { get; set; }
+        [Export] public Texture2D FacePortrait { get; set; }
+        
+        [ExportGroup("Legacy Graphics (Deprecated - Use Visual Assets instead)")]
         [Export] public string PortraitPath { get; set; } = "";
         [Export] public string BattleSpritePath { get; set; } = "";
         [Export] public MenuGraphics Graphics { get; set; }
@@ -66,6 +85,11 @@ namespace EchoesAcrossTime.Database
         [Export] public Godot.Collections.Array<SkillData> StartingSkills { get; set; }
         [Export] public Godot.Collections.Dictionary SkillsLearnedAtLevel { get; set; }
         
+        [ExportGroup("Character Scenes (Optional)")]
+        [Export] public PackedScene CustomOverworldScene { get; set; }
+        [Export] public PackedScene CustomFollowerScene { get; set; }
+        [Export] public PackedScene CustomBattleScene { get; set; }
+        
         public CharacterData()
         {
             ElementAffinities = new ElementAffinityData();
@@ -85,6 +109,131 @@ namespace EchoesAcrossTime.Database
             SkillsLearnedAtLevel = new Godot.Collections.Dictionary();
         }
         
+        /// <summary>
+        /// Create an overworld character instance from this data
+        /// </summary>
+        public OverworldCharacter CreateOverworldInstance(PackedScene characterScene = null)
+        {
+            OverworldCharacter character;
+            
+            // Use custom scene if provided
+            if (CustomOverworldScene != null)
+            {
+                character = CustomOverworldScene.Instantiate<OverworldCharacter>();
+            }
+            else if (characterScene != null)
+            {
+                character = characterScene.Instantiate<OverworldCharacter>();
+            }
+            else
+            {
+                // Use default character scene
+                var defaultScene = GD.Load<PackedScene>("res://Characters/GenericCharacter.tscn");
+                character = defaultScene.Instantiate<OverworldCharacter>();
+            }
+            
+            // Apply visual data
+            if (character.AnimatedSprite != null && OverworldSpriteFrames != null)
+            {
+                character.AnimatedSprite.SpriteFrames = OverworldSpriteFrames;
+                character.AnimatedSprite.Position = OverworldSpriteOffset;
+                character.AnimatedSprite.Scale = new Vector2(OverworldScale, OverworldScale);
+            }
+            
+            if (character.ShadowSprite != null && OverworldShadow != null)
+            {
+                character.ShadowSprite.Texture = OverworldShadow;
+            }
+            
+            // Apply character data
+            character.CharacterName = DisplayName;
+            character.CharacterData = this;
+            
+            // Create stats instance
+            if (Type == CharacterType.PlayableCharacter || Type == CharacterType.NPC)
+            {
+                character.Stats = CreateStatsInstance();
+            }
+            
+            GD.Print($"Created overworld instance for {DisplayName}");
+            return character;
+        }
+        
+        /// <summary>
+        /// Create follower instance
+        /// </summary>
+        public FollowerCharacter CreateFollowerInstance(PackedScene followerScene = null)
+        {
+            FollowerCharacter follower;
+            
+            // Use custom scene if provided
+            if (CustomFollowerScene != null)
+            {
+                follower = CustomFollowerScene.Instantiate<FollowerCharacter>();
+            }
+            else if (followerScene != null)
+            {
+                follower = followerScene.Instantiate<FollowerCharacter>();
+            }
+            else
+            {
+                var defaultScene = GD.Load<PackedScene>("res://Characters/GenericFollower.tscn");
+                follower = defaultScene.Instantiate<FollowerCharacter>();
+            }
+            
+            // Apply visual data
+            if (follower.AnimatedSprite != null && OverworldSpriteFrames != null)
+            {
+                follower.AnimatedSprite.SpriteFrames = OverworldSpriteFrames;
+                follower.AnimatedSprite.Position = OverworldSpriteOffset;
+                follower.AnimatedSprite.Scale = new Vector2(OverworldScale, OverworldScale);
+            }
+            
+            if (follower.ShadowSprite != null && OverworldShadow != null)
+            {
+                follower.ShadowSprite.Texture = OverworldShadow;
+            }
+            
+            follower.CharacterName = DisplayName;
+            follower.CharacterData = this;
+            follower.Stats = CreateStatsInstance();
+            
+            GD.Print($"Created follower instance for {DisplayName}");
+            return follower;
+        }
+        
+        /// <summary>
+        /// Create a battle character instance (for future battle system)
+        /// </summary>
+        public Node CreateBattleInstance(PackedScene battleScene = null)
+        {
+            Node battleCharacter;
+            
+            // Use custom scene if provided
+            if (CustomBattleScene != null)
+            {
+                battleCharacter = CustomBattleScene.Instantiate();
+            }
+            else if (battleScene != null)
+            {
+                battleCharacter = battleScene.Instantiate();
+            }
+            else
+            {
+                GD.PrintErr($"CharacterData: No battle scene provided for {DisplayName}");
+                return null;
+            }
+            
+            // Apply battle visual data through reflection or direct assignment
+            // This will be implemented when you create your battle system
+            
+            GD.Print($"Created battle instance for {DisplayName}");
+            return battleCharacter;
+        }
+        
+        /// <summary>
+        /// Create a stats instance from this character data
+        /// </summary>
         public CharacterStats CreateStatsInstance()
         {
             int validLevel = Mathf.Clamp(Level, CharacterStats.MIN_LEVEL, CharacterStats.MAX_LEVEL);
@@ -172,5 +321,44 @@ namespace EchoesAcrossTime.Database
                    !string.IsNullOrEmpty(DisplayName) && 
                    MaxHP > 0;
         }
+        
+        /// <summary>
+        /// Check if this character has overworld sprites assigned
+        /// </summary>
+        public bool HasOverworldSprites()
+        {
+            return OverworldSpriteFrames != null;
+        }
+        
+        /// <summary>
+        /// Check if this character has battle sprites assigned
+        /// </summary>
+        public bool HasBattleSprites()
+        {
+            return BattleSpriteFrames != null;
+        }
+        
+        /// <summary>
+        /// Get the appropriate portrait based on context
+        /// </summary>
+        public Texture2D GetPortrait(PortraitType type = PortraitType.Menu)
+        {
+            return type switch
+            {
+                PortraitType.Menu => MenuPortrait ?? FacePortrait ?? BattlePortrait,
+                PortraitType.Battle => BattlePortrait ?? MenuPortrait ?? FacePortrait,
+                PortraitType.Dialogue => FacePortrait ?? MenuPortrait ?? BattlePortrait,
+                PortraitType.Icon => IconSmall ?? MenuPortrait,
+                _ => MenuPortrait
+            };
+        }
+    }
+    
+    public enum PortraitType
+    {
+        Menu,
+        Battle,
+        Dialogue,
+        Icon
     }
 }
