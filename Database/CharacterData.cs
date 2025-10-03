@@ -12,54 +12,55 @@ namespace EchoesAcrossTime.Database
         NPC,
         Boss
     }
+    
     [GlobalClass]
     public partial class CharacterData : Resource
     {
-        // Existing properties...
-        public string CharacterId { get; set; } = "character_001";
-        public string DisplayName { get; set; } = "Character";
-        public string PortraitPath { get; set; } = "";
-        public string BattleSpritePath { get; set; } = "";
+        [ExportGroup("Basic Info")]
+        [Export] public string CharacterId { get; set; } = "character_001";
+        [Export] public string DisplayName { get; set; } = "Character";
+        [Export(PropertyHint.MultilineText)] public string Description { get; set; } = "";
+        [Export] public CharacterType Type { get; set; } = CharacterType.PlayableCharacter;
+        [Export] public CharacterClass Class { get; set; } = CharacterClass.CourtMage;
+        [Export] public bool IsBoss { get; set; } = false;
         
-        public int Level { get; set; } = 1;
-        public int MaxHP { get; set; } = 100;
-        public int MaxMP { get; set; } = 50;
-        public int Attack { get; set; } = 10;
-        public int Defense { get; set; } = 10;
-        public int MagicAttack { get; set; } = 10;
-        public int MagicDefense { get; set; } = 10;
-        public int Speed { get; set; } = 10;
+        [ExportGroup("Graphics")]
+        [Export] public string PortraitPath { get; set; } = "";
+        [Export] public string BattleSpritePath { get; set; } = "";
+        [Export] public MenuGraphics Graphics { get; set; }
         
-        public float HPGrowthRate { get; set; } = 0.05f;
-        public float MPGrowthRate { get; set; } = 0.05f;
-        public float AttackGrowthRate { get; set; } = 0.03f;
-        public float DefenseGrowthRate { get; set; } = 0.03f;
-        public float MagicAttackGrowthRate { get; set; } = 0.03f;
-        public float MagicDefenseGrowthRate { get; set; } = 0.03f;
-        public float SpeedGrowthRate { get; set; } = 0.02f;
+        [ExportGroup("Base Stats")]
+        [Export] public int Level { get; set; } = 1;
+        [Export] public int MaxHP { get; set; } = 100;
+        [Export] public int MaxMP { get; set; } = 50;
+        [Export] public int Attack { get; set; } = 10;
+        [Export] public int Defense { get; set; } = 10;
+        [Export] public int MagicAttack { get; set; } = 10;
+        [Export] public int MagicDefense { get; set; } = 10;
+        [Export] public int Speed { get; set; } = 10;
         
-        public ElementAffinityData ElementAffinities { get; set; }
-        public ExperienceCurve ExpCurve { get; set; }
+        [ExportGroup("Growth Rates")]
+        [Export(PropertyHint.Range, "0,1,0.01")] public float HPGrowthRate { get; set; } = 0.05f;
+        [Export(PropertyHint.Range, "0,1,0.01")] public float MPGrowthRate { get; set; } = 0.05f;
+        [Export(PropertyHint.Range, "0,1,0.01")] public float AttackGrowthRate { get; set; } = 0.03f;
+        [Export(PropertyHint.Range, "0,1,0.01")] public float DefenseGrowthRate { get; set; } = 0.03f;
+        [Export(PropertyHint.Range, "0,1,0.01")] public float MagicAttackGrowthRate { get; set; } = 0.03f;
+        [Export(PropertyHint.Range, "0,1,0.01")] public float MagicDefenseGrowthRate { get; set; } = 0.03f;
+        [Export(PropertyHint.Range, "0,1,0.01")] public float SpeedGrowthRate { get; set; } = 0.02f;
         
-        public CharacterType Type { get; set; } = CharacterType.PlayableCharacter;
-        public bool IsBoss { get; set; } = false;
-        public CharacterClass Class { get; set; } = CharacterClass.CourtMage;
+        [ExportGroup("Combat System")]
+        [Export] public ElementAffinityData ElementAffinities { get; set; }
+        [Export] public ExperienceCurve ExpCurve { get; set; }
+        [Export] public BattleStats BattleStats { get; set; }
         
         [ExportGroup("Battle Animations")]
         [Export] public BattleAnimationData BattleAnimations { get; set; }
 
         [ExportGroup("AI Behavior")]
         [Export] public AIPattern AIBehavior { get; set; }
-        public string Description { get; set; } = "";
         
-        // NEW: Menu Graphics
-        public MenuGraphics Graphics { get; set; }
-        
-        // NEW: Battle-specific stats
-        public BattleStats BattleStats { get; set; }
-        
-        // NEW: Enemy rewards (only for enemies/bosses)
-        public EnemyRewards Rewards { get; set; }
+        [ExportGroup("Enemy Rewards")]
+        [Export] public EnemyRewards Rewards { get; set; }
         
         [ExportGroup("Skills")]
         [Export] public Godot.Collections.Array<SkillData> StartingSkills { get; set; }
@@ -71,6 +72,8 @@ namespace EchoesAcrossTime.Database
             ExpCurve = ExperienceCurve.CreateQuadraticCurve();
             Graphics = new MenuGraphics();
             BattleStats = new BattleStats();
+            BattleAnimations = new BattleAnimationData();
+            AIBehavior = new AIPattern();
             
             // Only create rewards if this is an enemy
             if (Type == CharacterType.Enemy || Type == CharacterType.Boss)
@@ -80,9 +83,6 @@ namespace EchoesAcrossTime.Database
             
             StartingSkills = new Godot.Collections.Array<SkillData>();
             SkillsLearnedAtLevel = new Godot.Collections.Dictionary();
-            
-            BattleAnimations = new BattleAnimationData();
-            AIBehavior = new AIPattern();
         }
         
         public CharacterStats CreateStatsInstance()
@@ -132,7 +132,6 @@ namespace EchoesAcrossTime.Database
                 stats.ElementAffinities = new ElementAffinityData();
             }
             
-            // NEW: Copy battle stats
             if (this.BattleStats != null)
             {
                 stats.BattleStats = this.BattleStats.Clone();
@@ -140,6 +139,21 @@ namespace EchoesAcrossTime.Database
             else
             {
                 stats.BattleStats = new BattleStats();
+            }
+            
+            // Initialize skills
+            stats.Skills = new CharacterSkills(this.CharacterId);
+            
+            // Learn starting skills
+            if (StartingSkills != null)
+            {
+                foreach (var skill in StartingSkills)
+                {
+                    if (skill != null)
+                    {
+                        stats.Skills.LearnSkill(skill);
+                    }
+                }
             }
             
             return stats;

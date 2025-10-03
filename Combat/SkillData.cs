@@ -33,6 +33,8 @@ namespace EchoesAcrossTime.Combat
         Fixed,              // Ignores defense
         Percentage          // % of target's HP
     }
+    
+    
 
     /// <summary>
     /// Complete skill data similar to RPG Maker
@@ -58,6 +60,7 @@ namespace EchoesAcrossTime.Combat
         [Export] public int GoldCost { get; set; } = 0;
         
         [ExportGroup("Damage")]
+        [Export] public DamageFormulaType DamageFormula { get; set; } = DamageFormulaType.Simple;
         [Export] public DamageType DamageType { get; set; } = DamageType.Physical;
         [Export] public ElementType Element { get; set; } = ElementType.Physical;
         [Export] public int BasePower { get; set; } = 100;
@@ -175,41 +178,27 @@ namespace EchoesAcrossTime.Combat
         /// <summary>
         /// Calculate skill damage
         /// </summary>
-        public int CalculateDamage(CharacterStats user, CharacterStats target)
+        /// <summary>
+        /// Calculate skill damage using selected formula
+        /// </summary>
+        public int CalculateDamage(CharacterStats user, CharacterStats target, bool isCritical = false)
         {
             if (user == null || target == null) return 0;
 
-            int baseDamage = 0;
-
-            switch (DamageType)
+            // Fixed damage type ignores formula
+            if (DamageType == Combat.DamageType.Fixed)
             {
-                case Combat.DamageType.Physical:
-                    baseDamage = IgnoreDefense 
-                        ? user.Attack 
-                        : user.Attack - target.Defense / 2;
-                    break;
-
-                case Combat.DamageType.Magical:
-                    baseDamage = IgnoreDefense
-                        ? user.MagicAttack
-                        : user.MagicAttack - target.MagicDefense / 2;
-                    break;
-
-                case Combat.DamageType.Fixed:
-                    return BasePower;
-
-                case Combat.DamageType.Percentage:
-                    return Mathf.RoundToInt(target.MaxHP * (BasePower / 100f));
+                return BasePower;
             }
 
-            // Apply power and multiplier
-            float finalDamage = (baseDamage * BasePower / 100f) * PowerMultiplier;
-            
-            // Element multiplier
-            float elementMultiplier = target.ElementAffinities?.GetDamageMultiplier(Element) ?? 1f;
-            finalDamage *= elementMultiplier;
+            // Percentage damage type
+            if (DamageType == Combat.DamageType.Percentage)
+            {
+                return Mathf.RoundToInt(target.MaxHP * (BasePower / 100f));
+            }
 
-            return Mathf.Max(1, Mathf.RoundToInt(finalDamage));
+            // Use selected damage formula
+            return Combat.DamageFormula.Calculate(DamageFormula, user, target, this, isCritical);
         }
 
         /// <summary>
