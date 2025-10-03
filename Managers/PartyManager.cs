@@ -15,6 +15,8 @@ public partial class PartyManager : Node
     [Export] public bool UseFormation { get; set; } = false;
     [Export] public FormationType Formation { get; set; } = FormationType.Line;
     
+    public static PartyManager Instance { get; private set; }
+    
     public enum FormationType
     {
         Line,      // Single file line
@@ -37,6 +39,14 @@ public partial class PartyManager : Node
     
     public override void _Ready()
     {
+        if (Instance != null)
+        {
+            QueueFree();
+            return;
+        }
+        
+        Instance = this;
+        
         if (Player == null)
         {
             GD.PrintErr("PartyManager: Player character not assigned!");
