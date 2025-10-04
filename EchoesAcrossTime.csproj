@@ -9,12 +9,14 @@
     <Content Include="Docs\CompleteIntegrationGuide.md" />
     <Content Include="Docs\CoreCommandsDocumentation.md" />
     <Content Include="Docs\LimitBreakDocumentation.md" />
+    <Content Include="Docs\PartyMenu.md" />
     <Content Include="Docs\Persona5BattleSystem_Documentation.md" />
     <Content Include="Docs\Phase2_Documentation.md" />
     <Content Include="Docs\QuickReference.md" />
     <Content Include="Docs\SkitReadMe.md" />
     <Content Include="Docs\SkitSystemGuide.md" />
     <Content Include="Skits\SkitUI.tscn" />
+    <Content Include="UI\PartyMenuUI.tscn" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scenes\" />
