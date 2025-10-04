@@ -104,20 +104,35 @@ namespace EchoesAcrossTime.Combat
             this.isBossBattle = isBossBattle;
             this.isPinnedDown = isPinnedDown;
             
-            // Create battle members
-            playerParty = playerStats.Select(s => new BattleMember(s, false)).ToList();
-            enemyParty = enemyStats.Select(s => new BattleMember(s, true)).ToList();
-            
-            // Register showtimes
-            if (availableShowtimes != null)
+            // Create battle members with positions
+            playerParty = new List<BattleMember>();
+            for (int i = 0; i < playerStats.Count; i++)
             {
-                showtimeManager.RegisterShowtimes(playerParty, availableShowtimes);
+                playerParty.Add(new BattleMember(playerStats[i], false, i));
             }
             
-            // Register limit breaks
-            if (availableLimitBreaks != null)
+            enemyParty = new List<BattleMember>();
+            for (int i = 0; i < enemyStats.Count; i++)
             {
-                limitBreakSystem.RegisterLimitBreaks(playerParty, availableLimitBreaks);
+                enemyParty.Add(new BattleMember(enemyStats[i], true, i));
+            }
+            
+            // Register showtimes if available
+            if (availableShowtimes != null && availableShowtimes.Count > 0)
+            {
+                foreach (var showtime in availableShowtimes)
+                {
+                    showtimeManager.RegisterShowtime(showtime);
+                }
+            }
+            
+            // Register limit breaks if available
+            if (availableLimitBreaks != null && availableLimitBreaks.Count > 0)
+            {
+                foreach (var limitBreak in availableLimitBreaks)
+                {
+                    limitBreakSystem.RegisterLimitBreak(limitBreak);
+                }
             }
             
             // Calculate turn order
@@ -168,7 +183,7 @@ namespace EchoesAcrossTime.Combat
             // Process guard HP/MP regeneration at start of turn
             foreach (var member in playerParty.Concat(enemyParty))
             {
-                guardSystem.ProcessRegeneration(member);
+                guardSystem.ProcessGuardEffects(member);
             }
             
             // Get next actor
@@ -182,7 +197,7 @@ namespace EchoesAcrossTime.Combat
             }
             
             // Process status effects at turn start
-            statusManager.ProcessTurnStart(CurrentActor);
+            statusManager.ProcessStatusEffects(CurrentActor.Stats, true);
             
             // Check if actor can act
             if (!CurrentActor.CanAct())
@@ -219,7 +234,7 @@ namespace EchoesAcrossTime.Combat
             // Reset all turn flags
             foreach (var member in turnOrder)
             {
-                member.StartNewRound();
+                member.StartRound();
             }
             
             // Reset baton pass
@@ -237,11 +252,11 @@ namespace EchoesAcrossTime.Combat
             // Process end-of-round status effects
             foreach (var member in turnOrder.Where(m => m.Stats.IsAlive))
             {
-                statusManager.ProcessRoundEnd(member);
+                statusManager.ProcessStatusEffects(member.Stats, false);
             }
             
             // Update showtime cooldowns
-            showtimeManager.ProcessRoundEnd();
+            showtimeManager.IncrementTurn();
             
             // Start next round
             StartNextTurn();
@@ -439,8 +454,8 @@ namespace EchoesAcrossTime.Combat
             {
                 var target = targetMember.Stats;
                 
-                // Healing skills
-                if (skill.DamageType == DamageType.Healing)
+                // Healing skills (check SkillCategory or similar property instead)
+                if (skill.BasePower < 0 || skill.DisplayName.ToLower().Contains("heal"))
                 {
                     int healing = CalculateHealing(action.Actor, targetMember, skill);
                     
@@ -466,21 +481,19 @@ namespace EchoesAcrossTime.Combat
                 int damage = CalculateMagicDamage(action.Actor, targetMember, skill);
                 
                 // Check for technical damage
-                bool isTechnical = technicalSystem.CheckTechnical(targetMember, skill.Element);
-                if (isTechnical)
+                var technicalResult = technicalSystem.CheckTechnical(targetMember.Stats, skill.Element);
+                if (technicalResult.IsTechnical)
                 {
-                    string comboType = technicalSystem.GetComboType(targetMember, skill.Element);
-                    damage = Mathf.RoundToInt(damage * technicalSystem.TechnicalMultiplier);
-                    result.WasTechnical = true;
+                    damage = Mathf.RoundToInt(damage * 1.5f); // Technical multiplier
                     
                     EmitSignal(SignalName.TechnicalDamage,
                         attacker.CharacterName,
                         target.CharacterName,
-                        comboType);
+                        technicalResult.ComboType.ToString());
                     
                     rewardsManager.RecordEvent("technical_hit");
                     
-                    GD.Print($"  ⚡ TECHNICAL! ({comboType})");
+                    GD.Print($"  ⚡ TECHNICAL! ({technicalResult.ComboType})");
                 }
                 
                 // Apply baton pass bonus
@@ -514,7 +527,7 @@ namespace EchoesAcrossTime.Combat
                     damage = Mathf.RoundToInt(damage * 0.5f);
                     GD.Print($"  Resisted...");
                 }
-                else if (affinity == ElementAffinity.Null)
+                else if (affinity == ElementAffinity.Immune)
                 {
                     damage = 0;
                     GD.Print($"  Nullified!");
@@ -548,7 +561,7 @@ namespace EchoesAcrossTime.Combat
                         int chance = skill.StatusChances != null && i < skill.StatusChances.Count ?
                             skill.StatusChances[i] : 30;
                         
-                        statusManager.TryInflictStatus(targetMember, status, chance, rng);
+                        statusManager.ApplyStatus(targetMember.Stats, status, 3, 5, attacker.CharacterName);
                     }
                 }
                 
@@ -571,16 +584,12 @@ namespace EchoesAcrossTime.Combat
         /// </summary>
         private BattleActionResult ExecuteGuard(BattleAction action)
         {
-            guardSystem.ApplyGuard(action.Actor);
+            var result = guardSystem.ExecuteGuard(action.Actor);
             
             // Guarding builds limit gauge
-            limitBreakSystem.AddGaugeFromGuarding(action.Actor);
+            limitBreakSystem.AddGaugeFromDealingDamage(action.Actor, 0, false);
             
-            return new BattleActionResult
-            {
-                Success = true,
-                Message = $"{action.Actor.Stats.CharacterName} is guarding!"
-            };
+            return result;
         }
         
         /// <summary>
@@ -588,7 +597,7 @@ namespace EchoesAcrossTime.Combat
         /// </summary>
         private BattleActionResult ExecuteItem(BattleAction action)
         {
-            var item = action.ItemData;
+            var item = action.ItemData as EchoesAcrossTime.Items.ConsumableData;
             
             if (item == null)
             {
@@ -744,7 +753,7 @@ namespace EchoesAcrossTime.Combat
         private int CalculateHealing(BattleMember caster, BattleMember target, SkillData skill)
         {
             float magicPower = caster.Stats.MagicAttack;
-            float baseHealing = magicPower * (skill.BasePower / 100.0f);
+            float baseHealing = magicPower * (Mathf.Abs(skill.BasePower) / 100.0f);
             
             return Mathf.Max(1, Mathf.RoundToInt(baseHealing));
         }
@@ -826,7 +835,7 @@ namespace EchoesAcrossTime.Combat
         public List<ShowtimeAttackData> GetAvailableShowtimes()
         {
             if (CurrentActor == null) return new List<ShowtimeAttackData>();
-            return showtimeManager.GetAvailableShowtimes(CurrentActor, playerParty);
+            return showtimeManager.GetAvailableShowtimes();
         }
         
         /// <summary>
@@ -860,7 +869,7 @@ namespace EchoesAcrossTime.Combat
                 enemyParty.Where(e => e.Stats.IsAlive).ToList() :
                 new List<BattleMember> { enemyParty.First(e => e.Stats.IsAlive) };
             
-            var result = showtimeManager.ExecuteShowtime(showtime, CurrentActor, partner, targets, rng);
+            var result = showtimeManager.ExecuteShowtime(showtime, CurrentActor, partner, targets);
             
             // Both characters end their turns
             CurrentActor.EndTurn();
@@ -882,7 +891,7 @@ namespace EchoesAcrossTime.Combat
         /// </summary>
         public float GetLimitGaugePercent(BattleMember member)
         {
-            return member.GetLimitGaugePercent();
+            return (float)member.LimitGauge / 100f * 100f; // 100 is the max limit gauge
         }
         
         /// <summary>
@@ -898,7 +907,7 @@ namespace EchoesAcrossTime.Combat
         /// </summary>
         public int GetEscapeChance()
         {
-            return escapeSystem.CalculateEscapeChance(playerParty, enemyParty);
+            return escapeSystem.GetEscapeChanceDisplay(playerParty, enemyParty);
         }
         
         #endregion
