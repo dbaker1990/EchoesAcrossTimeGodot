@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cb7fx7hk48iuc"]
+
+[ext_resource type="Script" uid="uid://cffosbtigioyd" path="res://Quests/QuestUIComplete.cs" id="3_tu4ow"]
+
+[node name="CanvasLayer" type="CanvasLayer"]
+script = ExtResource("3_tu4ow")

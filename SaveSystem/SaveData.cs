@@ -12,7 +12,7 @@ namespace EchoesAcrossTime
     /// Complete save data structure
     /// </summary>
     [Serializable]
-    public class SaveData
+    public partial class SaveData
     {
         // Meta information
         public string SaveSlotName { get; set; } = "Save 1";

@@ -18,6 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 SystemManager="*res://Managers/SystemManager.cs"
+QuestManager="*res://Quests/QuestManager.cs"
+PartyManager="*res://Managers/PartyManager.cs"
 
 [display]
 

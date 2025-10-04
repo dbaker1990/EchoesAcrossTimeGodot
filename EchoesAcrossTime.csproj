@@ -12,6 +12,8 @@
     <Content Include="Docs\PartyMenu.md" />
     <Content Include="Docs\Persona5BattleSystem_Documentation.md" />
     <Content Include="Docs\Phase2_Documentation.md" />
+    <Content Include="Docs\QuestSystemGuide.md" />
+    <Content Include="Docs\QuestSystemReadme.md" />
     <Content Include="Docs\QuickReference.md" />
     <Content Include="Docs\SkitReadMe.md" />
     <Content Include="Docs\SkitSystemGuide.md" />
