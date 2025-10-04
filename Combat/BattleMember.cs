@@ -13,6 +13,9 @@ namespace EchoesAcrossTime.Combat
         public bool IsPlayerControlled { get; set; }
         public int BattlePosition { get; set; }
         
+        // NEW: Store reference to original CharacterData for rewards
+        public EchoesAcrossTime.Database.CharacterData SourceData { get; set; }
+        
         // Persona 5 specific states
         public bool IsKnockedDown { get; private set; }
         public bool HasExtraTurn { get; set; }
@@ -24,7 +27,7 @@ namespace EchoesAcrossTime.Combat
         public int LastActionTurn { get; set; }
         
         // One More tracking
-        public int OneMoreCount { get; set; } // How many One Mores this turn
+        public int OneMoreCount { get; set; }
         public bool UsedOncePerTurnSkill { get; set; }
         
         // Baton Pass tracking
@@ -44,7 +47,15 @@ namespace EchoesAcrossTime.Combat
             BattlePosition = position;
             BatonPassData = new BatonPassData();
             GuardState = new GuardState();
+            SourceData = null; // Will be set separately if needed
             Reset();
+        }
+        
+        // NEW: Constructor that accepts CharacterData
+        public BattleMember(EchoesAcrossTime.Database.CharacterData characterData, bool isPlayerControlled, int position)
+            : this(characterData.CreateStatsInstance(), isPlayerControlled, position)
+        {
+            SourceData = characterData;
         }
         
         /// <summary>
@@ -107,9 +118,8 @@ namespace EchoesAcrossTime.Combat
             HasExtraTurn = false;
             OneMoreCount = 0;
             UsedOncePerTurnSkill = false;
-            BatonPassData.Reset(); // Reset baton pass bonuses each round
+            BatonPassData.Reset();
             
-            // Knocked down enemies stand up at start of their turn
             if (IsKnockedDown && !IsPlayerControlled)
             {
                 StandUp();
@@ -124,7 +134,6 @@ namespace EchoesAcrossTime.Combat
             if (!Stats.IsAlive) return false;
             if (HasActedThisTurn && !HasExtraTurn) return false;
             
-            // Check for status effects that prevent action
             foreach (var status in Stats.ActiveStatuses)
             {
                 if (status.Effect == StatusEffect.Sleep ||

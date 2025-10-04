@@ -232,13 +232,27 @@ namespace EchoesAcrossTime.Combat
             
             foreach (var enemy in defeatedEnemies)
             {
-                // Fallback: calculate based on enemy level/stats
-                int enemyLevel = enemy.Stats.Level;
-                totalExp += enemyLevel * 10;
-                totalGold += enemyLevel * 5;
-                
-                // Optionally check if the actual type is CharacterData with rewards
-                // This would require accessing the CharacterData through another means
+                // Check if we have the original CharacterData with Rewards
+                if (enemy.SourceData != null && enemy.SourceData.Rewards != null)
+                {
+                    totalExp += enemy.SourceData.Rewards.GetExpReward(rng);
+                    totalGold += enemy.SourceData.Rewards.GetGoldReward(rng);
+                    
+                    // Roll for drops
+                    var drops = enemy.SourceData.Rewards.RollAllDrops(rng);
+                    foreach (var drop in drops)
+                    {
+                        result.ItemDrops.Add(drop);
+                    }
+                }
+                else
+                {
+                    // Fallback: calculate based on enemy level/stats
+                    int enemyLevel = enemy.Stats.Level;
+                    totalExp += enemyLevel * 10;
+                    totalGold += enemyLevel * 5;
+                    GD.Print($"Warning: {enemy.Stats.CharacterName} has no reward data, using fallback calculation");
+                }
             }
             
             // Apply bonuses
