@@ -1,15 +1,20 @@
-﻿[gd_scene load_steps=2 format=3 uid="uid://party_menu_scene"]
+[gd_scene load_steps=2 format=3 uid="uid://dwcaoqi00mc7b"]
 
-[ext_resource type="Script" path="res://UI/PartyMenuUI.cs" id="1"]
+[ext_resource type="Script" uid="uid://our64usx4kgq" path="res://UI/PartyMenuUI.cs" id="1_3l03l"]
 
-[node name="PartyMenuUI" type="Control"]
+[node name="PartyMenuUI" type="Control" node_paths=PackedStringArray("mainPartyContainer", "subPartyContainer", "mainPartyLabel", "subPartyLabel", "closeButton")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1")
+script = ExtResource("1_3l03l")
+mainPartyContainer = NodePath("CenterContainer/Panel/MarginContainer/VBoxContainer/MainPartySection")
+subPartyContainer = NodePath("CenterContainer/Panel/MarginContainer/VBoxContainer/SubPartySection")
+mainPartyLabel = NodePath("CenterContainer/Panel/MarginContainer/VBoxContainer/MainPartySection/MainPartyLabel")
+subPartyLabel = NodePath("CenterContainer/Panel/MarginContainer/VBoxContainer/SubPartySection/SubPartyLabel")
+closeButton = NodePath("CenterContainer/Panel/MarginContainer/VBoxContainer/Header/CloseButton")
 
 [node name="DimBackground" type="ColorRect" parent="."]
 layout_mode = 1
@@ -18,7 +23,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.7)
+color = Color(0, 0, 0, 0.654902)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
