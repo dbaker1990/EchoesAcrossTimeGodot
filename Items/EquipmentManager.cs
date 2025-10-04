@@ -158,6 +158,7 @@ namespace EchoesAcrossTime.Items
         public int MagicAttackBonus;
         public int MagicDefenseBonus;
         public int SpeedBonus;
+        public int LuckBonus;
         public int CriticalRateBonus;
         public int EvasionRateBonus;
     }

@@ -1,6 +1,10 @@
 ﻿using Godot;
 using System;
 using System.Collections.Generic;
+using EchoesAcrossTime;              // For GameManager
+using EchoesAcrossTime.Managers;     // For SystemManager, PartyMenuManager
+using EchoesAcrossTime.Items;        // For InventorySystem
+using EchoesAcrossTime.UI;  
 
 namespace EchoesAcrossTime.UI
 {
@@ -236,7 +240,7 @@ namespace EchoesAcrossTime.UI
             // Update playtime
             if (playtimeLabel != null)
             {
-                var playtime = Managers.GameManager.Instance?.GetPlaytime() ?? 0;
+                var playtime = GameManager.Instance?.CurrentSave?.PlayTimeSeconds ?? 0;
                 var hours = (int)(playtime / 3600);
                 var minutes = (int)((playtime % 3600) / 60);
                 playtimeLabel.Text = $"{hours:D2}:{minutes:D2}";
@@ -420,7 +424,7 @@ namespace EchoesAcrossTime.UI
             {
                 // Fallback - quick save
                 GD.Print("Performing quick save...");
-                SaveSystem.SaveManager.Instance?.QuickSave();
+                SaveSystem.Instance?.QuickSave();
                 menuPanel?.Show();
             }
         }

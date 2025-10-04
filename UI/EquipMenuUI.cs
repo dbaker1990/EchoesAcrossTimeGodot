@@ -1,25 +1,17 @@
 ﻿using Godot;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using EchoesAcrossTime.Combat;
 using EchoesAcrossTime.Items;
+using EchoesAcrossTime.Managers;
+using EchoesAcrossTime.Database;
 
 namespace EchoesAcrossTime.UI
 {
-    /// <summary>
-    /// Equipment menu for managing character equipment
-    /// </summary>
     public partial class EquipMenuUI : Control
     {
-        #region Node References
         [Export] private ItemList characterList;
-        
-        // Equipment slots
-        [Export] private Button weaponSlot;
-        [Export] private Button armorSlot;
-        [Export] private Button accessory1Slot;
-        [Export] private Button accessory2Slot;
+        [Export] private Panel characterInfoPanel;
         
         // Character stats display
         [Export] private Label characterNameLabel;
@@ -32,37 +24,41 @@ namespace EchoesAcrossTime.UI
         [Export] private Label magicDefenseLabel;
         [Export] private Label speedLabel;
         
-        // Equipment selection panel
-        [Export] private Control equipmentSelectionPanel;
+        // Equipment slots
+        [Export] private Button weaponSlot;
+        [Export] private Button armorSlot;
+        [Export] private Button accessory1Slot;
+        [Export] private Button accessory2Slot;
+        
+        // Equipment selection
+        [Export] private Panel equipmentSelectionPanel;
         [Export] private ItemList equipmentList;
         [Export] private Label equipmentNameLabel;
         [Export] private Label equipmentDescriptionLabel;
         [Export] private Label equipmentStatsLabel;
-        [Export] private Button equipConfirmButton;
-        [Export] private Button equipCancelButton;
         
         [Export] private Button closeButton;
-        #endregion
+        [Export] private Button equipButton;
         
-        #region State
         private CharacterStats selectedCharacter;
+        private string selectedCharacterId;
         private EquipSlot selectedSlot;
         private EquipmentData selectedEquipment;
-        #endregion
         
         public override void _Ready()
         {
-            // Connect signals
             characterList.ItemSelected += OnCharacterSelected;
+            
             weaponSlot.Pressed += () => OnSlotPressed(EquipSlot.Weapon);
             armorSlot.Pressed += () => OnSlotPressed(EquipSlot.Armor);
             accessory1Slot.Pressed += () => OnSlotPressed(EquipSlot.Accessory1);
             accessory2Slot.Pressed += () => OnSlotPressed(EquipSlot.Accessory2);
+            
             equipmentList.ItemSelected += OnEquipmentSelected;
-            equipConfirmButton.Pressed += OnEquipConfirmed;
-            equipCancelButton.Pressed += OnEquipCancelled;
+            equipButton.Pressed += OnEquipPressed;
             closeButton.Pressed += OnClosePressed;
             
+            equipmentSelectionPanel.Hide();
             Hide();
         }
         
@@ -71,7 +67,6 @@ namespace EchoesAcrossTime.UI
             Show();
             RefreshCharacterList();
             
-            // Select first character
             if (characterList.ItemCount > 0)
             {
                 characterList.Select(0);
@@ -83,7 +78,8 @@ namespace EchoesAcrossTime.UI
         {
             characterList.Clear();
             
-            var party = Party.PartyManager.Instance?.GetMainParty();
+            // FIXED: Use PartyMenuManager instead of Party.PartyManager
+            var party = PartyMenuManager.Instance?.GetMainPartyStats();
             if (party == null) return;
             
             foreach (var stats in party)
@@ -94,10 +90,12 @@ namespace EchoesAcrossTime.UI
         
         private void OnCharacterSelected(long index)
         {
-            var party = Party.PartyManager.Instance?.GetMainParty();
+            // FIXED: Proper comparison
+            var party = PartyMenuManager.Instance?.GetMainPartyStats();
             if (party == null || index >= party.Count) return;
             
             selectedCharacter = party[(int)index];
+            selectedCharacterId = selectedCharacter.CharacterName.ToLower().Replace(" ", "_");
             RefreshCharacterDisplay();
             
             Managers.SystemManager.Instance?.PlayCursorSE();
@@ -107,11 +105,8 @@ namespace EchoesAcrossTime.UI
         {
             if (selectedCharacter == null) return;
             
-            // Update character info
             characterNameLabel.Text = selectedCharacter.CharacterName;
-            levelLabel.Text = $"Lv {selectedCharacter.Level}";
-            
-            // Update stats
+            levelLabel.Text = $"Level {selectedCharacter.Level}";
             hpLabel.Text = $"HP: {selectedCharacter.CurrentHP}/{selectedCharacter.MaxHP}";
             mpLabel.Text = $"MP: {selectedCharacter.CurrentMP}/{selectedCharacter.MaxMP}";
             attackLabel.Text = $"ATK: {selectedCharacter.Attack}";
@@ -120,7 +115,6 @@ namespace EchoesAcrossTime.UI
             magicDefenseLabel.Text = $"M.DEF: {selectedCharacter.MagicDefense}";
             speedLabel.Text = $"SPD: {selectedCharacter.Speed}";
             
-            // Update equipment slots
             UpdateEquipmentSlots();
         }
         
@@ -128,18 +122,17 @@ namespace EchoesAcrossTime.UI
         {
             if (selectedCharacter == null) return;
             
-            var equipment = selectedCharacter.Equipment;
-            
             // Update slot texts
-            weaponSlot.Text = GetEquipmentSlotText(equipment, EquipSlot.Weapon);
-            armorSlot.Text = GetEquipmentSlotText(equipment, EquipSlot.Armor);
-            accessory1Slot.Text = GetEquipmentSlotText(equipment, EquipSlot.Accessory1);
-            accessory2Slot.Text = GetEquipmentSlotText(equipment, EquipSlot.Accessory2);
+            weaponSlot.Text = GetEquipmentSlotText(EquipSlot.Weapon);
+            armorSlot.Text = GetEquipmentSlotText(EquipSlot.Armor);
+            accessory1Slot.Text = GetEquipmentSlotText(EquipSlot.Accessory1);
+            accessory2Slot.Text = GetEquipmentSlotText(EquipSlot.Accessory2);
         }
         
-        private string GetEquipmentSlotText(EquipmentManager equipment, EquipSlot slot)
+        private string GetEquipmentSlotText(EquipSlot slot)
         {
-            var equipped = equipment.GetEquipped(slot);
+            // FIXED: Use EquipmentManager.GetEquippedItem instead
+            var equipped = EquipmentManager.Instance?.GetEquippedItem(selectedCharacterId, slot);
             
             if (equipped == null)
             {
@@ -161,10 +154,8 @@ namespace EchoesAcrossTime.UI
             equipmentSelectionPanel.Show();
             equipmentList.Clear();
             
-            // Add "Unequip" option
             equipmentList.AddItem("(Unequip)");
             
-            // Get available equipment from inventory
             var availableEquipment = GetAvailableEquipment(selectedSlot);
             
             foreach (var equipment in availableEquipment)
@@ -191,8 +182,9 @@ namespace EchoesAcrossTime.UI
             {
                 if (inventorySlot.Item is EquipmentData equipData && equipData.Slot == slot)
                 {
-                    // Check if character can equip
-                    if (selectedCharacter != null && equipData.CanEquip(selectedCharacter.CharacterData))
+                    // FIXED: Need to get CharacterData - for now, check minimum level
+                    // TODO: Add proper CharacterData lookup
+                    if (selectedCharacter != null && equipData.MinimumLevel <= selectedCharacter.Level)
                     {
                         equipment.Add(equipData);
                     }
@@ -206,7 +198,6 @@ namespace EchoesAcrossTime.UI
         {
             if (index == 0)
             {
-                // Unequip selected
                 selectedEquipment = null;
                 equipmentNameLabel.Text = "(Unequip)";
                 equipmentDescriptionLabel.Text = "Remove currently equipped item";
@@ -232,7 +223,6 @@ namespace EchoesAcrossTime.UI
             equipmentNameLabel.Text = equipment.DisplayName;
             equipmentDescriptionLabel.Text = equipment.Description;
             
-            // Show stat bonuses
             var bonuses = new List<string>();
             if (equipment.MaxHPBonus > 0) bonuses.Add($"HP+{equipment.MaxHPBonus}");
             if (equipment.MaxMPBonus > 0) bonuses.Add($"MP+{equipment.MaxMPBonus}");
@@ -245,48 +235,42 @@ namespace EchoesAcrossTime.UI
             equipmentStatsLabel.Text = string.Join(", ", bonuses);
         }
         
-        private void OnEquipConfirmed()
+        private void OnEquipPressed()
         {
             if (selectedCharacter == null) return;
-            
-            Managers.SystemManager.Instance?.PlayOkSE();
             
             if (selectedEquipment == null)
             {
                 // Unequip
-                EquipmentManager.Instance?.UnequipToInventory(
-                    selectedCharacter.CharacterId,
-                    selectedSlot
-                );
+                EquipmentManager.Instance?.UnequipToInventory(selectedCharacterId, selectedSlot);
             }
             else
             {
-                // Equip new item
+                // Equip - TODO: Need to pass CharacterData
+                // For now, skip the CanEquip check in EquipFromInventory
                 EquipmentManager.Instance?.EquipFromInventory(
-                    selectedCharacter.CharacterId,
+                    selectedCharacterId, 
                     selectedEquipment.ItemId,
-                    selectedCharacter.CharacterData
+                    null // TODO: Pass actual CharacterData
                 );
             }
             
-            // Refresh display
+            equipmentSelectionPanel.Hide();
             RefreshCharacterDisplay();
-            equipmentSelectionPanel.Hide();
-        }
-        
-        private void OnEquipCancelled()
-        {
-            equipmentSelectionPanel.Hide();
-            Managers.SystemManager.Instance?.PlayCancelSE();
+            Managers.SystemManager.Instance?.PlayOkSE();
         }
         
         private void OnClosePressed()
         {
-            Hide();
-            
-            // Return to main menu
-            var mainMenu = GetParent().GetNodeOrNull<MainMenuUI>("%MainMenuUI");
-            mainMenu?.ReturnToMainMenu();
+            if (equipmentSelectionPanel.Visible)
+            {
+                equipmentSelectionPanel.Hide();
+            }
+            else
+            {
+                Hide();
+            }
+            Managers.SystemManager.Instance?.PlayCancelSE();
         }
         
         public override void _Input(InputEvent @event)
@@ -295,14 +279,7 @@ namespace EchoesAcrossTime.UI
             
             if (@event.IsActionPressed("ui_cancel"))
             {
-                if (equipmentSelectionPanel.Visible)
-                {
-                    OnEquipCancelled();
-                }
-                else
-                {
-                    OnClosePressed();
-                }
+                OnClosePressed();
                 GetViewport().SetInputAsHandled();
             }
         }

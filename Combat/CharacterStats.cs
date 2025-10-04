@@ -32,6 +32,8 @@ namespace EchoesAcrossTime.Combat
         public int MagicDefense { get; set; } = 10;
         public int Speed { get; set; } = 10;
         
+        public int Luck { get; set; } = 10;
+        
         public BattleStats BattleStats { get; set; }
         
         // Experience system
@@ -46,6 +48,7 @@ namespace EchoesAcrossTime.Combat
         public float MagicAttackGrowthRate { get; set; } = 0.03f;
         public float MagicDefenseGrowthRate { get; set; } = 0.03f;
         public float SpeedGrowthRate { get; set; } = 0.02f;
+        public float LuckGrowthRate { get; set; } = 0.03f;
         
         public CharacterSkills Skills { get; set; }
         
@@ -238,6 +241,7 @@ namespace EchoesAcrossTime.Combat
             int magicAttackGrowth = Mathf.Max(1, Mathf.RoundToInt(MagicAttack * MagicAttackGrowthRate) + 1);
             int magicDefenseGrowth = Mathf.Max(1, Mathf.RoundToInt(MagicDefense * MagicDefenseGrowthRate) + 1);
             int speedGrowth = Mathf.Max(1, Mathf.RoundToInt(Speed * SpeedGrowthRate));
+            int luckGrowth = Mathf.Max(1, Mathf.RoundToInt(Luck * LuckGrowthRate));
             
             MaxHP += hpGrowth;
             MaxMP += mpGrowth;
@@ -246,6 +250,7 @@ namespace EchoesAcrossTime.Combat
             MagicAttack += magicAttackGrowth;
             MagicDefense += magicDefenseGrowth;
             Speed += speedGrowth;
+            Luck += luckGrowth;
             
             GD.Print($"Stats increased - HP+{hpGrowth}, MP+{mpGrowth}, ATK+{attackGrowth}, DEF+{defenseGrowth}, MATK+{magicAttackGrowth}, MDEF+{magicDefenseGrowth}, SPD+{speedGrowth}");
         }
@@ -312,6 +317,7 @@ namespace EchoesAcrossTime.Combat
             MagicAttack += bonuses.MagicAttackBonus;
             MagicDefense += bonuses.MagicDefenseBonus;
             Speed += bonuses.SpeedBonus;
+            Luck += bonuses.LuckBonus;
     
             // Store current bonuses
             currentBonuses = bonuses;

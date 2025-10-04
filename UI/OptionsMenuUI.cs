@@ -248,9 +248,9 @@ namespace EchoesAcrossTime.UI
             }
             
             // Load audio settings
-            bgmVolumeSlider.Value = settingsConfig.GetValue("audio", "bgm_volume", 80);
-            sfxVolumeSlider.Value = settingsConfig.GetValue("audio", "sfx_volume", 80);
-            voiceVolumeSlider.Value = settingsConfig.GetValue("audio", "voice_volume", 80);
+            bgmVolumeSlider.Value = settingsConfig.GetValue("audio", "bgm_volume", 80).As<Double>();
+            sfxVolumeSlider.Value = settingsConfig.GetValue("audio", "sfx_volume", 80).As<Double>();
+            voiceVolumeSlider.Value = settingsConfig.GetValue("audio", "voice_volume", 80).As<Double>();
             
             // Load display settings
             bool isFullscreen = settingsConfig.GetValue("display", "fullscreen", false).AsBool();
@@ -265,7 +265,7 @@ namespace EchoesAcrossTime.UI
             OnVSyncToggled(vsync);
             
             // Load gameplay settings
-            textSpeedSlider.Value = settingsConfig.GetValue("gameplay", "text_speed", 50);
+            double textSpeed = settingsConfig.GetValue("gameplay", "text_speed", 50).As<double>();
             autoSaveCheckbox.ButtonPressed = settingsConfig.GetValue("gameplay", "auto_save", true).AsBool();
             showTutorialsCheckbox.ButtonPressed = settingsConfig.GetValue("gameplay", "show_tutorials", true).AsBool();
             battleAnimationsCheckbox.ButtonPressed = settingsConfig.GetValue("gameplay", "battle_animations", true).AsBool();

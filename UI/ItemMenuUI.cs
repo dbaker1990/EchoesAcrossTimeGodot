@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EchoesAcrossTime.Combat;
 using EchoesAcrossTime.Items;
+using EchoesAcrossTime.Managers;
 
 namespace EchoesAcrossTime.UI
 {
@@ -182,7 +183,7 @@ namespace EchoesAcrossTime.UI
             }
             
             // Get party members
-            var party = Party.PartyManager.Instance?.GetMainParty();
+            var party = PartyMenuManager.Instance?.GetMainPartyStats();
             if (party == null || party.Count == 0)
             {
                 GD.PrintErr("No party members found!");
