@@ -1,16 +1,15 @@
-﻿[gd_scene load_steps=3 format=3 uid="uid://skit_ui_scene"]
+[gd_scene load_steps=3 format=3 uid="uid://dynlpj7ijr3h6"]
 
-[ext_resource type="Script" path="res://Skits/SkitUI.cs" id="1"]
+[ext_resource type="Script" uid="uid://b53bgxy23rpyd" path="res://Skits/SkitUI.cs" id="1_rq27w"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_background"]
-bg_color = Color(0, 0, 0, 0.8)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aihou"]
+bg_color = Color(0, 0, 0, 0.6117647)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [node name="SkitUI" type="Control" node_paths=PackedStringArray("leftPortraitContainer", "rightPortraitContainer", "leftPortrait", "rightPortrait", "leftHighlight", "rightHighlight", "dialoguePanel", "speakerNameLabel", "dialogueLabel", "skipHintLabel", "backgroundPanel", "backgroundOverlay", "voicePlayer", "textBlipPlayer", "skitStartSFX", "skitEndSFX")]
-unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,7 +17,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-script = ExtResource("1")
+script = ExtResource("1_rq27w")
 leftPortraitContainer = NodePath("PortraitLayer/LeftPortraitContainer")
 rightPortraitContainer = NodePath("PortraitLayer/RightPortraitContainer")
 leftPortrait = NodePath("PortraitLayer/LeftPortraitContainer/LeftPortrait")
@@ -30,7 +29,7 @@ speakerNameLabel = NodePath("DialogueLayer/DialoguePanel/VBoxContainer/SpeakerNa
 dialogueLabel = NodePath("DialogueLayer/DialoguePanel/VBoxContainer/DialogueText")
 skipHintLabel = NodePath("DialogueLayer/SkipHint")
 backgroundPanel = NodePath("Background/BackgroundPanel")
-backgroundOverlay = NodePath("Background/Overlay")
+backgroundOverlay = NodePath("Background/BackgroundPanel/Overlay")
 voicePlayer = NodePath("Audio/VoicePlayer")
 textBlipPlayer = NodePath("Audio/TextBlipPlayer")
 skitStartSFX = NodePath("Audio/SkitStartSFX")
@@ -54,7 +53,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Overlay" type="ColorRect" parent="Background"]
+[node name="Overlay" type="ColorRect" parent="Background/BackgroundPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -62,7 +61,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0, 0, 0, 0.4)
+color = Color(0, 0, 0, 0.30980393)
 
 [node name="PortraitLayer" type="Control" parent="."]
 layout_mode = 1
@@ -75,13 +74,10 @@ mouse_filter = 2
 
 [node name="LeftPortraitContainer" type="Control" parent="PortraitLayer"]
 layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = 50.0
-offset_top = -200.0
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 350.0
 offset_right = 350.0
-offset_bottom = 200.0
 grow_vertical = 2
 
 [node name="LeftPortrait" type="TextureRect" parent="PortraitLayer/LeftPortraitContainer"]
@@ -106,15 +102,12 @@ mouse_filter = 2
 
 [node name="RightPortraitContainer" type="Control" parent="PortraitLayer"]
 layout_mode = 1
-anchors_preset = 6
+anchors_preset = 11
 anchor_left = 1.0
-anchor_top = 0.5
 anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -350.0
-offset_top = -200.0
-offset_right = -50.0
-offset_bottom = 200.0
+anchor_bottom = 1.0
+offset_left = -400.0
+offset_right = -400.0
 grow_horizontal = 0
 grow_vertical = 2
 
@@ -148,18 +141,15 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="DialoguePanel" type="Panel" parent="DialogueLayer"]
+custom_minimum_size = Vector2(100, 200)
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 100.0
-offset_top = -200.0
-offset_right = -100.0
-offset_bottom = -50.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_background")
+theme_override_styles/panel = SubResource("StyleBoxFlat_aihou")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="DialogueLayer/DialoguePanel"]
 layout_mode = 1
@@ -176,6 +166,7 @@ theme_override_font_sizes/font_size = 20
 text = "Speaker Name"
 
 [node name="DialogueText" type="Label" parent="DialogueLayer/DialoguePanel/VBoxContainer"]
+custom_minimum_size = Vector2(200, 170)
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 18
@@ -189,13 +180,11 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -200.0
-offset_top = -30.0
-offset_right = -20.0
-offset_bottom = -10.0
+offset_left = -40.0
+offset_top = -23.0
 grow_horizontal = 0
 grow_vertical = 0
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_colors/font_color = Color(0.7019608, 0.7019608, 0.7019608, 1)
 theme_override_font_sizes/font_size = 14
 text = "[Press X to Skip]"
 horizontal_alignment = 2

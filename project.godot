@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 SystemManager="*res://Managers/SystemManager.cs"
 QuestManager="*res://Quests/QuestManager.cs"
 PartyManager="*res://Managers/PartyManager.cs"
+SkitManager="*res://Skits/SkitManager.cs"
 
 [display]
 
