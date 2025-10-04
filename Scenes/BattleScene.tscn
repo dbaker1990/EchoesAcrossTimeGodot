@@ -6,6 +6,7 @@
 [node name="BattleScene" type="Node2D"]
 
 [node name="BattleManager" type="Node" parent="."]
+unique_name_in_owner = true
 script = ExtResource("1_12f34")
 
 [node name="Background" type="TextureRect" parent="."]
