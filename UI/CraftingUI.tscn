@@ -1,0 +1,245 @@
+[gd_scene load_steps=2 format=3 uid="uid://csbky3mh1c13f"]
+
+[ext_resource type="Script" uid="uid://dyll1kpyk67ls" path="res://UI/CraftingUI.cs" id="1_v5w7q"]
+
+[node name="CraftingUI" type="Control" node_paths=PackedStringArray("recipeListPanel", "recipeDetailPanel", "recipeList", "categoryFilter", "searchBox", "recipeNameLabel", "recipeDescriptionLabel", "recipeDifficultyLabel", "recipeStationLabel", "recipeLevelRequirement", "ingredientsContainer", "goldCostLabel", "successRateLabel", "craftButton", "craftingProgressBar", "craftingLevelLabel", "craftingExpBar", "craftingExpLabel", "resultPopup", "resultMessageLabel", "resultItemIcon", "resultCloseButton")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_v5w7q")
+recipeListPanel = NodePath("Panel/VBoxContainer/MainContent/RecipeListPanel")
+recipeDetailPanel = NodePath("Panel/VBoxContainer/MainContent/RecipeDetailPanel")
+recipeList = NodePath("Panel/VBoxContainer/MainContent/RecipeListPanel/RecipeList")
+categoryFilter = NodePath("Panel/VBoxContainer/TopBar/CategoryFilter")
+searchBox = NodePath("Panel/VBoxContainer/TopBar/SearchBox")
+recipeNameLabel = NodePath("Panel/VBoxContainer/MainContent/RecipeDetailPanel/RecipeInfo/RecipeNameLabel")
+recipeDescriptionLabel = NodePath("Panel/VBoxContainer/MainContent/RecipeDetailPanel/RecipeInfo/RecipeDescriptionLabel")
+recipeDifficultyLabel = NodePath("Panel/VBoxContainer/MainContent/RecipeDetailPanel/RecipeInfo/DifficultyLabel")
+recipeStationLabel = NodePath("Panel/VBoxContainer/MainContent/RecipeDetailPanel/RecipeInfo/StationLabel")
+recipeLevelRequirement = NodePath("Panel/VBoxContainer/MainContent/RecipeDetailPanel/RecipeInfo/LevelRequirement")
+ingredientsContainer = NodePath("Panel/VBoxContainer/MainContent/RecipeDetailPanel/IngredientsContainer")
+goldCostLabel = NodePath("Panel/VBoxContainer/MainContent/RecipeDetailPanel/GoldCostLabel")
+successRateLabel = NodePath("Panel/VBoxContainer/MainContent/RecipeDetailPanel/SuccessRateLabel")
+craftButton = NodePath("Panel/VBoxContainer/MainContent/RecipeDetailPanel/CraftButton")
+craftingProgressBar = NodePath("Panel/VBoxContainer/BottomBar/ExpBar/CraftingExpBar")
+craftingLevelLabel = NodePath("Panel/VBoxContainer/BottomBar/CraftingLevelLabel")
+craftingExpBar = NodePath("Panel/VBoxContainer/BottomBar/ExpBar/CraftingExpBar")
+craftingExpLabel = NodePath("Panel/VBoxContainer/BottomBar/ExpBar/CraftingExpBar/CraftingExpLabel")
+resultPopup = NodePath("ResultPopup")
+resultMessageLabel = NodePath("ResultPopup/VBoxContainer/ResultMessageLabel")
+resultItemIcon = NodePath("ResultPopup/VBoxContainer/ResultItemIcon")
+resultCloseButton = NodePath("ResultPopup/VBoxContainer/ResultCloseButton")
+
+[node name="Panel" type="Panel" parent="."]
+custom_minimum_size = Vector2(800, 600)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="TopBar" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="CategoryFilter" type="OptionButton" parent="Panel/VBoxContainer/TopBar"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="SearchBox" type="LineEdit" parent="Panel/VBoxContainer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Search recipes..."
+
+[node name="CloseButton" type="Button" parent="Panel/VBoxContainer/TopBar"]
+layout_mode = 2
+text = "Close"
+
+[node name="MainContent" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="RecipeListPanel" type="Panel" parent="Panel/VBoxContainer/MainContent"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+
+[node name="RecipeList" type="ItemList" parent="Panel/VBoxContainer/MainContent/RecipeListPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RecipeDetailPanel" type="Panel" parent="Panel/VBoxContainer/MainContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RecipeInfo" type="VBoxContainer" parent="Panel/VBoxContainer/MainContent/RecipeDetailPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 172.0
+grow_horizontal = 2
+theme_override_constants/separation = 5
+
+[node name="RecipeNameLabel" type="Label" parent="Panel/VBoxContainer/MainContent/RecipeDetailPanel/RecipeInfo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Recipe Name"
+
+[node name="RecipeDescriptionLabel" type="Label" parent="Panel/VBoxContainer/MainContent/RecipeDetailPanel/RecipeInfo"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Recipe description will appear here..."
+autowrap_mode = 3
+
+[node name="DifficultyLabel" type="Label" parent="Panel/VBoxContainer/MainContent/RecipeDetailPanel/RecipeInfo"]
+layout_mode = 2
+text = "Difficulty: Easy"
+
+[node name="StationLabel" type="Label" parent="Panel/VBoxContainer/MainContent/RecipeDetailPanel/RecipeInfo"]
+layout_mode = 2
+text = "Station: None"
+
+[node name="LevelRequirement" type="Label" parent="Panel/VBoxContainer/MainContent/RecipeDetailPanel/RecipeInfo"]
+layout_mode = 2
+text = "Required Level: 1"
+
+[node name="IngredientsContainer" type="VBoxContainer" parent="Panel/VBoxContainer/MainContent/RecipeDetailPanel"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 3
+
+[node name="GoldCostLabel" type="Label" parent="Panel/VBoxContainer/MainContent/RecipeDetailPanel"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -11.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Cost: 0g"
+
+[node name="SuccessRateLabel" type="Label" parent="Panel/VBoxContainer/MainContent/RecipeDetailPanel"]
+layout_direction = 3
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -11.5
+offset_right = 149.0
+offset_bottom = 11.5
+grow_vertical = 2
+text = "Success Rate: 100%"
+
+[node name="CraftButton" type="Button" parent="Panel/VBoxContainer/MainContent/RecipeDetailPanel"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -31.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Craft"
+
+[node name="BottomBar" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="CraftingLevelLabel" type="Label" parent="Panel/VBoxContainer/BottomBar"]
+layout_mode = 2
+text = "Crafting Level: 1"
+
+[node name="ExpBar" type="HBoxContainer" parent="Panel/VBoxContainer/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="CraftingExpBar" type="ProgressBar" parent="Panel/VBoxContainer/BottomBar/ExpBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CraftingExpLabel" type="Label" parent="Panel/VBoxContainer/BottomBar/ExpBar/CraftingExpBar"]
+layout_direction = 3
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -11.5
+offset_right = 85.0
+offset_bottom = 11.5
+grow_vertical = 2
+text = "0 / 100 EXP"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResultPopup" type="Panel" parent="."]
+custom_minimum_size = Vector2(400, 300)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ResultPopup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="ResultMessageLabel" type="Label" parent="ResultPopup/VBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Crafting Result Message"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ResultItemIcon" type="TextureRect" parent="ResultPopup/VBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="ResultCloseButton" type="Button" parent="ResultPopup/VBoxContainer"]
+layout_mode = 2
+text = "OK"
