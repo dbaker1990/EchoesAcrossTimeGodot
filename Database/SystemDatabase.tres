@@ -1,9 +1,26 @@
-[gd_resource type="Resource" script_class="SystemDatabase" load_steps=2 format=3 uid="uid://ct1til02gm2cw"]
+[gd_resource type="Resource" script_class="SystemDatabase" load_steps=10 format=3 uid="uid://ct1til02gm2cw"]
 
 [ext_resource type="Script" uid="uid://bs2bw6qjoj0w0" path="res://Database/SystemDatabase.cs" id="1_g2q08"]
+[ext_resource type="AudioStream" uid="uid://cbvja8tn75hvr" path="res://Audio/BGM/Ashes in Motion(Battle 1 Theme).mp3" id="1_g308u"]
+[ext_resource type="AudioStream" uid="uid://b3j3m0t54v82x" path="res://Audio/SFX/buzzer.mp3" id="2_janac"]
+[ext_resource type="AudioStream" uid="uid://bgdij68t061aa" path="res://Audio/SFX/cancel.mp3" id="3_hvqqh"]
+[ext_resource type="AudioStream" uid="uid://bnp4f25u78ay6" path="res://Audio/SFX/cursor.mp3" id="4_liid0"]
+[ext_resource type="AudioStream" uid="uid://1wtmaqkj8imh" path="res://Audio/SFX/equip.mp3" id="5_r06x4"]
+[ext_resource type="AudioStream" uid="uid://0l3wwdg4a3yo" path="res://Audio/SFX/confirm.mp3" id="6_nu0sl"]
+[ext_resource type="AudioStream" uid="uid://xv583q3ushno" path="res://Audio/SFX/save.mp3" id="7_jtgin"]
+[ext_resource type="AudioStream" uid="uid://b8ovyhusi4i24" path="res://Audio/BGM/CROOKED HEAVEN (SAY NOTHING).mp3" id="8_t55o4"]
 
 [resource]
 script = ExtResource("1_g2q08")
 UseGlobalFormulaOverride = true
 GlobalDamageFormula = 4
+TitleMusic = ExtResource("8_t55o4")
+BattleMusic = ExtResource("1_g308u")
+CursorSE = ExtResource("4_liid0")
+OkSE = ExtResource("6_nu0sl")
+BuzzerSE = ExtResource("2_janac")
+CancelSE = ExtResource("3_hvqqh")
+EquipSE = ExtResource("5_r06x4")
+SaveSE = ExtResource("7_jtgin")
+LoadSE = ExtResource("5_r06x4")
 metadata/_custom_type_script = "uid://bs2bw6qjoj0w0"

@@ -1,0 +1,118 @@
+[gd_scene load_steps=3 format=3 uid="uid://b8k4hvurghe8k"]
+
+[ext_resource type="Script" uid="uid://bis4htr86mh3q" path="res://UI/TitleScreen.cs" id="1_vmg2h"]
+[ext_resource type="Texture2D" uid="uid://baf4agafp2sms" path="res://Images/TitleScreen/Title Screen.png" id="2_8l4an"]
+
+[node name="TitleScreen" type="Control" node_paths=PackedStringArray("newGameButton", "loadGameButton", "optionsButton", "quitButton", "titleBackground", "titleLabel")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_vmg2h")
+newGameButton = NodePath("CenterContainer/MenuPanel/VBoxContainer/NewGameButton")
+loadGameButton = NodePath("CenterContainer/MenuPanel/VBoxContainer/LoadGameButton")
+optionsButton = NodePath("CenterContainer/MenuPanel/VBoxContainer/OptionsButton")
+quitButton = NodePath("CenterContainer/MenuPanel/VBoxContainer/QuitButton")
+titleBackground = NodePath("Background")
+titleLabel = NodePath("TitleLabel")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_8l4an")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="TitleLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.7529412, 0.7529412, 0.7529412, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(1, 0.84313726, 0, 1)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 4
+theme_override_font_sizes/font_size = 64
+text = "Echoes Across Time"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 200.0
+offset_top = -430.0
+offset_right = 600.0005
+offset_bottom = -50.0
+grow_vertical = 0
+
+[node name="MenuPanel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(400, 350)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/MenuPanel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Spacer1" type="Control" parent="CenterContainer/MenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="NewGameButton" type="Button" parent="CenterContainer/MenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(350, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "New Game"
+
+[node name="LoadGameButton" type="Button" parent="CenterContainer/MenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(350, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Load Game"
+
+[node name="OptionsButton" type="Button" parent="CenterContainer/MenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(350, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Options"
+
+[node name="QuitButton" type="Button" parent="CenterContainer/MenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(350, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "To Desktop"
+
+[node name="Spacer2" type="Control" parent="CenterContainer/MenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="VersionLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -42.0
+offset_right = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "v1.0.0"
+horizontal_alignment = 2
+vertical_alignment = 1

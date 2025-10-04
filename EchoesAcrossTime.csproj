@@ -17,10 +17,13 @@
     <Content Include="Docs\QuickReference.md" />
     <Content Include="Docs\SkitReadMe.md" />
     <Content Include="Docs\SkitSystemGuide.md" />
+    <Content Include="Images\TitleScreen\Title Screen.png" />
     <Content Include="Skits\SkitUI.tscn" />
     <Content Include="UI\PartyMenuUI.tscn" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Audio\BGM\" />
+    <Folder Include="Audio\SFX\" />
     <Folder Include="Scenes\" />
   </ItemGroup>
 </Project>

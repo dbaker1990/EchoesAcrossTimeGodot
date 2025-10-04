@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cbvja8tn75hvr"
+path="res://.godot/imported/Ashes in Motion(Battle 1 Theme).mp3-291f085359d3dd50673ae9f41fe0ebbf.mp3str"
+
+[deps]
+
+source_file="res://Audio/BGM/Ashes in Motion(Battle 1 Theme).mp3"
+dest_files=["res://.godot/imported/Ashes in Motion(Battle 1 Theme).mp3-291f085359d3dd50673ae9f41fe0ebbf.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
