@@ -70,6 +70,7 @@ MessageLabel = NodePath("BackgroundPanel/MarginContainer/VBoxContainer/HBoxConta
 PortraitRect = NodePath("BackgroundPanel/MarginContainer/VBoxContainer/HBoxContainer/PortraitRect")
 AnimationPlayer = NodePath("AnimationPlayer")
 SoundEffectPlayer = NodePath("SoundEffectPlayer")
+SpeakerNameColor = Color(1, 0.84313726, 0, 1)
 
 [node name="BackgroundPanel" type="Panel" parent="."]
 unique_name_in_owner = true
