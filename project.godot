@@ -22,6 +22,7 @@ QuestManager="*res://Quests/QuestManager.cs"
 PartyManager="*res://Managers/PartyManager.cs"
 SkitManager="*res://Skits/SkitManager.cs"
 AudioManager="*res://Audio/AudioManager.cs"
+BestiaryManager="*res://Beastiary/BestiaryManager.cs"
 
 [display]
 

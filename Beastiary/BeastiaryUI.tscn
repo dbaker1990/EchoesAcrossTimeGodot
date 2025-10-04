@@ -1,0 +1,243 @@
+[gd_scene load_steps=2 format=3 uid="uid://di8mlyf0idul0"]
+
+[ext_resource type="Script" uid="uid://dd1wg1fmm4k5h" path="res://Beastiary/BestiaryUI.cs" id="1_oikci"]
+
+[node name="BestiaryUI" type="Control" node_paths=PackedStringArray("mainPanel", "enemyListScroll", "enemyListContainer", "detailPanel", "closeButton", "titleLabel", "completionLabel", "completionBar", "filterDropdown", "sortDropdown", "sortDescending", "searchBox", "enemyNameLabel", "enemyTypeLabel", "enemyPortrait", "levelLabel", "hpLabel", "encountersLabel", "defeatsLabel", "loreText", "statsGrid", "weaknessContainer", "resistanceContainer", "skillsContainer", "dropsContainer")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_oikci")
+mainPanel = NodePath("MainPanel")
+enemyListScroll = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/EnemyListScroll")
+enemyListContainer = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/EnemyListScroll/EnemyListContainer")
+detailPanel = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel")
+closeButton = NodePath("MainPanel/MarginContainer/VBoxContainer/Header/CloseButton")
+titleLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/Header/TitleLabel")
+completionLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/CompletionLabel")
+completionBar = NodePath("MainPanel/MarginContainer/VBoxContainer/CompletionBar")
+filterDropdown = NodePath("MainPanel/MarginContainer/VBoxContainer/Controls/FilterDropdown")
+sortDropdown = NodePath("MainPanel/MarginContainer/VBoxContainer/Controls/SortDropdown")
+sortDescending = NodePath("MainPanel/MarginContainer/VBoxContainer/Controls/SortDescending")
+searchBox = NodePath("MainPanel/MarginContainer/VBoxContainer/Controls/SearchBox")
+enemyNameLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/InfoVBox/EnemyNameLabel")
+enemyTypeLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/InfoVBox/EnemyTypeLabel")
+enemyPortrait = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/EnemyPortrait")
+levelLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/InfoVBox/LevelLabel")
+hpLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/InfoVBox/HPLabel")
+encountersLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/InfoVBox/EncountersLabel")
+defeatsLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/InfoVBox/DefeatsLabel")
+loreText = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/LoreText")
+statsGrid = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/StatsGrid")
+weaknessContainer = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/WeaknessContainer")
+resistanceContainer = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/ResistanceContainer")
+skillsContainer = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/SkillsContainer")
+dropsContainer = NodePath("MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/DropsContainer")
+
+[node name="DimBackground" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5882353)
+
+[node name="MainPanel" type="Panel" parent="."]
+custom_minimum_size = Vector2(1000, 700)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="Header" type="HBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
+text = "BESTIARY"
+
+[node name="CloseButton" type="Button" parent="MainPanel/MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "X"
+
+[node name="CompletionBar" type="ProgressBar" parent="MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="CompletionLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Discovered: 0/0 (0%)"
+
+[node name="HSeparator" type="HSeparator" parent="MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Controls" type="HBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SearchBox" type="LineEdit" parent="MainPanel/MarginContainer/VBoxContainer/Controls"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Search enemies..."
+
+[node name="FilterDropdown" type="OptionButton" parent="MainPanel/MarginContainer/VBoxContainer/Controls"]
+layout_mode = 2
+
+[node name="SortDropdown" type="OptionButton" parent="MainPanel/MarginContainer/VBoxContainer/Controls"]
+layout_mode = 2
+
+[node name="SortDescending" type="CheckButton" parent="MainPanel/MarginContainer/VBoxContainer/Controls"]
+layout_mode = 2
+text = "Desc"
+
+[node name="HSplitContainer" type="HSplitContainer" parent="MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftPanel" type="Panel" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EnemyListScroll" type="ScrollContainer" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EnemyListContainer" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/EnemyListScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DetailPanel" type="Panel" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.5
+
+[node name="MarginContainer" type="MarginContainer" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TopSection" type="HBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="EnemyPortrait" type="TextureRect" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection"]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+expand_mode = 3
+stretch_mode = 5
+
+[node name="InfoVBox" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EnemyNameLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/InfoVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Enemy Name"
+
+[node name="EnemyTypeLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/InfoVBox"]
+layout_mode = 2
+text = "Type: Enemy"
+
+[node name="LevelLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/InfoVBox"]
+layout_mode = 2
+text = "Level: 1"
+
+[node name="HPLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/InfoVBox"]
+layout_mode = 2
+text = "HP: 100"
+
+[node name="EncountersLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/InfoVBox"]
+layout_mode = 2
+text = "Encountered: 0"
+
+[node name="DefeatsLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer/TopSection/InfoVBox"]
+layout_mode = 2
+text = "Defeated: 0"
+
+[node name="HSeparator" type="HSeparator" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Stats:"
+
+[node name="StatsGrid" type="GridContainer" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+columns = 4
+
+[node name="HSeparator2" type="HSeparator" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="WeaknessContainer" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ResistanceContainer" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SkillsContainer" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HSeparator3" type="HSeparator" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="DropsContainer" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HSeparator4" type="HSeparator" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="LoreLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Lore:"
+
+[node name="LoreText" type="RichTextLabel" parent="MainPanel/MarginContainer/VBoxContainer/HSplitContainer/DetailPanel/MarginContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "Enemy description and lore text goes here..."
+fit_content = true

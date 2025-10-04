@@ -12,7 +12,7 @@ namespace EchoesAcrossTime.Combat
     {
         public const int MAX_LEVEL = 100;
         public const int MIN_LEVEL = 1;
-        
+        public string CharacterId { get; set; } = "";
         public string CharacterName { get; set; } = "Character";
         
         private int level = 1;

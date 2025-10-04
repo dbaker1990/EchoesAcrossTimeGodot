@@ -5,7 +5,13 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Beastiary\BeastiaryUI.tscn" />
+    <Content Include="Beastiary\BestiaryNotification.tscn" />
     <Content Include="Database\CharacterDatabase.tres" />
+    <Content Include="Docs\BeastiaryReadMe.md" />
+    <Content Include="Docs\BestiaryCheatSheet.md" />
+    <Content Include="Docs\BestiarySystemComplete.md" />
+    <Content Include="Docs\BestiarySystemGuide.md" />
     <Content Include="Docs\CompleteIntegrationGuide.md" />
     <Content Include="Docs\CoreCommandsDocumentation.md" />
     <Content Include="Docs\LimitBreakDocumentation.md" />

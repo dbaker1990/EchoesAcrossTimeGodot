@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using EchoesAcrossTime.Bestiary;
 
 namespace EchoesAcrossTime.Combat
 {
@@ -137,6 +138,8 @@ namespace EchoesAcrossTime.Combat
             
             // Calculate turn order
             CalculateTurnOrder();
+            
+            TrackEnemyEncounters();
             
             // Reset rewards tracking
             rewardsManager.ResetMetrics();
@@ -421,6 +424,10 @@ namespace EchoesAcrossTime.Combat
                     {
                         rewardsManager.RecordEvent("character_ko");
                     }
+                    else if (enemyParty.Any(e => e.Stats == target))
+                    {
+                        BestiaryManager.Instance?.RecordDefeat(target.CharacterId);
+                    }
                 }
             }
             
@@ -571,6 +578,10 @@ namespace EchoesAcrossTime.Combat
                     if (playerParty.Any(p => p.Stats == target))
                     {
                         rewardsManager.RecordEvent("character_ko");
+                    }
+                    else if (enemyParty.Any(e => e.Stats == target))
+                    {
+                        BestiaryManager.Instance?.RecordDefeat(target.CharacterId);
                     }
                 }
             }
@@ -1025,6 +1036,21 @@ namespace EchoesAcrossTime.Combat
             return BattleRank.F;
         }
         
+        private void TrackEnemyEncounters()
+        {
+            if (BestiaryManager.Instance == null) return;
+    
+            foreach (var enemy in enemyParty)
+            {
+                if (enemy?.Stats != null)
+                {
+                    BestiaryManager.Instance.RecordEncounter(
+                        enemy.Stats.CharacterId,
+                        enemy.Stats.Level
+                    );
+                }
+            }
+        }
         #endregion
         
         #region Rewards Signal Handlers
