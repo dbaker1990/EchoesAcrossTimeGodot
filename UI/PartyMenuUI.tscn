@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://our64usx4kgq" path="res://UI/PartyMenuUI.cs" id="1_3l03l"]
 
 [node name="PartyMenuUI" type="Control" node_paths=PackedStringArray("mainPartyContainer", "subPartyContainer", "mainPartyLabel", "subPartyLabel", "closeButton")]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
