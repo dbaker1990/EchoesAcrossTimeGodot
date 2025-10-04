@@ -1,0 +1,216 @@
+﻿[gd_scene load_steps=3 format=3 uid="uid://skit_ui_scene"]
+
+[ext_resource type="Script" path="res://Skits/SkitUI.cs" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_background"]
+bg_color = Color(0, 0, 0, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="SkitUI" type="Control" node_paths=PackedStringArray("leftPortraitContainer", "rightPortraitContainer", "leftPortrait", "rightPortrait", "leftHighlight", "rightHighlight", "dialoguePanel", "speakerNameLabel", "dialogueLabel", "skipHintLabel", "backgroundPanel", "backgroundOverlay", "voicePlayer", "textBlipPlayer", "skitStartSFX", "skitEndSFX")]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1")
+leftPortraitContainer = NodePath("PortraitLayer/LeftPortraitContainer")
+rightPortraitContainer = NodePath("PortraitLayer/RightPortraitContainer")
+leftPortrait = NodePath("PortraitLayer/LeftPortraitContainer/LeftPortrait")
+rightPortrait = NodePath("PortraitLayer/RightPortraitContainer/RightPortrait")
+leftHighlight = NodePath("PortraitLayer/LeftPortraitContainer/LeftHighlight")
+rightHighlight = NodePath("PortraitLayer/RightPortraitContainer/RightHighlight")
+dialoguePanel = NodePath("DialogueLayer/DialoguePanel")
+speakerNameLabel = NodePath("DialogueLayer/DialoguePanel/VBoxContainer/SpeakerName")
+dialogueLabel = NodePath("DialogueLayer/DialoguePanel/VBoxContainer/DialogueText")
+skipHintLabel = NodePath("DialogueLayer/SkipHint")
+backgroundPanel = NodePath("Background/BackgroundPanel")
+backgroundOverlay = NodePath("Background/Overlay")
+voicePlayer = NodePath("Audio/VoicePlayer")
+textBlipPlayer = NodePath("Audio/TextBlipPlayer")
+skitStartSFX = NodePath("Audio/SkitStartSFX")
+skitEndSFX = NodePath("Audio/SkitEndSFX")
+
+[node name="Background" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BackgroundPanel" type="Panel" parent="Background"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Overlay" type="ColorRect" parent="Background"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.4)
+
+[node name="PortraitLayer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="LeftPortraitContainer" type="Control" parent="PortraitLayer"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 50.0
+offset_top = -200.0
+offset_right = 350.0
+offset_bottom = 200.0
+grow_vertical = 2
+
+[node name="LeftPortrait" type="TextureRect" parent="PortraitLayer/LeftPortraitContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LeftHighlight" type="Panel" parent="PortraitLayer/LeftPortraitContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="RightPortraitContainer" type="Control" parent="PortraitLayer"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -200.0
+offset_right = -50.0
+offset_bottom = 200.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="RightPortrait" type="TextureRect" parent="PortraitLayer/RightPortraitContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RightHighlight" type="Panel" parent="PortraitLayer/RightPortraitContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DialogueLayer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DialoguePanel" type="Panel" parent="DialogueLayer"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 100.0
+offset_top = -200.0
+offset_right = -100.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_background")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DialogueLayer/DialoguePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SpeakerName" type="Label" parent="DialogueLayer/DialoguePanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
+theme_override_font_sizes/font_size = 20
+text = "Speaker Name"
+
+[node name="DialogueText" type="Label" parent="DialogueLayer/DialoguePanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 18
+text = "Dialogue text appears here..."
+autowrap_mode = 3
+
+[node name="SkipHint" type="Label" parent="DialogueLayer"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -30.0
+offset_right = -20.0
+offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "[Press X to Skip]"
+horizontal_alignment = 2
+
+[node name="Audio" type="Node" parent="."]
+
+[node name="VoicePlayer" type="AudioStreamPlayer" parent="Audio"]
+bus = &"Voice"
+
+[node name="TextBlipPlayer" type="AudioStreamPlayer" parent="Audio"]
+volume_db = -10.0
+bus = &"SFX"
+
+[node name="SkitStartSFX" type="AudioStreamPlayer" parent="Audio"]
+bus = &"SFX"
+
+[node name="SkitEndSFX" type="AudioStreamPlayer" parent="Audio"]
+bus = &"SFX"
