@@ -25,6 +25,11 @@ namespace EchoesAcrossTime.Combat
         
         [ExportGroup("Earth")]
         [Export] public ElementAffinity EarthAffinity { get; set; } = ElementAffinity.Normal;
+        [ExportGroup("Wind")]
+        [Export] public ElementAffinity WindAffinity { get; set; } = ElementAffinity.Normal;
+        
+        [ExportGroup("Almighty")]
+        [Export] public ElementAffinity AlmightyAffinity { get; set; } = ElementAffinity.Normal;
         
         [ExportGroup("Light")]
         [Export] public ElementAffinity LightAffinity { get; set; } = ElementAffinity.Normal;
@@ -39,6 +44,7 @@ namespace EchoesAcrossTime.Combat
         [Export] public float WeakMultiplier { get; set; } = 1.5f;
         [Export] public float ResistMultiplier { get; set; } = 0.5f;
         [Export] public float ImmuneMultiplier { get; set; } = 0f;
+        [Export] public float NullMultiplier { get; set; } = 0f;
         [Export] public float AbsorbMultiplier { get; set; } = -1f; // Negative = healing
         
         /// <summary>
@@ -62,6 +68,12 @@ namespace EchoesAcrossTime.Combat
                     break;
                 case ElementType.Earth:
                     EarthAffinity = affinity;
+                    break;
+                case ElementType.Wind:
+                    WindAffinity = affinity;
+                    break;
+                case ElementType.Almighty:
+                    AlmightyAffinity = affinity;
                     break;
                 case ElementType.Light:
                     LightAffinity = affinity;
@@ -87,6 +99,8 @@ namespace EchoesAcrossTime.Combat
                 ElementType.Thunder => ThunderAffinity,
                 ElementType.Ice => IceAffinity,
                 ElementType.Earth => EarthAffinity,
+                ElementType.Wind => WindAffinity,
+                ElementType.Almighty => AlmightyAffinity,
                 ElementType.Light => LightAffinity,
                 ElementType.Dark => DarkAffinity,
                 ElementType.Physical => PhysicalAffinity,
@@ -107,6 +121,7 @@ namespace EchoesAcrossTime.Combat
                 ElementAffinity.Resist => ResistMultiplier,
                 ElementAffinity.Immune => ImmuneMultiplier,
                 ElementAffinity.Absorb => AbsorbMultiplier,
+                ElementAffinity.Null => NullMultiplier,
                 _ => 1f
             };
         }
@@ -139,6 +154,8 @@ namespace EchoesAcrossTime.Combat
             if (ThunderAffinity == ElementAffinity.Weak) weaknesses.Add(ElementType.Thunder);
             if (IceAffinity == ElementAffinity.Weak) weaknesses.Add(ElementType.Ice);
             if (EarthAffinity == ElementAffinity.Weak) weaknesses.Add(ElementType.Earth);
+            if (WindAffinity == ElementAffinity.Weak) weaknesses.Add(ElementType.Wind);
+            if (AlmightyAffinity == ElementAffinity.Weak) weaknesses.Add(ElementType.Almighty);
             if (LightAffinity == ElementAffinity.Weak) weaknesses.Add(ElementType.Light);
             if (DarkAffinity == ElementAffinity.Weak) weaknesses.Add(ElementType.Dark);
             if (PhysicalAffinity == ElementAffinity.Weak) weaknesses.Add(ElementType.Physical);
@@ -158,6 +175,8 @@ namespace EchoesAcrossTime.Combat
             if (ThunderAffinity == ElementAffinity.Resist) resistances.Add(ElementType.Thunder);
             if (IceAffinity == ElementAffinity.Resist) resistances.Add(ElementType.Ice);
             if (EarthAffinity == ElementAffinity.Resist) resistances.Add(ElementType.Earth);
+            if (WindAffinity == ElementAffinity.Resist) resistances.Add(ElementType.Wind);
+            if (AlmightyAffinity == ElementAffinity.Resist) resistances.Add(ElementType.Almighty);
             if (LightAffinity == ElementAffinity.Resist) resistances.Add(ElementType.Light);
             if (DarkAffinity == ElementAffinity.Resist) resistances.Add(ElementType.Dark);
             if (PhysicalAffinity == ElementAffinity.Resist) resistances.Add(ElementType.Physical);
@@ -177,6 +196,8 @@ namespace EchoesAcrossTime.Combat
             if (ThunderAffinity == ElementAffinity.Immune) immunities.Add(ElementType.Thunder);
             if (IceAffinity == ElementAffinity.Immune) immunities.Add(ElementType.Ice);
             if (EarthAffinity == ElementAffinity.Immune) immunities.Add(ElementType.Earth);
+            if (WindAffinity == ElementAffinity.Immune) immunities.Add(ElementType.Wind);
+            if (AlmightyAffinity == ElementAffinity.Immune) immunities.Add(ElementType.Almighty);
             if (LightAffinity == ElementAffinity.Immune) immunities.Add(ElementType.Light);
             if (DarkAffinity == ElementAffinity.Immune) immunities.Add(ElementType.Dark);
             if (PhysicalAffinity == ElementAffinity.Immune) immunities.Add(ElementType.Physical);
@@ -196,6 +217,8 @@ namespace EchoesAcrossTime.Combat
             if (ThunderAffinity == ElementAffinity.Absorb) absorptions.Add(ElementType.Thunder);
             if (IceAffinity == ElementAffinity.Absorb) absorptions.Add(ElementType.Ice);
             if (EarthAffinity == ElementAffinity.Absorb) absorptions.Add(ElementType.Earth);
+            if (WindAffinity == ElementAffinity.Absorb) absorptions.Add(ElementType.Wind);
+            if (AlmightyAffinity == ElementAffinity.Absorb) absorptions.Add(ElementType.Almighty);
             if (LightAffinity == ElementAffinity.Absorb) absorptions.Add(ElementType.Light);
             if (DarkAffinity == ElementAffinity.Absorb) absorptions.Add(ElementType.Dark);
             if (PhysicalAffinity == ElementAffinity.Absorb) absorptions.Add(ElementType.Physical);
@@ -215,6 +238,8 @@ namespace EchoesAcrossTime.Combat
                 ThunderAffinity = this.ThunderAffinity,
                 IceAffinity = this.IceAffinity,
                 EarthAffinity = this.EarthAffinity,
+                WindAffinity = this.WindAffinity,
+                AlmightyAffinity = this.AlmightyAffinity,
                 LightAffinity = this.LightAffinity,
                 DarkAffinity = this.DarkAffinity,
                 PhysicalAffinity = this.PhysicalAffinity,

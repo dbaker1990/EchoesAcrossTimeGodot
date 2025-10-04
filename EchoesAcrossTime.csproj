@@ -15,6 +15,9 @@
     <Content Include="Docs\CompleteIntegrationGuide.md" />
     <Content Include="Docs\CoreCommandsDocumentation.md" />
     <Content Include="Docs\LimitBreakDocumentation.md" />
+    <Content Include="Docs\MainMenuCompleteSummary.md" />
+    <Content Include="Docs\MainMenuSystemGuide.md" />
+    <Content Include="Docs\MenuSystemQuickReference.md" />
     <Content Include="Docs\PartyMenu.md" />
     <Content Include="Docs\Persona5BattleSystem_Documentation.md" />
     <Content Include="Docs\Phase2_Documentation.md" />

@@ -11,9 +11,11 @@ namespace EchoesAcrossTime.Combat
         Thunder,
         Ice,
         Earth,
+        Wind,
         Light,
         Dark,
-        Physical  // For non-elemental attacks
+        Almighty,
+        Physical
     }
     
     public enum ElementAffinity
@@ -22,6 +24,7 @@ namespace EchoesAcrossTime.Combat
         Weak,      // 150% damage
         Resist,    // 50% damage
         Immune,    // 0% damage
-        Absorb     // Heals instead of damages
+        Absorb,     // Heals instead of damages
+        Null
     }
 }
