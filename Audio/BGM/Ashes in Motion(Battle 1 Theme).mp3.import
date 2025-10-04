@@ -12,7 +12,7 @@ dest_files=["res://.godot/imported/Ashes in Motion(Battle 1 Theme).mp3-291f08535
 
 [params]
 
-loop=false
+loop=true
 loop_offset=0
 bpm=0
 beat_count=0
