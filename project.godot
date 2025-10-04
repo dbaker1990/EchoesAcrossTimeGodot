@@ -23,6 +23,7 @@ PartyManager="*res://Managers/PartyManager.cs"
 SkitManager="*res://Skits/SkitManager.cs"
 AudioManager="*res://Audio/AudioManager.cs"
 BestiaryManager="*res://Beastiary/BestiaryManager.cs"
+EncounterManager="*res://Encounters/EncounterManager.cs"
 
 [display]
 

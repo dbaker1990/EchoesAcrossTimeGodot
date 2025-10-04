@@ -3,6 +3,7 @@ using System;
 using EchoesAcrossTime.Combat;
 using EchoesAcrossTime.Database;
 using System.Collections.Generic;
+using EchoesAcrossTime.Characters.States;
 
 public partial class OverworldCharacter : CharacterBody2D
 {
