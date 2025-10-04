@@ -1,4 +1,4 @@
-﻿// Combat/AIPattern.cs
+﻿// Combat/AIPattern.cs - Enhanced with Technical Awareness & Smart Tactics
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -24,15 +24,13 @@ namespace EchoesAcrossTime.Combat
         LowestDefense,
         HighestThreat,
         Random,
-        Healer,         // Target healers first
-        Mage,           // Target magic users
-        Weakest,        // Lowest level/stats
-        Leader          // Player character
+        Healer,
+        Mage,
+        Weakest,
+        Leader,
+        MostVulnerable  // NEW: Considers status + weaknesses
     }
 
-    /// <summary>
-    /// AI behavior pattern for enemies
-    /// </summary>
     [GlobalClass]
     public partial class AIPattern : Resource
     {
@@ -49,7 +47,7 @@ namespace EchoesAcrossTime.Combat
         [Export] public bool PrefersMelee { get; set; } = false;
         [Export(PropertyHint.Range, "0,100")] public int SkillUsageRate { get; set; } = 60;
         [Export] public Godot.Collections.Array<string> PreferredSkillIds { get; set; }
-        [Export] public Godot.Collections.Array<string> EmergencySkillIds { get; set; }  // Used at low HP
+        [Export] public Godot.Collections.Array<string> EmergencySkillIds { get; set; }
         
         [ExportGroup("Thresholds")]
         [Export(PropertyHint.Range, "0,100")] public int LowHPThreshold { get; set; } = 30;
@@ -65,41 +63,71 @@ namespace EchoesAcrossTime.Combat
         
         [ExportGroup("Turn Patterns")]
         [Export] public bool HasTurnPattern { get; set; } = false;
-        [Export] public Godot.Collections.Array<string> TurnPattern { get; set; }  // Skill IDs in order
+        [Export] public Godot.Collections.Array<string> TurnPattern { get; set; }
+        
+        // NEW: Smart AI Features
+        [ExportGroup("Smart AI")]
+        [Export] public bool LearnWeaknesses { get; set; } = true;
+        [Export] public bool ExploitTechnicals { get; set; } = true;
+        [Export] public bool UseDefensiveTactics { get; set; } = true;
+        [Export(PropertyHint.Range, "0,100")] public int TechnicalPriority { get; set; } = 80;
+        [Export(PropertyHint.Range, "0,100")] public int WeaknessPriority { get; set; } = 90;
+        
         private int currentPatternIndex = 0;
+        private TechnicalDamageSystem technicalSystem;
+        private Dictionary<string, ElementAffinity> learnedWeaknesses;
 
         public AIPattern()
         {
             PreferredSkillIds = new Godot.Collections.Array<string>();
             EmergencySkillIds = new Godot.Collections.Array<string>();
             TurnPattern = new Godot.Collections.Array<string>();
+            learnedWeaknesses = new Dictionary<string, ElementAffinity>();
+        }
+
+        public void Initialize(TechnicalDamageSystem techSystem)
+        {
+            technicalSystem = techSystem;
         }
 
         /// <summary>
-        /// Decide what action the AI should take
+        /// Main decision making - NOW WITH TECHNICAL & WEAKNESS AWARENESS
         /// </summary>
         public AIDecision DecideAction(CharacterStats actor, List<CharacterStats> allies, List<CharacterStats> enemies)
         {
             var decision = new AIDecision();
 
-            // Check for emergency situations
+            // Check for emergency situations FIRST
             if (ShouldUseEmergencySkill(actor))
             {
                 decision = DecideEmergencyAction(actor, allies, enemies);
                 if (decision.ActionType != AIActionType.None) return decision;
             }
 
-            // Check for special behaviors
-            if (WillFlee && actor.HPPercent <= FleeThreshold / 100f)
+            // NEW: Check for defensive needs
+            if (UseDefensiveTactics && ShouldDefend(actor, enemies))
             {
-                decision.ActionType = AIActionType.Flee;
-                return decision;
+                return new AIDecision { ActionType = AIActionType.Defend };
             }
 
-            if (CallsForHelp && allies.Count(a => a.IsAlive) < 2 && actor.HPPercent < 0.5f)
+            // Check for flee condition
+            if (WillFlee && actor.HPPercent <= FleeThreshold / 100f)
             {
-                decision.ActionType = AIActionType.CallForHelp;
-                return decision;
+                return new AIDecision { ActionType = AIActionType.Flee };
+            }
+
+            // NEW: PRIORITIZE TECHNICAL DAMAGE OPPORTUNITIES
+            if (ExploitTechnicals && GD.Randf() * 100 < TechnicalPriority)
+            {
+                decision = FindTechnicalOpportunity(actor, enemies);
+                if (decision.ActionType != AIActionType.None) return decision;
+            }
+
+            // NEW: PRIORITIZE WEAKNESS EXPLOITATION
+            if (LearnWeaknesses && GD.Randf() * 100 < WeaknessPriority)
+            {
+                decision = FindWeaknessOpportunity(actor, enemies);
+                if (decision.ActionType != AIActionType.None) return decision;
             }
 
             // Follow turn pattern if set
@@ -125,6 +153,133 @@ namespace EchoesAcrossTime.Combat
             return decision;
         }
 
+        #region NEW: Smart AI Functions
+
+        /// <summary>
+        /// NEW: Find and execute technical damage combos
+        /// </summary>
+        private AIDecision FindTechnicalOpportunity(CharacterStats actor, List<CharacterStats> enemies)
+        {
+            if (technicalSystem == null) return new AIDecision { ActionType = AIActionType.None };
+
+            var skills = actor.Skills?.GetUsableSkills(actor);
+            if (skills == null || skills.Count == 0) return new AIDecision { ActionType = AIActionType.None };
+
+            // Check each enemy for technical opportunities
+            foreach (var enemy in enemies.Where(e => e.IsAlive))
+            {
+                foreach (var skill in skills)
+                {
+                    if (technicalSystem.CanCreateTechnical(enemy, skill.Element))
+                    {
+                        GD.Print($"[AI] {actor.CharacterName} found TECHNICAL opportunity on {enemy.CharacterName}!");
+                        return new AIDecision
+                        {
+                            ActionType = AIActionType.UseSkill,
+                            SelectedSkill = skill,
+                            Target = enemy,
+                            Reasoning = "Technical Combo Opportunity"
+                        };
+                    }
+                }
+            }
+
+            return new AIDecision { ActionType = AIActionType.None };
+        }
+
+        /// <summary>
+        /// NEW: Find and exploit known/discovered weaknesses
+        /// </summary>
+        private AIDecision FindWeaknessOpportunity(CharacterStats actor, List<CharacterStats> enemies)
+        {
+            var skills = actor.Skills?.GetUsableSkills(actor);
+            if (skills == null || skills.Count == 0) return new AIDecision { ActionType = AIActionType.None };
+
+            // Try learned weaknesses first
+            foreach (var enemy in enemies.Where(e => e.IsAlive))
+            {
+                string key = enemy.CharacterId;
+                if (learnedWeaknesses.TryGetValue(key, out var weakElement))
+                {
+                    var skill = skills.FirstOrDefault(s => 
+                        s.Element.ToString() == weakElement.ToString());
+                    
+                    if (skill != null)
+                    {
+                        GD.Print($"[AI] {actor.CharacterName} exploiting learned weakness!");
+                        return new AIDecision
+                        {
+                            ActionType = AIActionType.UseSkill,
+                            SelectedSkill = skill,
+                            Target = enemy,
+                            Reasoning = "Exploiting Known Weakness"
+                        };
+                    }
+                }
+
+                // Try to discover new weaknesses
+                foreach (var skill in skills.Where(s => s.Element != ElementType.None))
+                {
+                    var affinity = enemy.ElementAffinities.GetAffinity(skill.Element);
+                    if (affinity == ElementAffinity.Weak)
+                    {
+                        // Learn this weakness
+                        learnedWeaknesses[key] = affinity;
+                        
+                        GD.Print($"[AI] {actor.CharacterName} discovered weakness to {skill.Element}!");
+                        return new AIDecision
+                        {
+                            ActionType = AIActionType.UseSkill,
+                            SelectedSkill = skill,
+                            Target = enemy,
+                            Reasoning = "Discovered New Weakness"
+                        };
+                    }
+                }
+            }
+
+            return new AIDecision { ActionType = AIActionType.None };
+        }
+
+        /// <summary>
+        /// NEW: Determine if AI should defend this turn
+        /// </summary>
+        private bool ShouldDefend(CharacterStats actor, List<CharacterStats> enemies)
+        {
+            // Defend if low HP and no healing available
+            if (actor.HPPercent < DefensiveThreshold / 100f)
+            {
+                var healSkills = actor.Skills?.GetEquippedSkills()
+                    .Where(s => s.DisplayName.ToLower().Contains("heal") && s.CanUse(actor))
+                    .ToList();
+                
+                if (healSkills == null || healSkills.Count == 0)
+                {
+                    GD.Print($"[AI] {actor.CharacterName} guards defensively (Low HP: {actor.HPPercent * 100}%)");
+                    return true;
+                }
+            }
+
+            // Defend if heavily outnumbered
+            if (GuardsAllies)
+            {
+                int livingAllies = enemies.Count(e => e.IsAlive);
+                int livingEnemies = enemies.Count(e => e.IsAlive);
+                
+                if (livingEnemies >= livingAllies * 2)
+                {
+                    GD.Print($"[AI] {actor.CharacterName} guards strategically (Outnumbered!)");
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        #endregion
+
+        #region Emergency & Defensive Actions
+
         private bool ShouldUseEmergencySkill(CharacterStats actor)
         {
             return actor.HPPercent <= LowHPThreshold / 100f && EmergencySkillIds.Count > 0;
@@ -132,109 +287,124 @@ namespace EchoesAcrossTime.Combat
 
         private AIDecision DecideEmergencyAction(CharacterStats actor, List<CharacterStats> allies, List<CharacterStats> enemies)
         {
-            var usableEmergencySkills = new List<SkillData>();
+            var skills = actor.Skills?.GetEquippedSkills();
+            if (skills == null) return new AIDecision { ActionType = AIActionType.None };
 
             foreach (var skillId in EmergencySkillIds)
             {
-                var skill = actor.Skills?.GetEquippedSkills().Find(s => s.SkillId == skillId);
-                if (skill != null && skill.CanUse(actor))
+                var skill = skills.Find(s => s.SkillId == skillId && s.CanUse(actor));
+                if (skill != null)
                 {
-                    usableEmergencySkills.Add(skill);
+                    GD.Print($"[AI] {actor.CharacterName} uses EMERGENCY skill: {skill.DisplayName}");
+                    return new AIDecision
+                    {
+                        ActionType = AIActionType.UseSkill,
+                        SelectedSkill = skill,
+                        Target = ChooseSkillTarget(skill, actor, allies, enemies),
+                        Reasoning = "Emergency Skill"
+                    };
                 }
-            }
-
-            if (usableEmergencySkills.Count > 0)
-            {
-                var skill = usableEmergencySkills[GD.RandRange(0, usableEmergencySkills.Count - 1)];
-                return new AIDecision
-                {
-                    ActionType = AIActionType.UseSkill,
-                    SelectedSkill = skill,
-                    Target = ChooseSkillTarget(skill, actor, allies, enemies)
-                };
             }
 
             return new AIDecision { ActionType = AIActionType.None };
         }
 
-        private AIDecision DecideAggressiveAction(CharacterStats actor, List<CharacterStats> enemies)
+        private AIDecision DecideDefensiveAction(CharacterStats actor, List<CharacterStats> allies)
         {
-            // High chance to use damage skills
-            if (GD.Randf() * 100 < SkillUsageRate)
-            {
-                var damageSkills = actor.Skills?.GetEquippedSkills()
-                    .Where(s => s.Type == SkillType.ActiveAttack && s.CanUse(actor))
-                    .ToList();
+            var skills = actor.Skills?.GetUsableSkills(actor);
+            if (skills == null) return new AIDecision { ActionType = AIActionType.Defend };
 
-                if (damageSkills != null && damageSkills.Count > 0)
+            // Prioritize healing wounded allies
+            var woundedAlly = allies.Where(a => a.IsAlive && a.HPPercent < 0.6f)
+                .OrderBy(a => a.HPPercent).FirstOrDefault();
+
+            if (woundedAlly != null)
+            {
+                var healSkill = skills.FirstOrDefault(s => 
+                    s.DisplayName.ToLower().Contains("heal"));
+                
+                if (healSkill != null)
                 {
-                    var skill = ChoosePreferredSkill(damageSkills);
                     return new AIDecision
                     {
                         ActionType = AIActionType.UseSkill,
-                        SelectedSkill = skill,
-                        Target = ChooseTarget(enemies, TargetPriority)
+                        SelectedSkill = healSkill,
+                        Target = woundedAlly,
+                        Reasoning = "Healing Wounded Ally"
                     };
                 }
             }
 
-            // Default to basic attack
+            // Use buff skills
+            var buffSkills = skills.Where(s => 
+                s.Type == SkillType.ActiveSupport && !s.IsDebuff).ToList();
+            
+            if (buffSkills.Count > 0)
+            {
+                var buff = buffSkills[GD.RandRange(0, buffSkills.Count - 1)];
+                return new AIDecision
+                {
+                    ActionType = AIActionType.UseSkill,
+                    SelectedSkill = buff,
+                    Target = allies.OrderBy(a => a.HPPercent).First(),
+                    Reasoning = "Buffing Ally"
+                };
+            }
+
+            return new AIDecision { ActionType = AIActionType.Defend };
+        }
+
+        #endregion
+
+        #region Behavior Types
+
+        private AIDecision DecideAggressiveAction(CharacterStats actor, List<CharacterStats> enemies)
+        {
+            var skills = actor.Skills?.GetUsableSkills(actor);
+            var damageSkills = skills?.Where(s => 
+                s.Type == SkillType.ActiveAttack && s.BasePower > 0).ToList();
+
+            if (damageSkills != null && damageSkills.Count > 0 && 
+                GD.Randf() * 100 < SkillUsageRate)
+            {
+                // Choose highest damage skill
+                var skill = damageSkills.OrderByDescending(s => s.BasePower).First();
+                var target = ChooseTarget(enemies, TargetPriority);
+
+                return new AIDecision
+                {
+                    ActionType = AIActionType.UseSkill,
+                    SelectedSkill = skill,
+                    Target = target,
+                    Reasoning = "Aggressive Damage"
+                };
+            }
+
             return new AIDecision
             {
                 ActionType = AIActionType.Attack,
-                Target = ChooseTarget(enemies, TargetPriority)
-            };
-        }
-
-        private AIDecision DecideDefensiveAction(CharacterStats actor, List<CharacterStats> allies)
-        {
-            // Check if anyone needs healing
-            var woundedAllies = allies.Where(a => a.IsAlive && a.HPPercent < 0.7f).ToList();
-
-            if (woundedAllies.Count > 0)
-            {
-                var healingSkills = actor.Skills?.GetEquippedSkills()
-                    .Where(s => s.HealAmount > 0 && s.CanUse(actor))
-                    .ToList();
-
-                if (healingSkills != null && healingSkills.Count > 0)
-                {
-                    var mostWounded = woundedAllies.OrderBy(a => a.HPPercent).First();
-                    return new AIDecision
-                    {
-                        ActionType = AIActionType.UseSkill,
-                        SelectedSkill = healingSkills[0],
-                        Target = mostWounded
-                    };
-                }
-            }
-
-            // Otherwise defend
-            return new AIDecision
-            {
-                ActionType = AIActionType.Defend
+                Target = ChooseTarget(enemies, TargetPriority),
+                Reasoning = "Basic Attack"
             };
         }
 
         private AIDecision DecideBalancedAction(CharacterStats actor, List<CharacterStats> allies, List<CharacterStats> enemies)
         {
-            // Mix of offense and defense
-            if (actor.HPPercent < DefensiveThreshold / 100f)
+            // Check if healing needed
+            if (allies.Any(a => a.IsAlive && a.HPPercent < 0.5f))
             {
                 return DecideDefensiveAction(actor, allies);
             }
-            else
-            {
-                return DecideAggressiveAction(actor, enemies);
-            }
+
+            // Otherwise be aggressive
+            return DecideAggressiveAction(actor, enemies);
         }
 
         private AIDecision DecideTacticalAction(CharacterStats actor, List<CharacterStats> enemies)
         {
-            // Exploit weaknesses
-            var skillsWithElements = actor.Skills?.GetEquippedSkills()
-                .Where(s => s.Type == SkillType.ActiveAttack && s.Element != ElementType.Physical && s.CanUse(actor))
-                .ToList();
+            var skills = actor.Skills?.GetUsableSkills(actor);
+            var skillsWithElements = skills?.Where(s => 
+                s.Element != ElementType.None && s.BasePower > 0).ToList();
 
             if (skillsWithElements != null && skillsWithElements.Count > 0)
             {
@@ -245,24 +415,24 @@ namespace EchoesAcrossTime.Combat
                     {
                         if (enemy.ElementAffinities.GetAffinity(skill.Element) == ElementAffinity.Weak)
                         {
+                            GD.Print($"[AI] Tactical strike on weakness!");
                             return new AIDecision
                             {
                                 ActionType = AIActionType.UseSkill,
                                 SelectedSkill = skill,
-                                Target = enemy
+                                Target = enemy,
+                                Reasoning = "Tactical Weakness Hit"
                             };
                         }
                     }
                 }
             }
 
-            // Fall back to aggressive
             return DecideAggressiveAction(actor, enemies);
         }
 
         private AIDecision DecideBerserkAction(CharacterStats actor, List<CharacterStats> enemies)
         {
-            // Random powerful attacks
             var allSkills = actor.Skills?.GetUsableSkills(actor);
 
             if (allSkills != null && allSkills.Count > 0 && GD.Randf() < 0.7f)
@@ -274,20 +444,21 @@ namespace EchoesAcrossTime.Combat
                 {
                     ActionType = AIActionType.UseSkill,
                     SelectedSkill = skill,
-                    Target = target
+                    Target = target,
+                    Reasoning = "Berserk Attack"
                 };
             }
 
             return new AIDecision
             {
                 ActionType = AIActionType.Attack,
-                Target = enemies[GD.RandRange(0, enemies.Count - 1)]
+                Target = enemies[GD.RandRange(0, enemies.Count - 1)],
+                Reasoning = "Berserk Attack"
             };
         }
 
         private AIDecision DecideSupportiveAction(CharacterStats actor, List<CharacterStats> allies, List<CharacterStats> enemies)
         {
-            // Prioritize buffs and debuffs
             var supportSkills = actor.Skills?.GetEquippedSkills()
                 .Where(s => s.Type == SkillType.ActiveSupport && s.CanUse(actor))
                 .ToList();
@@ -303,18 +474,19 @@ namespace EchoesAcrossTime.Combat
                 {
                     ActionType = AIActionType.UseSkill,
                     SelectedSkill = skill,
-                    Target = target
+                    Target = target,
+                    Reasoning = "Support Action"
                 };
             }
 
-            return DecideDefensiveAction(actor, allies);
+            return DecideBalancedAction(actor, allies, enemies);
         }
 
         private AIDecision DecideCowardlyAction(CharacterStats actor, List<CharacterStats> allies, List<CharacterStats> enemies)
         {
             if (actor.HPPercent < 0.5f)
             {
-                return new AIDecision { ActionType = AIActionType.Flee };
+                return new AIDecision { ActionType = AIActionType.Flee, Reasoning = "Cowardly Flee" };
             }
 
             return DecideBalancedAction(actor, allies, enemies);
@@ -335,12 +507,17 @@ namespace EchoesAcrossTime.Combat
                 {
                     ActionType = AIActionType.UseSkill,
                     SelectedSkill = skill,
-                    Target = ChooseSkillTarget(skill, actor, allies, enemies)
+                    Target = ChooseSkillTarget(skill, actor, allies, enemies),
+                    Reasoning = "Turn Pattern"
                 };
             }
 
             return new AIDecision { ActionType = AIActionType.None };
         }
+
+        #endregion
+
+        #region Target Selection
 
         private CharacterStats ChooseTarget(List<CharacterStats> targets, TargetPriority priority)
         {
@@ -353,12 +530,23 @@ namespace EchoesAcrossTime.Combat
                 TargetPriority.HighestHP => aliveTargets.OrderByDescending(t => t.CurrentHP).First(),
                 TargetPriority.LowestDefense => aliveTargets.OrderBy(t => t.Defense).First(),
                 TargetPriority.Weakest => aliveTargets.OrderBy(t => t.Level).First(),
+                TargetPriority.MostVulnerable => FindMostVulnerable(aliveTargets),
                 TargetPriority.Random => aliveTargets[GD.RandRange(0, aliveTargets.Count - 1)],
                 _ => aliveTargets[GD.RandRange(0, aliveTargets.Count - 1)]
             };
         }
 
-        private CharacterStats ChooseSkillTarget(SkillData skill, CharacterStats actor, List<CharacterStats> allies, List<CharacterStats> enemies)
+        private CharacterStats FindMostVulnerable(List<CharacterStats> targets)
+        {
+            // Prioritize targets with status effects or low HP
+            return targets
+                .OrderBy(t => t.ActiveStatuses.Count > 0 ? 0 : 1)
+                .ThenBy(t => t.HPPercent)
+                .First();
+        }
+
+        private CharacterStats ChooseSkillTarget(SkillData skill, CharacterStats actor, 
+            List<CharacterStats> allies, List<CharacterStats> enemies)
         {
             return skill.Target switch
             {
@@ -370,19 +558,7 @@ namespace EchoesAcrossTime.Combat
             };
         }
 
-        private SkillData ChoosePreferredSkill(List<SkillData> skills)
-        {
-            if (PreferredSkillIds.Count > 0)
-            {
-                foreach (var preferredId in PreferredSkillIds)
-                {
-                    var preferred = skills.Find(s => s.SkillId == preferredId);
-                    if (preferred != null) return preferred;
-                }
-            }
-
-            return skills[GD.RandRange(0, skills.Count - 1)];
-        }
+        #endregion
     }
 
     public enum AIActionType
@@ -402,5 +578,6 @@ namespace EchoesAcrossTime.Combat
         public SkillData SelectedSkill { get; set; }
         public CharacterStats Target { get; set; }
         public string ItemId { get; set; }
+        public string Reasoning { get; set; } // NEW: For debugging
     }
 }

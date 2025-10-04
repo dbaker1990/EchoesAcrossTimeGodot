@@ -23,6 +23,7 @@
     <Content Include="Docs\QuickReference.md" />
     <Content Include="Docs\SkitReadMe.md" />
     <Content Include="Docs\SkitSystemGuide.md" />
+    <Content Include="Docs\SmartAIIntegration.md" />
     <Content Include="Images\TitleScreen\Title Screen.png" />
     <Content Include="Skits\SkitUI.tscn" />
     <Content Include="UI\PartyMenuUI.tscn" />
