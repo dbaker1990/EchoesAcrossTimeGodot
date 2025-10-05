@@ -22,7 +22,7 @@ namespace EchoesAcrossTime.Database
         [Export] public string DisplayName { get; set; } = "Character";
         [Export(PropertyHint.MultilineText)] public string Description { get; set; } = "";
         [Export] public CharacterType Type { get; set; } = CharacterType.PlayableCharacter;
-        [Export] public CharacterClass Class { get; set; } = CharacterClass.CourtMage;
+        [Export] public CharacterClass Class { get; set; } = CharacterClass.BlackMage;
         [Export] public bool IsBoss { get; set; } = false;
         
         [ExportGroup("Visual Assets")]

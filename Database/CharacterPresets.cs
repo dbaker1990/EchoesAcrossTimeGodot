@@ -14,7 +14,7 @@ namespace EchoesAcrossTime.Database
                 CharacterId = "dominic",
                 DisplayName = "Prince Dominic Valebran",
                 Type = CharacterType.PlayableCharacter,
-                Class = CharacterClass.PrismShadow,
+                Class = CharacterClass.BlackMage,
                 Description = "Prince of Valebran with shadow magic abilities",
             
                 // Visual Assets

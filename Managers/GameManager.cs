@@ -7,8 +7,8 @@ namespace EchoesAcrossTime
     public partial class GameManager : Node
     {
         public static GameManager Instance { get; private set; }
-        
         [Export] public GameDatabase Database { get; set; }
+        [Export] public GameOverUI GameOverScreen { get; set; }
         
         // Current game state - Changed to public set for SaveSystem
         public SaveData CurrentSave { get; set; }
@@ -62,6 +62,42 @@ namespace EchoesAcrossTime
         {
             IsGameActive = false;
             CurrentSave = null;
+            GetTree().ChangeSceneToFile("res://Scenes/TitleScreen.tscn");
+        }
+        
+        public void TriggerGameOver()
+        {
+            // You might want to pause the game or stop player input here
+            GetTree().Paused = true; 
+            GameOverScreen?.ShowScreen();
+        }
+
+        public void ContinueFromLastSave()
+        {
+            GetTree().Paused = false;
+
+            // Get the index of the most recent save file.
+            int lastSaveSlot = SaveSystem.Instance.GetMostRecentSaveSlot();
+
+            if (lastSaveSlot != -1)
+            {
+                // Attempt to load the game from that slot.
+                bool loadSuccessful = SaveSystem.Instance.LoadGame(lastSaveSlot); 
+                if (loadSuccessful)
+                {
+                    SaveData data = SaveSystem.Instance.CurrentSaveData;
+                    LoadGame(data);
+                    return;
+                }
+            }
+
+            // If no save exists or it fails to load, go to the title screen.
+            ReturnToTitleScreen();
+        }
+
+        public void ReturnToTitleScreen()
+        {
+            GetTree().Paused = false;
             GetTree().ChangeSceneToFile("res://Scenes/TitleScreen.tscn");
         }
     }

@@ -21,6 +21,7 @@ namespace EchoesAcrossTime
         
         [Export] public bool EnableAutoSave { get; set; } = true;
         [Export] public float AutoSaveInterval { get; set; } = 300f; // 5 minutes
+        public SaveData CurrentSaveData { get; private set; }
         
         private float autoSaveTimer = 0f;
         
@@ -199,6 +200,32 @@ namespace EchoesAcrossTime
         }
         
         /// <summary>
+        /// Finds the index of the most recently saved game file.
+        /// </summary>
+        /// <returns>The slot index of the most recent save, or -1 if no saves are found.</returns>
+        public int GetMostRecentSaveSlot()
+        {
+            var saveFiles = GetSaveFileInfoList();
+    
+            if (saveFiles.Count == 0)
+            {
+                return -1; // No save files found
+            }
+
+            // Find the save file with the latest DateTime
+            SaveFileInfo mostRecentSave = null;
+            foreach (var saveInfo in saveFiles)
+            {
+                if (mostRecentSave == null || saveInfo.SaveDateTime > mostRecentSave.SaveDateTime)
+                {
+                    mostRecentSave = saveInfo;
+                }
+            }
+
+            return mostRecentSave.SlotIndex;
+        }
+        
+        /// <summary>
         /// Auto-save to slot 0
         /// </summary>
         public void AutoSave()
@@ -261,6 +288,88 @@ namespace EchoesAcrossTime
             catch (Exception e)
             {
                 GD.PrintErr($"Error reading save info: {e.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of info for all existing save files.
+        /// </summary>
+        public List<SaveFileInfo> GetSaveFileInfoList()
+        {
+            var list = new List<SaveFileInfo>();
+    
+            if (!DirAccess.DirExistsAbsolute(SAVE_DIRECTORY))
+            {
+                return list;
+            }
+
+            using var dir = DirAccess.Open(SAVE_DIRECTORY);
+            if (dir != null)
+            {
+                dir.ListDirBegin();
+                string fileName = dir.GetNext();
+                while (fileName != "")
+                {
+                    if (!dir.CurrentIsDir() && fileName.EndsWith(SAVE_FILE_EXTENSION))
+                    {
+                        // Extract slot index from file name
+                        string slotStr = fileName.Replace(SAVE_FILE_PREFIX, "").Replace(SAVE_FILE_EXTENSION, "");
+                        if (int.TryParse(slotStr, out int slotIndex))
+                        {
+                            var saveInfo = GetSaveFileInfo(slotIndex);
+                            if (saveInfo != null)
+                            {
+                                list.Add(saveInfo);
+                            }
+                        }
+                    }
+                    fileName = dir.GetNext();
+                }
+            }
+
+            return list;
+        }
+        
+        
+        /// <summary>
+        /// Reads the metadata from a single save file without loading the full game state.
+        /// </summary>
+        public SaveFileInfo GetSaveFileInfo(int slotIndex)
+        {
+            string path = SAVE_DIRECTORY + SAVE_FILE_PREFIX + slotIndex + SAVE_FILE_EXTENSION;
+    
+            if (!FileAccess.FileExists(path))
+            {
+                return null;
+            }
+
+            try
+            {
+                using var file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
+                string jsonString = file.GetAsText();
+        
+                // Deserialize the full data to easily access header info
+                SaveData data = JsonSerializer.Deserialize<SaveData>(jsonString);
+
+                if (data == null) return null;
+
+                // Create a lightweight info object for the UI
+                var info = new SaveFileInfo
+                {
+                    SlotIndex = slotIndex,
+                    SlotName = data.SaveSlotName,
+                    SaveDateTime = data.SaveDateTime,
+                    PlayTimeSeconds = data.PlayTimeSeconds,
+                    MapName = data.CurrentMapPath, // You might want to format this later
+                    PartyLevel = data.Party.Count > 0 ? data.Party[0].Level : 1, // Example: gets level of first party member
+                    // Screenshot loading can be added here if you save it in SaveData
+                };
+                return info;
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr($"Error reading save file info for slot {slotIndex}: {e.Message}");
                 return null;
             }
         }
