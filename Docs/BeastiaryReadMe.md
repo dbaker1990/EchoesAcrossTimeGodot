@@ -1,4 +1,4 @@
-﻿# 📖 Bestiary System - Quick Reference
+# 📖 Bestiary System - Quick Reference
 
 ## 🎯 What Is This?
 
@@ -48,7 +48,7 @@ BestiaryManager.Instance?.InitializeFromDatabase(GameManager.Instance.Database);
 ```csharp
 private void OnBestiaryPressed()
 {
-    GetNode<BestiaryUI>("%BestiaryUI")?.ShowBestiary();
+	GetNode<BestiaryUI>("%BestiaryUI")?.ShowBestiary();
 }
 ```
 
@@ -104,17 +104,17 @@ var byLevel = BestiaryManager.Instance.GetSortedEnemies(BestiarySortType.ByLevel
 
 ```
 Battle Starts
-    ↓
+	↓
 Enemy Appears → Recorded as "encountered"
-    ↓
+	↓
 Player Attacks with Fire
-    ↓
+	↓
 Enemy Weak to Fire? → Weakness recorded
-    ↓
+	↓
 Notification: "Weakness Discovered: Fire!"
-    ↓
+	↓
 Enemy Defeated → Defeat count +1
-    ↓
+	↓
 Bestiary Updated
 ```
 
@@ -162,9 +162,9 @@ BestiaryManager.Instance.RecordWeaknessDiscovered("dragon", ElementType.Ice);
 
 public override void _Ready()
 {
-    bestiaryButton.Pressed += () => {
-        GetNode<BestiaryUI>("%BestiaryUI")?.ShowBestiary();
-    };
+	bestiaryButton.Pressed += () => {
+		GetNode<BestiaryUI>("%BestiaryUI")?.ShowBestiary();
+	};
 }
 ```
 
@@ -173,10 +173,10 @@ public override void _Ready()
 // In your battle manager when enemy uses skill
 private void OnEnemyUseSkill(BattleMember enemy, SkillData skill)
 {
-    BestiaryManager.Instance?.RecordSkillDiscovered(
-        enemy.Stats.CharacterId,
-        skill.SkillId
-    );
+	BestiaryManager.Instance?.RecordSkillDiscovered(
+		enemy.Stats.CharacterId,
+		skill.SkillId
+	);
 }
 ```
 
@@ -185,21 +185,21 @@ private void OnEnemyUseSkill(BattleMember enemy, SkillData skill)
 // Skill that reveals all enemy info
 if (skill.SkillId == "scan")
 {
-    var entry = BestiaryManager.Instance.GetEntry(target.CharacterId);
-    
-    // Reveal all weaknesses
-    for (int i = 0; i < 8; i++)
-    {
-        var element = (ElementType)i;
-        var affinity = target.ElementAffinities.GetAffinity(element);
-        
-        if (affinity == ElementAffinity.Weak)
-        {
-            BestiaryManager.Instance.RecordWeaknessDiscovered(
-                target.CharacterId, element
-            );
-        }
-    }
+	var entry = BestiaryManager.Instance.GetEntry(target.CharacterId);
+	
+	// Reveal all weaknesses
+	for (int i = 0; i < 8; i++)
+	{
+		var element = (ElementType)i;
+		var affinity = target.ElementAffinities.GetAffinity(element);
+		
+		if (affinity == ElementAffinity.Weak)
+		{
+			BestiaryManager.Instance.RecordWeaknessDiscovered(
+				target.CharacterId, element
+			);
+		}
+	}
 }
 ```
 
@@ -222,26 +222,26 @@ public Godot.Collections.Dictionary CustomData { get; set; } = new();
 // When saving
 public void CaptureCurrentState()
 {
-    // ... existing code ...
-    
-    if (BestiaryManager.Instance != null)
-    {
-        var bestiaryData = BestiaryManager.Instance.GetSaveData();
-        CustomData["Bestiary"] = Json.Stringify(bestiaryData);
-    }
+	// ... existing code ...
+	
+	if (BestiaryManager.Instance != null)
+	{
+		var bestiaryData = BestiaryManager.Instance.GetSaveData();
+		CustomData["Bestiary"] = Json.Stringify(bestiaryData);
+	}
 }
 
 // When loading
 public void ApplyToGame()
 {
-    // ... existing code ...
-    
-    if (CustomData.ContainsKey("Bestiary"))
-    {
-        var json = CustomData["Bestiary"].AsString();
-        var data = Json.ParseString(json);
-        // Parse and load bestiary data
-    }
+	// ... existing code ...
+	
+	if (CustomData.ContainsKey("Bestiary"))
+	{
+		var json = CustomData["Bestiary"].AsString();
+		var data = Json.ParseString(json);
+		// Parse and load bestiary data
+	}
 }
 ```
 
@@ -264,13 +264,13 @@ filterDropdown.AddItem("Fire Enemies", (int)BestiaryFilterType.ByElement);
 ### Reward Milestones
 ```csharp
 BestiaryManager.Instance.BestiaryUpdated += () => {
-    float completion = BestiaryManager.Instance.CompletionPercentage;
-    
-    if (completion >= 50f)
-        GiveReward("bestiary_50");
-    
-    if (completion >= 100f)
-        GiveReward("bestiary_master");
+	float completion = BestiaryManager.Instance.CompletionPercentage;
+	
+	if (completion >= 50f)
+		GiveReward("bestiary_50");
+	
+	if (completion >= 100f)
+		GiveReward("bestiary_master");
 };
 ```
 

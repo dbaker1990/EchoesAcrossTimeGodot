@@ -1,0 +1,69 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=14 format=3 uid="uid://cyu0ebqc2yodg"]
+
+[ext_resource type="Script" uid="uid://p16fiucorrw4" path="res://Combat/AIPattern.cs" id="1_26tk0"]
+[ext_resource type="Script" uid="uid://cqhok56saxuo3" path="res://Combat/BattleAnimationData.cs" id="2_cvyen"]
+[ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="3_yqr70"]
+[ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="4_ftvjt"]
+[ext_resource type="Script" uid="uid://cg2tuivyyfkte" path="res://Combat/ExperienceCurve.cs" id="5_3imhm"]
+[ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="6_yd8s2"]
+[ext_resource type="Texture2D" uid="uid://c6l21qj52e47e" path="res://Images/FacePics/Dominic facepic.png" id="6_yqr70"]
+[ext_resource type="Texture2D" uid="uid://cgx37a8vpyvgo" path="res://Images/MenuPortraits/Dominic portrait.png" id="7_ftvjt"]
+
+[sub_resource type="Resource" id="Resource_q872v"]
+script = ExtResource("1_26tk0")
+BehaviorType = 0
+TargetPriority = 5
+PrefersMelee = true
+PreferredSkillIds = null
+EmergencySkillIds = null
+EnragesAtLowHP = true
+TurnPattern = null
+metadata/_custom_type_script = "uid://p16fiucorrw4"
+
+[sub_resource type="Resource" id="Resource_4pc82"]
+script = ExtResource("2_cvyen")
+metadata/_custom_type_script = "uid://cqhok56saxuo3"
+
+[sub_resource type="Resource" id="Resource_4nevw"]
+script = ExtResource("3_yqr70")
+metadata/_custom_type_script = "uid://cii0v4krf5lb8"
+
+[sub_resource type="Resource" id="Resource_8hh8e"]
+script = ExtResource("4_ftvjt")
+metadata/_custom_type_script = "uid://cr283ljrg7q0d"
+
+[sub_resource type="Resource" id="Resource_ypspe"]
+script = ExtResource("5_3imhm")
+metadata/_custom_type_script = "uid://cg2tuivyyfkte"
+
+[resource]
+script = ExtResource("6_yd8s2")
+CharacterId = "dominic"
+DisplayName = "Dominic"
+Description = "Heir to Valebran, Dominic leads with empathy and quick wits. A disciplined swordsman and the first Shadow-Prism adept in centuries, he balances duty with a stubborn need to understand ordinary lives—warping the field when his friends need him most."
+Class = 10
+MenuPortrait = ExtResource("7_ftvjt")
+FacePortrait = ExtResource("6_yqr70")
+MaxHP = 110
+MaxMP = 60
+Attack = 12
+MagicAttack = 12
+MagicDefense = 11
+Speed = 14
+Luck = 13
+HPGrowthRate = 0.06
+MPGrowthRate = 0.05
+AttackGrowthRate = 0.12
+DefenseGrowthRate = 0.09
+MagicAttackGrowthRate = 0.08
+MagicDefenseGrowthRate = 0.08
+SpeedGrowthRate = 0.1
+LuckGrowthRate = 0.07
+ElementAffinities = SubResource("Resource_8hh8e")
+ExpCurve = SubResource("Resource_ypspe")
+BattleStats = SubResource("Resource_4nevw")
+BattleAnimations = SubResource("Resource_4pc82")
+AIBehavior = SubResource("Resource_q872v")
+StartingSkills = Array[Object]([])
+SkillsLearnedAtLevel = {}
+metadata/_custom_type_script = "uid://uxwpgs5c4g7l"

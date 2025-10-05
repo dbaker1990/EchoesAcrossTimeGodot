@@ -57,6 +57,7 @@ namespace EchoesAcrossTime.Database
         [Export] public int MagicAttack { get; set; } = 10;
         [Export] public int MagicDefense { get; set; } = 10;
         [Export] public int Speed { get; set; } = 10;
+        [Export] public int Luck { get; set; } = 10;
         
         [ExportGroup("Growth Rates")]
         [Export(PropertyHint.Range, "0,1,0.01")] public float HPGrowthRate { get; set; } = 0.05f;
@@ -66,6 +67,7 @@ namespace EchoesAcrossTime.Database
         [Export(PropertyHint.Range, "0,1,0.01")] public float MagicAttackGrowthRate { get; set; } = 0.03f;
         [Export(PropertyHint.Range, "0,1,0.01")] public float MagicDefenseGrowthRate { get; set; } = 0.03f;
         [Export(PropertyHint.Range, "0,1,0.01")] public float SpeedGrowthRate { get; set; } = 0.02f;
+        [Export(PropertyHint.Range, "0,1,0.01")] public float LuckGrowthRate { get; set; } = 0.02f;
         
         [ExportGroup("Combat System")]
         [Export] public ElementAffinityData ElementAffinities { get; set; }
@@ -251,6 +253,7 @@ namespace EchoesAcrossTime.Database
                 MagicAttack = this.MagicAttack,
                 MagicDefense = this.MagicDefense,
                 Speed = this.Speed,
+                Luck = this.Luck,
                 CurrentExp = 0,
                 HPGrowthRate = this.HPGrowthRate,
                 MPGrowthRate = this.MPGrowthRate,
@@ -258,7 +261,8 @@ namespace EchoesAcrossTime.Database
                 DefenseGrowthRate = this.DefenseGrowthRate,
                 MagicAttackGrowthRate = this.MagicAttackGrowthRate,
                 MagicDefenseGrowthRate = this.MagicDefenseGrowthRate,
-                SpeedGrowthRate = this.SpeedGrowthRate
+                SpeedGrowthRate = this.SpeedGrowthRate,
+                LuckGrowthRate = this.LuckGrowthRate
             };
             
             if (ExpCurve != null)

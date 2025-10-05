@@ -1,4 +1,4 @@
-﻿# 📖 Bestiary System - Developer Cheat Sheet
+# 📖 Bestiary System - Developer Cheat Sheet
 
 ## ⚡ Quick Commands
 
@@ -68,10 +68,10 @@ notif.ShowCustomNotification("dragon", "Special Enemy Spotted!");
 // In BattleManager.InitializeBattle()
 foreach (var enemy in enemyParty)
 {
-    BestiaryManager.Instance?.RecordEncounter(
-        enemy.Stats.CharacterId,
-        enemy.Stats.Level
-    );
+	BestiaryManager.Instance?.RecordEncounter(
+		enemy.Stats.CharacterId,
+		enemy.Stats.Level
+	);
 }
 ```
 
@@ -80,10 +80,10 @@ foreach (var enemy in enemyParty)
 // In BattleManager.ExecuteAction() after damage
 if (result.HitWeakness && IsPlayerAttackingEnemy())
 {
-    BestiaryManager.Instance?.RecordWeaknessDiscovered(
-        target.Stats.CharacterId,
-        result.Element
-    );
+	BestiaryManager.Instance?.RecordWeaknessDiscovered(
+		target.Stats.CharacterId,
+		result.Element
+	);
 }
 ```
 
@@ -98,10 +98,10 @@ BestiaryManager.Instance?.RecordDefeat(enemy.Stats.CharacterId);
 // In AI or skill execution
 if (IsEnemy(user))
 {
-    BestiaryManager.Instance?.RecordSkillDiscovered(
-        user.Stats.CharacterId,
-        skill.SkillId
-    );
+	BestiaryManager.Instance?.RecordSkillDiscovered(
+		user.Stats.CharacterId,
+		skill.SkillId
+	);
 }
 ```
 
@@ -131,12 +131,12 @@ if (IsEnemy(user))
 ### Check Completion & Reward
 ```csharp
 BestiaryManager.Instance.BestiaryUpdated += () => {
-    float completion = BestiaryManager.Instance.CompletionPercentage;
-    
-    if (completion >= 25f) UnlockReward("bestiary_25");
-    if (completion >= 50f) UnlockReward("bestiary_50");
-    if (completion >= 75f) UnlockReward("bestiary_75");
-    if (completion >= 100f) UnlockReward("bestiary_master");
+	float completion = BestiaryManager.Instance.CompletionPercentage;
+	
+	if (completion >= 25f) UnlockReward("bestiary_25");
+	if (completion >= 50f) UnlockReward("bestiary_50");
+	if (completion >= 75f) UnlockReward("bestiary_75");
+	if (completion >= 100f) UnlockReward("bestiary_master");
 };
 ```
 
@@ -144,17 +144,17 @@ BestiaryManager.Instance.BestiaryUpdated += () => {
 ```csharp
 if (skill.SkillId == "scan")
 {
-    // Reveal all info about target
-    for (int i = 0; i < 8; i++)
-    {
-        var element = (ElementType)i;
-        var affinity = target.ElementAffinities.GetAffinity(element);
-        
-        if (affinity == ElementAffinity.Weak)
-            BestiaryManager.Instance.RecordWeaknessDiscovered(target.CharacterId, element);
-        else if (affinity != ElementAffinity.Normal)
-            BestiaryManager.Instance.RecordResistanceDiscovered(target.CharacterId, element, affinity);
-    }
+	// Reveal all info about target
+	for (int i = 0; i < 8; i++)
+	{
+		var element = (ElementType)i;
+		var affinity = target.ElementAffinities.GetAffinity(element);
+		
+		if (affinity == ElementAffinity.Weak)
+			BestiaryManager.Instance.RecordWeaknessDiscovered(target.CharacterId, element);
+		else if (affinity != ElementAffinity.Normal)
+			BestiaryManager.Instance.RecordResistanceDiscovered(target.CharacterId, element, affinity);
+	}
 }
 ```
 
@@ -162,14 +162,14 @@ if (skill.SkillId == "scan")
 ```csharp
 private void OnBossDefeated(BattleMember boss)
 {
-    var entry = BestiaryManager.Instance.GetEntry(boss.Stats.CharacterId);
-    
-    if (entry.TimesDefeated == 1)
-    {
-        // First time defeating this boss
-        ShowMessage("Boss data added to bestiary!");
-        GiveReward("boss_data_complete");
-    }
+	var entry = BestiaryManager.Instance.GetEntry(boss.Stats.CharacterId);
+	
+	if (entry.TimesDefeated == 1)
+	{
+		// First time defeating this boss
+		ShowMessage("Boss data added to bestiary!");
+		GiveReward("boss_data_complete");
+	}
 }
 ```
 
@@ -178,8 +178,8 @@ private void OnBossDefeated(BattleMember boss)
 // On rare enemy encounter
 if (enemyData.CharacterId == "rare_golden_slime")
 {
-    var notif = GetNode<BestiaryNotification>("%BestiaryNotification");
-    notif.ShowCustomNotification("rare_golden_slime", "Rare Enemy Encountered!");
+	var notif = GetNode<BestiaryNotification>("%BestiaryNotification");
+	notif.ShowCustomNotification("rare_golden_slime", "Rare Enemy Encountered!");
 }
 ```
 
@@ -195,22 +195,22 @@ public Godot.Collections.Dictionary CustomData { get; set; } = new();
 // Save
 public void CaptureCurrentState()
 {
-    if (BestiaryManager.Instance != null)
-    {
-        var data = BestiaryManager.Instance.GetSaveData();
-        CustomData["Bestiary"] = Json.Stringify(data);
-    }
+	if (BestiaryManager.Instance != null)
+	{
+		var data = BestiaryManager.Instance.GetSaveData();
+		CustomData["Bestiary"] = Json.Stringify(data);
+	}
 }
 
 // Load
 public void ApplyToGame()
 {
-    if (CustomData.ContainsKey("Bestiary") && BestiaryManager.Instance != null)
-    {
-        var json = CustomData["Bestiary"].AsString();
-        var data = Json.ParseString(json);
-        // Deserialize and apply
-    }
+	if (CustomData.ContainsKey("Bestiary") && BestiaryManager.Instance != null)
+	{
+		var json = CustomData["Bestiary"].AsString();
+		var data = Json.ParseString(json);
+		// Deserialize and apply
+	}
 }
 ```
 
@@ -241,22 +241,22 @@ GD.Print($"Found: {BestiaryManager.Instance.TotalDiscovered}/{BestiaryManager.In
 ```csharp
 // New enemy discovered
 BestiaryManager.Instance.EnemyDiscovered += (enemyId, data) => {
-    GD.Print($"Discovered: {data.DisplayName}");
+	GD.Print($"Discovered: {data.DisplayName}");
 };
 
 // Weakness found
 BestiaryManager.Instance.WeaknessDiscovered += (enemyId, element) => {
-    GD.Print($"Weak to: {element}");
+	GD.Print($"Weak to: {element}");
 };
 
 // Skill learned
 BestiaryManager.Instance.NewSkillDiscovered += (enemyId, skillId) => {
-    GD.Print($"Skill learned: {skillId}");
+	GD.Print($"Skill learned: {skillId}");
 };
 
 // Any update
 BestiaryManager.Instance.BestiaryUpdated += () => {
-    RefreshUI();
+	RefreshUI();
 };
 ```
 

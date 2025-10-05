@@ -12,6 +12,8 @@
         Knight,       
         Scholar,
         Summoner,
-        Prince
+        Prince,
+        WarMage,
+        Archivist
     }
 }

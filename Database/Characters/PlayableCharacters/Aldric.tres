@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=10 format=3 uid="uid://dk6nnk8jigg5d"]
+
+[ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="1_q528u"]
+[ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="2_s4kmk"]
+[ext_resource type="Script" uid="uid://cg2tuivyyfkte" path="res://Combat/ExperienceCurve.cs" id="3_p3nha"]
+[ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="4_0mmqd"]
+[ext_resource type="Texture2D" uid="uid://bhxam0svfgsmi" path="res://Images/FacePics/aldricface.png" id="4_p3nha"]
+[ext_resource type="Texture2D" uid="uid://be6sv3vg61s10" path="res://Images/MenuPortraits/aldricmenu.png" id="5_0mmqd"]
+
+[sub_resource type="Resource" id="Resource_meqy6"]
+script = ExtResource("1_q528u")
+metadata/_custom_type_script = "uid://cii0v4krf5lb8"
+
+[sub_resource type="Resource" id="Resource_yny53"]
+script = ExtResource("2_s4kmk")
+metadata/_custom_type_script = "uid://cr283ljrg7q0d"
+
+[sub_resource type="Resource" id="Resource_l1lmy"]
+script = ExtResource("3_p3nha")
+metadata/_custom_type_script = "uid://cg2tuivyyfkte"
+
+[resource]
+script = ExtResource("4_0mmqd")
+CharacterId = "aldric"
+DisplayName = "Aldric"
+Description = "Dominic’s childhood friend from Millbrook and nephew to the renowned Archivist Renn Vale, Aldric serves as the party’s White Mage. Calm, practical, and people-smart, he turns lore into lifesaving wards—mending wounds, cleansing curses, and keeping the team on its feet."
+Class = 12
+MenuPortrait = ExtResource("5_0mmqd")
+FacePortrait = ExtResource("4_p3nha")
+MaxMP = 85
+Attack = 7
+Defense = 9
+MagicAttack = 14
+MagicDefense = 15
+Speed = 9
+Luck = 14
+HPGrowthRate = 0.06
+MPGrowthRate = 0.1
+DefenseGrowthRate = 0.05
+MagicAttackGrowthRate = 0.11
+MagicDefenseGrowthRate = 0.11
+SpeedGrowthRate = 0.08
+LuckGrowthRate = 0.06
+ElementAffinities = SubResource("Resource_yny53")
+ExpCurve = SubResource("Resource_l1lmy")
+BattleStats = SubResource("Resource_meqy6")
+StartingSkills = null
+SkillsLearnedAtLevel = null
+metadata/_custom_type_script = "uid://uxwpgs5c4g7l"

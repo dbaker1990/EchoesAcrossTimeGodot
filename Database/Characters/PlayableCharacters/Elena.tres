@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=10 format=3 uid="uid://bf0ykbq17surk"]
+
+[ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="1_ebtga"]
+[ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="2_pvpl8"]
+[ext_resource type="Script" uid="uid://cg2tuivyyfkte" path="res://Combat/ExperienceCurve.cs" id="3_3sipx"]
+[ext_resource type="Texture2D" uid="uid://dnc2fqrpr5t7p" path="res://Images/FacePics/elena face.png" id="4_3sipx"]
+[ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="4_6m8ua"]
+[ext_resource type="Texture2D" uid="uid://bl2e8k4oe6g0q" path="res://Images/MenuPortraits/elenaMenu.png" id="5_6m8ua"]
+
+[sub_resource type="Resource" id="Resource_cs3b2"]
+script = ExtResource("1_ebtga")
+metadata/_custom_type_script = "uid://cii0v4krf5lb8"
+
+[sub_resource type="Resource" id="Resource_mqrcc"]
+script = ExtResource("2_pvpl8")
+metadata/_custom_type_script = "uid://cr283ljrg7q0d"
+
+[sub_resource type="Resource" id="Resource_s3kl0"]
+script = ExtResource("3_3sipx")
+metadata/_custom_type_script = "uid://cg2tuivyyfkte"
+
+[resource]
+script = ExtResource("4_6m8ua")
+CharacterId = "elena"
+DisplayName = "Elena"
+Description = "Captain Mireya’s daughter and a front-line War Mage, Elena channels flame and thunder with soldier’s precision. She masks worry with sharp wit, guards Dominic’s cover, and burns a path through anything that threatens the convoy."
+Class = 11
+MenuPortrait = ExtResource("5_6m8ua")
+FacePortrait = ExtResource("4_3sipx")
+MaxHP = 90
+MaxMP = 80
+Attack = 8
+Defense = 9
+MagicAttack = 16
+MagicDefense = 12
+Speed = 11
+Luck = 11
+MPGrowthRate = 0.09
+AttackGrowthRate = 0.05
+DefenseGrowthRate = 0.07
+MagicAttackGrowthRate = 0.14
+MagicDefenseGrowthRate = 0.11
+SpeedGrowthRate = 0.08
+LuckGrowthRate = 0.05
+ElementAffinities = SubResource("Resource_mqrcc")
+ExpCurve = SubResource("Resource_s3kl0")
+BattleStats = SubResource("Resource_cs3b2")
+StartingSkills = null
+SkillsLearnedAtLevel = null
+metadata/_custom_type_script = "uid://uxwpgs5c4g7l"
