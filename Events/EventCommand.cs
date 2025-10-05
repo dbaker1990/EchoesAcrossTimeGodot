@@ -27,7 +27,11 @@ namespace EchoesAcrossTime.Events
         TransferMap,
         ConditionalBranch,
         SetVariable,
-        CallCommonEvent
+        CallCommonEvent,
+        ControlSelfSwitch,
+        NameInput,
+        ChangeTransparency,
+        ShowBalloonIcon
     }
 
     /// <summary>
@@ -251,28 +255,75 @@ namespace EchoesAcrossTime.Events
         }
     }
 
+    // Inside your EventCommand.cs file
+
     /// <summary>
-    /// Move player to location
+    /// Move a character to a location using pathfinding.
     /// </summary>
     [GlobalClass]
     public partial class MovePlayerCommand : EventCommand
     {
+        [Export] public NodePath TargetCharacterPath { get; set; }
         [Export] public Vector2 TargetPosition { get; set; }
-        [Export] public int FacingDirection { get; set; } = -1; // -1 = no change, 0-3 = directions
-        [Export] public bool UseTeleport { get; set; } = true;
-        
+        [Export] public float MoveSpeed { get; set; } = 200.0f;
+
         public MovePlayerCommand()
         {
             Type = EventCommandType.MovePlayer;
         }
-        
+
         public override async Task Execute(EventCommandExecutor executor)
         {
-            OverworldCharacter.Direction? direction = FacingDirection >= 0 
-                ? (OverworldCharacter.Direction)FacingDirection 
-                : null;
-            
-            await executor.MovePlayer(TargetPosition, direction, UseTeleport);
+            // CORRECTED: The method name now matches the one in the executor.
+            await executor.MoveCharacterOnPath(TargetCharacterPath, TargetPosition, MoveSpeed);
+        }
+    }
+    
+    /// <summary>
+    /// Executes a different set of commands based on a variable's value.
+    /// </summary>
+    [GlobalClass]
+    public partial class ConditionalBranchCommand : EventCommand
+    {
+        [ExportGroup("Condition")]
+        [Export] public string VariableName { get; set; } = "";
+        [Export] public Godot.Variant ValueToCompare { get; set; }
+        [Export] public ComparisonOperator Operator { get; set; } = ComparisonOperator.EqualTo;
+
+        [ExportGroup("Branches")]
+        [Export] public Godot.Collections.Array<EventCommand> ThenCommands { get; set; }
+        [Export] public Godot.Collections.Array<EventCommand> ElseCommands { get; set; }
+
+
+        public ConditionalBranchCommand()
+        {
+            Type = EventCommandType.ConditionalBranch;
+            ThenCommands = new Godot.Collections.Array<EventCommand>();
+            ElseCommands = new Godot.Collections.Array<EventCommand>();
+        }
+
+        public override async Task Execute(EventCommandExecutor executor)
+        {
+            bool conditionMet = executor.EvaluateCondition(VariableName, Operator, ValueToCompare);
+
+            if (conditionMet)
+            {
+                await executor.ExecuteCommands(ThenCommands);
+            }
+            else
+            {
+                await executor.ExecuteCommands(ElseCommands);
+            }
+        }
+
+        public enum ComparisonOperator
+        {
+            EqualTo,
+            NotEqualTo,
+            GreaterThan,
+            LessThan,
+            GreaterThanOrEqualTo,
+            LessThanOrEqualTo
         }
     }
 
@@ -446,5 +497,93 @@ namespace EchoesAcrossTime.Events
             
             await executor.TransferMap(MapPath, SpawnPosition, direction, FadeOut, FadeIn);
         }
+        
+        /// <summary>
+        /// Controls a switch (A, B, C, D) local to a specific event object.
+        /// </summary>
+        [GlobalClass]
+        public partial class ControlSelfSwitchCommand : EventCommand
+        {
+            [Export] public NodePath TargetEventPath { get; set; }
+            [Export(PropertyHint.Enum, "A,B,C,D")] public string Switch { get; set; } = "A";
+            [Export] public bool Value { get; set; } = true;
+
+            public ControlSelfSwitchCommand()
+            {
+                Type = EventCommandType.ControlSelfSwitch;
+                WaitForCompletion = false;
+            }
+
+            public override async Task Execute(EventCommandExecutor executor)
+            {
+                var targetEvent = executor.GetNodeOrNull<EventObject>(TargetEventPath);
+                targetEvent?.SetSelfSwitch(Switch, Value);
+                await Task.CompletedTask;
+            }
+        }
+        
+        /// <summary>
+        /// Shows the name input screen for a character.
+        /// </summary>
+        [GlobalClass]
+        public partial class NameInputCommand : EventCommand
+        {
+            [Export] public string CharacterId { get; set; } // The ID of the character in your database
+            [Export] public int MaxLength { get; set; } = 10;
+
+            public NameInputCommand()
+            {
+                Type = EventCommandType.NameInput;
+            }
+
+            public override async Task Execute(EventCommandExecutor executor)
+            {
+                await executor.ProcessNameInput(CharacterId, MaxLength);
+            }
+        }
+
+        /// <summary>
+        /// Changes a character's visibility on the map.
+        /// </summary>
+        [GlobalClass]
+        public partial class ChangeTransparencyCommand : EventCommand
+        {
+            [Export] public NodePath TargetCharacterPath { get; set; }
+            [Export] public bool IsHidden { get; set; } = false;
+
+            public ChangeTransparencyCommand()
+            {
+                Type = EventCommandType.ChangeTransparency;
+                WaitForCompletion = false;
+            }
+
+            public override async Task Execute(EventCommandExecutor executor)
+            {
+                executor.ChangeTransparency(TargetCharacterPath, IsHidden);
+                await Task.CompletedTask;
+            }
+        }
+
+        /// <summary>
+        /// Shows a balloon icon (e.g., "!") over a character's head.
+        /// </summary>
+        [GlobalClass]
+        public partial class ShowBalloonIconCommand : EventCommand
+        {
+            public enum BalloonType { Exclamation, Question, MusicNote, Heart, Anger, Sweat, Silence, Lightbulb }
+            [Export] public NodePath TargetCharacterPath { get; set; }
+            [Export] public BalloonType Icon { get; set; } = BalloonType.Exclamation;
+
+            public ShowBalloonIconCommand()
+            {
+                Type = EventCommandType.ShowBalloonIcon;
+            }
+
+            public override async Task Execute(EventCommandExecutor executor)
+            {
+                await executor.ShowBalloonIcon(TargetCharacterPath, Icon, WaitForCompletion);
+            }
+        }
+        
     }
 }

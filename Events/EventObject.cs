@@ -16,6 +16,11 @@ namespace EchoesAcrossTime.Events
         [Export] public AnimatedSprite2D Sprite { get; set; }
         [Export] public Area2D InteractionArea { get; set; }
         
+        private Dictionary<string, bool> _selfSwitches = new Dictionary<string, bool>()
+        {
+            { "A", false }, { "B", false }, { "C", false }, { "D", false }
+        };
+        
         private bool isRunning = false;
         private bool hasRun = false;
         private int currentPageIndex = 0;
@@ -65,6 +70,19 @@ namespace EchoesAcrossTime.Events
                     RunEvent(activePage);
                 }
             }
+        }
+        
+        public void SetSelfSwitch(string key, bool value)
+        {
+            if (_selfSwitches.ContainsKey(key))
+            {
+                _selfSwitches[key] = value;
+            }
+        }
+        
+        public bool GetSelfSwitch(string key)
+        {
+            return _selfSwitches.GetValueOrDefault(key, false);
         }
         
         public override void _Process(double delta)
