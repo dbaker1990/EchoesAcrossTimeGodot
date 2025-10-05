@@ -14,6 +14,11 @@
         Summoner,
         Prince,
         WarMage,
-        Archivist
+        Archivist,
+        Edictbreaker,
+        Relaysmith,
+        Galescour,
+        TideCantor,
+        Testamentor
     }
 }

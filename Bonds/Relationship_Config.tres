@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="RelationshipConfig" load_steps=2 format=3 uid="uid://h7t2dk0p531y"]
+
+[ext_resource type="Script" uid="uid://dj8priukmvnsg" path="res://Bonds/RelationshipConfig.cs" id="1_icv27"]
+
+[resource]
+script = ExtResource("1_icv27")
+metadata/_custom_type_script = "uid://dj8priukmvnsg"

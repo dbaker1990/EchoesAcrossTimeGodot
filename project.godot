@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Nocturne Requiem"
 config/version="v1.0.0"
-run/main_scene="uid://b5sge4y61mc6w"
+run/main_scene="uid://b8k4hvurghe8k"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="uid://dagx8i2n4a61y"
 
@@ -25,6 +25,8 @@ SkitManager="*res://Skits/SkitManager.cs"
 AudioManager="*res://Audio/AudioManager.cs"
 BestiaryManager="*res://Beastiary/BestiaryManager.cs"
 EncounterManager="*res://Encounters/EncounterManager.cs"
+BondManager="*res://Bonds/BondManager.cs"
+RelationshipManager="*res://Bonds/RelationshipManager.cs"
 
 [display]
 

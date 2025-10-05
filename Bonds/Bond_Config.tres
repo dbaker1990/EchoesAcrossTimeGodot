@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="BondConfig" load_steps=2 format=3 uid="uid://dtce6hw6v3wp3"]
+
+[ext_resource type="Script" uid="uid://b46xl0udql28g" path="res://Bonds/BondConfig.cs" id="1_u2m0x"]
+
+[resource]
+script = ExtResource("1_u2m0x")
+metadata/_custom_type_script = "uid://b46xl0udql28g"
