@@ -10,10 +10,11 @@ config_version=5
 
 [application]
 
-config/name="EchoesAcrossTime"
+config/name="Nocturne Requiem"
+config/version="v1.0.0"
 run/main_scene="uid://b5sge4y61mc6w"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://dagx8i2n4a61y"
 
 [autoload]
 
@@ -36,7 +37,7 @@ project/assembly_name="EchoesAcrossTime"
 
 [editor_plugins]
 
-enabled=PackedStringArray()
+enabled=PackedStringArray("res://addons/effekseer/plugin.cfg")
 
 [rendering]
 

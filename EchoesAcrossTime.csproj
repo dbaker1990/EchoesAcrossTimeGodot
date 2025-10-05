@@ -29,6 +29,7 @@
     <Content Include="Docs\SmartAIIntegration.md" />
     <Content Include="Images\TitleScreen\Title Screen.png" />
     <Content Include="Skits\SkitUI.tscn" />
+    <Content Include="UI\Materials\LiquidGlass.shader" />
     <Content Include="UI\PartyMenuUI.tscn" />
   </ItemGroup>
   <ItemGroup>
