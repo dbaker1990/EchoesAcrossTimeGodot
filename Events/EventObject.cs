@@ -111,7 +111,7 @@ namespace EchoesAcrossTime.Events
             for (int i = Pages.Count - 1; i >= 0; i--)
             {
                 var page = Pages[i];
-                if (page != null && page.CheckConditions())
+                if (page != null && page.CheckConditions(this))
                 {
                     currentPageIndex = i;
                     return page;
