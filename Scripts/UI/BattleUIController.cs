@@ -55,6 +55,14 @@ public partial class BattleUIController : Node
     // Damage Numbers
     private Control damageNumbersContainer;
     
+    private PanelContainer itemMenu;
+    private ItemList itemList;
+    private Label itemNameLabel;
+    private Label itemDescriptionLabel;
+    private Label itemQuantityLabel;
+    private Button useItemButton;
+    private Button backFromItemsButton;
+    
     #endregion
     
     #region State Variables
@@ -137,6 +145,7 @@ public partial class BattleUIController : Node
         // Damage numbers
         damageNumbersContainer = GetNode<Control>("../UI/DamageNumbers");
     }
+    
     
     private void ConnectBattleSignals()
     {
