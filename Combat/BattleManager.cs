@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using EchoesAcrossTime.Bestiary;
+using EchoesAcrossTime.Events;
 
 namespace EchoesAcrossTime.Combat
 {
@@ -1113,6 +1114,70 @@ namespace EchoesAcrossTime.Combat
             {
                 rewardsManager.RecordEvent("critical_hit");
             }
+        }
+        
+        /// <summary>
+        /// Call this when battle ends with victory
+        /// </summary>
+        private void OnBattleVictory()
+        {
+            GD.Print("=== BATTLE VICTORY ===");
+        
+            // Set result for event system
+            if (EventCommandExecutor.Instance != null)
+            {
+                EventCommandExecutor.Instance.SetBattleResult(
+                    EventCommandExecutor.BattleResult.Victory
+                );
+            }
+        
+            // Your existing victory code...
+            // ShowVictoryScreen();
+            // GiveRewards();
+            // etc.
+        
+            EmitSignal(SignalName.BattleEnded, true);
+        }
+        
+        /// <summary>
+        /// Call this when battle ends with escape
+        /// </summary>
+        private void OnBattleEscape()
+        {
+            GD.Print("=== BATTLE ESCAPED ===");
+        
+            // Set result for event system
+            if (EventCommandExecutor.Instance != null)
+            {
+                EventCommandExecutor.Instance.SetBattleResult(
+                    EventCommandExecutor.BattleResult.Escape
+                );
+            }
+        
+            CurrentPhase = BattlePhase.Escaped;
+            EmitSignal(SignalName.BattleEnded, false);
+        }
+        
+        /// <summary>
+        /// Call this when battle ends with defeat
+        /// </summary>
+        private void OnBattleDefeat()
+        {
+            GD.Print("=== BATTLE DEFEAT ===");
+        
+            // Set result for event system
+            if (EventCommandExecutor.Instance != null)
+            {
+                EventCommandExecutor.Instance.SetBattleResult(
+                    EventCommandExecutor.BattleResult.Defeat
+                );
+            }
+            
+            // Your existing defeat code...
+            // ShowGameOverScreen();
+            // etc.
+        
+            EmitSignal(SignalName.BattleEnded, false);
         }
 
         

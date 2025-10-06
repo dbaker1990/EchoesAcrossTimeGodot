@@ -34,7 +34,9 @@ namespace EchoesAcrossTime.Events
         ShowBalloonIcon,
         ChangeBattleBGM,
         InitiateBattle,
-        InitiateShop
+        InitiateShop,
+        MoveCommand,
+        ConditionalBattleResultCommand
     }
 
     /// <summary>
@@ -52,6 +54,7 @@ namespace EchoesAcrossTime.Events
         }
     }
 
+    
     /// <summary>
     /// Show text message
     /// </summary>
@@ -368,6 +371,138 @@ namespace EchoesAcrossTime.Events
         public override async Task Execute(EventCommandExecutor executor)
         {
             await executor.TintScreen(TintColor, Duration);
+        }
+    }
+    
+    [GlobalClass]
+    public partial class SetVariableCommand : EventCommand
+    {
+        [Export] public string VariableName { get; set; } = "";
+        [Export] public Godot.Variant Value { get; set; }
+
+        // Advanced options
+        [Export] public bool UseRandomValue { get; set; } = false;
+        [Export] public int RandomMin { get; set; } = 0;
+        [Export] public int RandomMax { get; set; } = 100;
+
+        // Math operations
+        [Export] public bool UseMathOperation { get; set; } = false;
+        [Export] public MathOperation Operation { get; set; } = MathOperation.Set;
+        [Export] public Godot.Variant Operand { get; set; }
+
+        public enum MathOperation { Set, Add, Subtract, Multiply, Divide, Modulo }
+    
+        public SetVariableCommand()
+        {
+            Type = EventCommandType.SetVariable;
+            WaitForCompletion = false;
+        }
+    
+        public override async Task Execute(EventCommandExecutor executor)
+        {
+            executor.SetVariableAdvanced(
+                VariableName, 
+                Value, 
+                UseRandomValue, 
+                RandomMin, 
+                RandomMax,
+                UseMathOperation, 
+                Operation, 
+                Operand
+            );
+        
+            await Task.CompletedTask;
+        }
+    }
+    
+    // Enum exists but no implementation!
+    [GlobalClass]
+    public partial class CallCommonEventCommand : EventCommand
+    {
+        [Export] public EventPage CommonEvent { get; set; }
+        [Export] public string CommonEventId { get; set; } = "";
+    
+        public override async Task Execute(EventCommandExecutor executor)
+        {
+            // Load from database if ID provided
+            if (!string.IsNullOrEmpty(CommonEventId))
+            {
+                CommonEvent = executor.GetCommonEvent(CommonEventId);
+            }
+        
+            if (CommonEvent != null)
+            {
+                await executor.ExecuteEvent(CommonEvent);
+            }
+        }
+    }
+    
+    [GlobalClass]
+    public partial class StopSECommand : EventCommand
+    {
+        [Export] public string SoundEffectName { get; set; } = ""; // Optional: stop specific SE
+    
+        public StopSECommand()
+        {
+            Type = EventCommandType.StopSE;
+        }
+    
+        public override async Task Execute(EventCommandExecutor executor)
+        {
+            await executor.StopSE(SoundEffectName);
+        }
+    }
+    
+    [GlobalClass]
+    public partial class SetMoveRouteCommand : EventCommand
+    {
+        [Export] public NodePath TargetCharacterPath { get; set; }
+        [Export] public Godot.Collections.Array<MoveCommand> Route { get; set; }
+        [Export] public bool Repeat { get; set; } = false;
+        [Export] public bool SkipIfBlocked { get; set; } = false;
+    
+        public SetMoveRouteCommand()
+        {
+            Type = EventCommandType.MovePlayer; // Or add new type: SetMoveRoute
+            Route = new Godot.Collections.Array<MoveCommand>();
+        }
+    
+        public override async Task Execute(EventCommandExecutor executor)
+        {
+            await executor.ExecuteMoveRoute(TargetCharacterPath, Route, Repeat, SkipIfBlocked);
+        }
+    }
+
+    public enum MoveCommand
+    {
+        MoveUp, MoveDown, MoveLeft, MoveRight,
+        TurnUp, TurnDown, TurnLeft, TurnRight,
+        Turn90Left, Turn90Right, Turn180, TurnRandom,
+        Jump, Wait, StepForward, StepBackward,
+        ChangeSpeed, ChangeFrequency,
+        SwitchOn, SwitchOff,
+        ChangeGraphic, ChangeOpacity,
+        PlayAnimation
+    }
+    
+    [GlobalClass]
+    public partial class ConditionalBattleResultCommand : EventCommand
+    {
+        [Export] public Godot.Collections.Array<EventCommand> IfWin { get; set; }
+        [Export] public Godot.Collections.Array<EventCommand> IfEscape { get; set; }
+        [Export] public Godot.Collections.Array<EventCommand> IfLose { get; set; }
+    
+        public ConditionalBattleResultCommand()
+        {
+            Type = EventCommandType.ConditionalBranch; // Or add new type: BattleResultBranch
+            IfWin = new Godot.Collections.Array<EventCommand>();
+            IfEscape = new Godot.Collections.Array<EventCommand>();
+            IfLose = new Godot.Collections.Array<EventCommand>();
+        }
+    
+        public override async Task Execute(EventCommandExecutor executor)
+        {
+            await executor.ExecuteBattleResultBranch(IfWin, IfEscape, IfLose);
         }
     }
     

@@ -422,6 +422,343 @@ namespace EchoesAcrossTime.Events
             }
         }
         
+        /// <summary>
+        /// Advanced variable setting with math operations and random values
+        /// </summary>
+        public void SetVariableAdvanced(string variableName, Godot.Variant value, 
+            bool useRandom, int randomMin, int randomMax,
+            bool useMath, SetVariableCommand.MathOperation operation, Godot.Variant operand)
+        {
+            object finalValue = value.Obj;
+    
+            // Handle random value generation
+            if (useRandom)
+            {
+                var rng = new RandomNumberGenerator();
+                rng.Randomize();
+                finalValue = rng.RandiRange(randomMin, randomMax);
+            }
+    
+            // Handle math operations
+            if (useMath && variables.TryGetValue(variableName, out var currentValue))
+            {
+                finalValue = PerformMathOperation(currentValue, operand.Obj, operation);
+            }
+    
+            SetVariable(variableName, finalValue);
+        }
+        
+        /// <summary>
+        /// Perform mathematical operation on values
+        /// </summary>
+        private object PerformMathOperation(object current, object operand, SetVariableCommand.MathOperation operation)
+        {
+            // Try to convert to numbers
+            if (!TryConvertToNumber(current, out double currentNum) || !TryConvertToNumber(operand, out double operandNum))
+            {
+                GD.PrintErr($"Cannot perform math operation on non-numeric values");
+                return current;
+            }
+    
+            return operation switch
+            {
+                SetVariableCommand.MathOperation.Set => operandNum,
+                SetVariableCommand.MathOperation.Add => currentNum + operandNum,
+                SetVariableCommand.MathOperation.Subtract => currentNum - operandNum,
+                SetVariableCommand.MathOperation.Multiply => currentNum * operandNum,
+                SetVariableCommand.MathOperation.Divide => operandNum != 0 ? currentNum / operandNum : currentNum,
+                SetVariableCommand.MathOperation.Modulo => operandNum != 0 ? currentNum % operandNum : currentNum,
+                _ => current
+            };
+        }
+        
+        /// <summary>
+        /// Try to convert value to a number
+        /// </summary>
+        private bool TryConvertToNumber(object value, out double result)
+        {
+            result = 0;
+    
+            if (value is int intVal) { result = intVal; return true; }
+            if (value is float floatVal) { result = floatVal; return true; }
+            if (value is double doubleVal) { result = doubleVal; return true; }
+            if (value is long longVal) { result = longVal; return true; }
+    
+            return false;
+        }
+        
+        private Dictionary<string, EventPage> commonEvents = new Dictionary<string, EventPage>();
+
+        /// <summary>
+        /// Register a common event that can be called from anywhere
+        /// </summary>
+        public void RegisterCommonEvent(string eventId, EventPage eventPage)
+        {
+            commonEvents[eventId] = eventPage;
+            GD.Print($"Registered common event: {eventId}");
+        }
+
+        /// <summary>
+        /// Get a common event by ID
+        /// </summary>
+        public EventPage GetCommonEvent(string eventId)
+        {
+            if (commonEvents.TryGetValue(eventId, out var commonEvent))
+            {
+                return commonEvent;
+            }
+    
+            GD.PrintErr($"Common event '{eventId}' not found");
+            return null;
+        }
+        
+        public void LoadCommonEventsFromFolder(string folderPath)
+        {
+            var dir = DirAccess.Open(folderPath);
+            if (dir == null)
+            {
+                GD.PrintErr($"Failed to open common events folder: {folderPath}");
+                return;
+            }
+    
+            dir.ListDirBegin();
+            string fileName = dir.GetNext();
+    
+            while (fileName != "")
+            {
+                if (!dir.CurrentIsDir() && fileName.EndsWith(".tres"))
+                {
+                    string path = $"{folderPath}/{fileName}";
+                    var eventPage = GD.Load<EventPage>(path);
+            
+                    if (eventPage != null)
+                    {
+                        RegisterCommonEvent(eventPage.EventId, eventPage);
+                    }
+                }
+                fileName = dir.GetNext();
+            }
+    
+            dir.ListDirEnd();
+        }
+        
+        private List<AudioStreamPlayer> activeSoundEffects = new List<AudioStreamPlayer>();
+
+        /// <summary>
+        /// Stop a specific sound effect or all SEs if name is empty
+        /// </summary>
+        public async Task StopSE(string soundEffectName = "")
+        {
+            if (string.IsNullOrEmpty(soundEffectName))
+            {
+                // Stop all active sound effects
+                foreach (var player in activeSoundEffects.ToArray())
+                {
+                    if (IsInstanceValid(player) && player.Playing)
+                    {
+                        player.Stop();
+                        player.QueueFree();
+                    }
+                }
+                activeSoundEffects.Clear();
+                GD.Print("All sound effects stopped");
+            }
+            else
+            {
+                // Stop specific sound effect by name
+                var toRemove = new List<AudioStreamPlayer>();
+        
+                foreach (var player in activeSoundEffects)
+                {
+                    if (IsInstanceValid(player) && player.Name == soundEffectName)
+                    {
+                        player.Stop();
+                        player.QueueFree();
+                        toRemove.Add(player);
+                    }
+                }
+        
+                foreach (var player in toRemove)
+                {
+                    activeSoundEffects.Remove(player);
+                }
+        
+                GD.Print($"Sound effect '{soundEffectName}' stopped");
+            }
+    
+            await Task.CompletedTask;
+        }
+        
+        /// <summary>
+        /// Enhanced PlaySE that tracks sound effects for stopping
+        /// Override the existing PlaySE method to add tracking
+        /// </summary>
+        public void PlaySETracked(AudioStream se, float volume, string seName = "")
+        {
+            if (se == null) return;
+    
+            var player = new AudioStreamPlayer();
+            player.Stream = se;
+            player.VolumeDb = volume;
+            player.Bus = "SFX";
+    
+            if (!string.IsNullOrEmpty(seName))
+            {
+                player.Name = seName;
+            }
+    
+            AddChild(player);
+            player.Play();
+    
+            activeSoundEffects.Add(player);
+    
+            // Auto-cleanup when finished
+            player.Finished += () =>
+            {
+                activeSoundEffects.Remove(player);
+                player.QueueFree();
+            };
+        }
+        
+        /// <summary>
+        /// Execute a move route on a character
+        /// </summary>
+        public async Task ExecuteMoveRoute(NodePath characterPath, 
+            Godot.Collections.Array<MoveCommand> route, 
+            bool repeat, bool skipIfBlocked)
+        {
+            var character = GetNodeOrNull<Node2D>(characterPath);
+            if (character == null)
+            {
+                GD.PrintErr($"Character not found at path: {characterPath}");
+                return;
+            }
+    
+            // Get or add MoveRouteExecutor component
+            var executor = character.GetNodeOrNull<MoveRouteExecutor>("MoveRouteExecutor");
+            if (executor == null)
+            {
+                executor = new MoveRouteExecutor();
+                character.AddChild(executor);
+            }
+    
+            await executor.ExecuteRoute(character, route, repeat, skipIfBlocked);
+        }
+        
+        /// <summary>
+        /// Battle result for conditional branches
+        /// </summary>
+        public enum BattleResult
+        {
+            None,
+            Victory,
+            Escape,
+            Defeat
+        }
+        
+        private BattleResult lastBattleResult = BattleResult.None;
+
+        /// <summary>
+        /// Set the last battle result (called after battle ends)
+        /// </summary>
+        public void SetBattleResult(BattleResult result)
+        {
+            lastBattleResult = result;
+            SetVariable("last_battle_result", (int)result);
+            GD.Print($"Battle result set to: {result}");
+        }
+
+        /// <summary>
+        /// Get the last battle result
+        /// </summary>
+        public BattleResult GetBattleResult()
+        {
+            return lastBattleResult;
+        }
+
+        /// <summary>
+        /// Execute commands based on battle result
+        /// </summary>
+        public async Task ExecuteBattleResultBranch(
+            Godot.Collections.Array<EventCommand> ifWin,
+            Godot.Collections.Array<EventCommand> ifEscape,
+            Godot.Collections.Array<EventCommand> ifLose)
+        {
+            switch (lastBattleResult)
+            {
+                case BattleResult.Victory:
+                    if (ifWin != null && ifWin.Count > 0)
+                    {
+                        GD.Print("Executing victory branch");
+                        await ExecuteCommands(ifWin);
+                    }
+                    break;
+            
+                case BattleResult.Escape:
+                    if (ifEscape != null && ifEscape.Count > 0)
+                    {
+                        GD.Print("Executing escape branch");
+                        await ExecuteCommands(ifEscape);
+                    }
+                    break;
+            
+                case BattleResult.Defeat:
+                    if (ifLose != null && ifLose.Count > 0)
+                    {
+                        GD.Print("Executing defeat branch");
+                        await ExecuteCommands(ifLose);
+                    }
+                    break;
+            
+                default:
+                    GD.PrintErr("No battle result available for conditional branch");
+                    break;
+            }
+    
+            // Reset battle result after processing
+            lastBattleResult = BattleResult.None;
+        }
+        
+        /// <summary>
+        /// Enhanced InitiateBattle that tracks results
+        /// Replace your existing InitiateBattle method with this
+        /// </summary>
+        public async Task InitiateBattleWithResult(string troopId, bool canEscape, bool canLose, AudioStream battleBGM)
+        {
+            if (string.IsNullOrEmpty(troopId))
+            {
+                GD.PrintErr("Battle troop ID is empty");
+                return;
+            }
+    
+            // Use provided BGM or fall back to current battle BGM
+            var bgmToUse = battleBGM ?? currentBattleBGM;
+    
+            // Fade out current music
+            await StopBGM(0.5f);
+    
+            // Play battle transition (flash, sound, etc)
+            if (ScreenEffects != null)
+            {
+                await ScreenEffects.Flash(Colors.White, 0.3f);
+            }
+    
+            // TODO: Load battle scene with troopId
+            GD.Print($"Initiating battle: Troop={troopId}, CanEscape={canEscape}, CanLose={canLose}");
+    
+            // Play battle BGM
+            if (bgmToUse != null)
+            {
+                PlayBGM(bgmToUse, 0f, 1.0f);
+            }
+    
+            // IMPORTANT: After battle ends, you need to call:
+            // EventCommandExecutor.Instance.SetBattleResult(BattleResult.Victory/Escape/Defeat);
+            // This should be done in your BattleManager when the battle concludes
+    
+            await Task.CompletedTask;
+        }
+        
         private long Vector2IToId(Vector2I vec)
         {
             return ((long)vec.X << 32) | (long)(uint)vec.Y;
