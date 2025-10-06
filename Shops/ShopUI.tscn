@@ -1,0 +1,211 @@
+[gd_scene load_steps=3 format=3 uid="uid://fg0sqds4y2ti"]
+
+[ext_resource type="Script" uid="uid://c35ufjw7irwbe" path="res://Shops/ShopUI.cs" id="1_1cfl8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ipy4k"]
+bg_color = Color(0.1764706, 0.34901962, 0.5254902, 1)
+border_color = Color(0.4, 0.6, 0.8, 1)
+border_blend = true
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="ShopUI" type="Control" node_paths=PackedStringArray("shopPanel", "shopNameLabel", "shopDescriptionLabel", "goldLabel", "buyTabButton", "sellTabButton", "buyItemList", "sellItemList", "detailsPanel", "itemNameLabel", "itemDescriptionLabel", "itemPriceLabel", "itemStockLabel", "itemIcon", "quantitySpinBox", "totalCostLabel", "buyButton", "sellButton", "exitButton")]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1cfl8")
+shopPanel = NodePath("CanvasLayer/Background/CenterContainer/shopPanel")
+shopNameLabel = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/Header/shopNameLabel")
+shopDescriptionLabel = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/shopDescriptionLabel")
+goldLabel = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/Header/goldLabel")
+buyTabButton = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/TabBar/buyTabButton")
+sellTabButton = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/TabBar/sellTabButton")
+buyItemList = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/LeftPanel/buyItemList")
+sellItemList = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/LeftPanel/sellItemList")
+detailsPanel = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel")
+itemNameLabel = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel/itemNameLabel")
+itemDescriptionLabel = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel/itemDescriptionLabel")
+itemPriceLabel = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel/itemPriceLabel")
+itemStockLabel = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel/itemStockLabel")
+itemIcon = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel/itemIcon")
+quantitySpinBox = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel/QuantityControl/quantitySpinBox")
+totalCostLabel = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel/totalCostLabel")
+buyButton = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/Footer/buyButton")
+sellButton = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/Footer/sellButton")
+exitButton = NodePath("CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/Footer/exitButton")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Background" type="ColorRect" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7058824)
+
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/Background"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="shopPanel" type="PanelContainer" parent="CanvasLayer/Background/CenterContainer"]
+custom_minimum_size = Vector2(900, 600)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ipy4k")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Background/CenterContainer/shopPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="MainVBox" type="VBoxContainer" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox"]
+layout_mode = 2
+
+[node name="shopNameLabel" type="Label" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Shop Name"
+
+[node name="Spacer" type="Control" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="goldLabel" type="Label" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Gold: 9999G"
+
+[node name="shopDescriptionLabel" type="Label" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+text = "Welcome to my shop!"
+autowrap_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox"]
+layout_mode = 2
+
+[node name="TabBar" type="HBoxContainer" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox"]
+layout_mode = 2
+
+[node name="buyTabButton" type="Button" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/TabBar"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "BUY"
+
+[node name="sellTabButton" type="Button" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/TabBar"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "SELL"
+
+[node name="HSplitContainer" type="HSplitContainer" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftPanel" type="VBoxContainer" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer"]
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 2
+
+[node name="buyItemList" type="ItemList" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="sellItemList" type="ItemList" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/LeftPanel"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RightPanel" type="ScrollContainer" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer"]
+layout_mode = 2
+
+[node name="detailsPanel" type="VBoxContainer" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="itemIcon" type="TextureRect" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+expand_mode = 2
+stretch_mode = 5
+
+[node name="itemNameLabel" type="Label" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Item Name"
+
+[node name="itemDescriptionLabel" type="Label" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel"]
+custom_minimum_size = Vector2(300, 50)
+layout_mode = 2
+text = "Item description goes here..."
+autowrap_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel"]
+layout_mode = 2
+
+[node name="itemPriceLabel" type="Label" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel"]
+layout_mode = 2
+text = "Price: 0G"
+
+[node name="itemStockLabel" type="Label" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel"]
+layout_mode = 2
+text = "Stock: 0"
+
+[node name="HSeparator2" type="HSeparator" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel"]
+layout_mode = 2
+
+[node name="QuantityControl" type="HBoxContainer" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel/QuantityControl"]
+layout_mode = 2
+text = "Quantity:"
+
+[node name="quantitySpinBox" type="SpinBox" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel/QuantityControl"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+min_value = 1.0
+max_value = 99.0
+value = 1.0
+
+[node name="totalCostLabel" type="Label" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/HSplitContainer/RightPanel/detailsPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Total: 0G"
+
+[node name="Footer" type="HBoxContainer" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox"]
+layout_mode = 2
+
+[node name="buyButton" type="Button" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/Footer"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "Buy"
+
+[node name="sellButton" type="Button" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/Footer"]
+visible = false
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "Sell"
+
+[node name="Control" type="Control" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="exitButton" type="Button" parent="CanvasLayer/Background/CenterContainer/shopPanel/MarginContainer/MainVBox/Footer"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "Exit"

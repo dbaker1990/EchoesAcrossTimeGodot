@@ -1,0 +1,69 @@
+[gd_scene load_steps=3 format=3 uid="uid://ciu72va38ncbk"]
+
+[ext_resource type="Script" uid="uid://dkv0wnhepursj" path="res://Shops/ShopNotification.cs" id="1_rnrfu"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i6udy"]
+bg_color = Color(0.19607843, 0.29411766, 0.49019608, 0.9411765)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.78431374, 0.78431374, 0.78431374, 0.5019608)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_size = 4
+shadow_offset = Vector2(2, 2)
+
+[node name="ShopNotification" type="Control" node_paths=PackedStringArray("notificationPanel", "messageLabel", "iconRect")]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 150.0
+grow_horizontal = 2
+script = ExtResource("1_rnrfu")
+notificationPanel = NodePath("CenterContainer/notificationPanel")
+messageLabel = NodePath("CenterContainer/notificationPanel/MarginContainer/HBoxContainer/messageLabel")
+iconRect = NodePath("CenterContainer/notificationPanel/MarginContainer/HBoxContainer/iconRect")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="notificationPanel" type="PanelContainer" parent="CenterContainer"]
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_i6udy")
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/notificationPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/notificationPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="iconRect" type="TextureRect" parent="CenterContainer/notificationPanel/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+expand_mode = 2
+stretch_mode = 5
+
+[node name="messageLabel" type="Label" parent="CenterContainer/notificationPanel/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 18
+text = "Notification message"
+vertical_alignment = 1
+autowrap_mode = 2

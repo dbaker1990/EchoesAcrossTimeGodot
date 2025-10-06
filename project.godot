@@ -27,6 +27,8 @@ BestiaryManager="*res://Beastiary/BestiaryManager.cs"
 EncounterManager="*res://Encounters/EncounterManager.cs"
 BondManager="*res://Bonds/BondManager.cs"
 RelationshipManager="*res://Bonds/RelationshipManager.cs"
+ShopManager="*res://Shops/ShopManager.cs"
+LoreCodexManager="*res://LoreCodex/LoreCodexManager.cs"
 
 [display]
 

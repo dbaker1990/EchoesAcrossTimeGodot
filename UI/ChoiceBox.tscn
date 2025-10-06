@@ -1,0 +1,122 @@
+[gd_scene load_steps=9 format=3 uid="uid://cmnhx1d2sfkqs"]
+
+[ext_resource type="Script" uid="uid://b60pfupvuplgx" path="res://UI/ChoiceBox.cs" id="1_5dqr3"]
+[ext_resource type="AudioStream" uid="uid://bnp4f25u78ay6" path="res://Audio/SFX/cursor.mp3" id="2_3hfrv"]
+[ext_resource type="AudioStream" uid="uid://0l3wwdg4a3yo" path="res://Audio/SFX/confirm.mp3" id="3_cnbj2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jxco5"]
+bg_color = Color(0.101960786, 0.101960786, 0.18039216, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.7490196, 0.36078432, 1)
+border_blend = true
+shadow_size = 35
+shadow_offset = Vector2(5, 1)
+
+[sub_resource type="Animation" id="Animation_g4hb2"]
+resource_name = "RESET"
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_58gg0"]
+resource_name = "fade_in"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_kckww"]
+resource_name = "fade_out"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.02),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_12i04"]
+_data = {
+&"RESET": SubResource("Animation_g4hb2"),
+&"fade_in": SubResource("Animation_58gg0"),
+&"fade_out": SubResource("Animation_kckww")
+}
+
+[node name="ChoiceBox" type="Control" node_paths=PackedStringArray("BackgroundPanel", "ChoiceContainer", "AnimationPlayer")]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_5dqr3")
+BackgroundPanel = NodePath("BackgroundPanel")
+ChoiceContainer = NodePath("BackgroundPanel/MarginContainer/ChoiceContainer")
+AnimationPlayer = NodePath("AnimationPlayer")
+SelectSound = ExtResource("2_3hfrv")
+ConfirmSound = ExtResource("3_cnbj2")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 580.0
+offset_bottom = 380.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_jxco5")
+
+[node name="MarginContainer" type="MarginContainer" parent="BackgroundPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="ChoiceContainer" type="VBoxContainer" parent="BackgroundPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_12i04")
+}
