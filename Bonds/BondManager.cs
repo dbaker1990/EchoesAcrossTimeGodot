@@ -3,6 +3,7 @@ using Godot;
 using Godot.Collections;
 using System;
 using System.Linq;
+using EchoesAcrossTime;
 
 public partial class BondManager : Node
 {
@@ -61,7 +62,88 @@ public partial class BondManager : Node
         if (afterRank != beforeRank) EmitSignal(SignalName.BondRankUp, s.A, s.B, afterRank);
     }
     
+    #region Save/Load
+
+    /// <summary>
+    /// Get current bond data for saving
+    /// </summary>
+    public BondSaveData GetSaveData()
+    {
+        var saveData = new BondSaveData
+        {
+            CurrentGameDay = GetCurrentGameDay(), // You'll need to implement this
+            BondPairs = new System.Collections.Generic.Dictionary<string, BondPairData>()
+        };
     
+        foreach (var kvp in _pairs)
+        {
+            var state = kvp.Value;
+            saveData.BondPairs[kvp.Key] = new BondPairData
+            {
+                CharacterA = state.A,
+                CharacterB = state.B,
+                Points = state.Points,
+                LastGainDay = state.LastGainDay,
+                CurrentRank = GetRank(state.Points)
+            };
+        }
+    
+        return saveData;
+    }
+
+    /// <summary>
+    /// Load bond data from save
+    /// </summary>
+    public void LoadSaveData(BondSaveData saveData)
+    {
+        if (saveData == null) return;
+    
+        _pairs.Clear();
+    
+        foreach (var kvp in saveData.BondPairs)
+        {
+            var pairData = kvp.Value;
+            _pairs[kvp.Key] = new BondState
+            {
+                A = pairData.CharacterA,
+                B = pairData.CharacterB,
+                Points = pairData.Points,
+                LastGainDay = pairData.LastGainDay
+            };
+        }
+    
+        SetCurrentGameDay(saveData.CurrentGameDay);
+    
+        GD.Print($"Loaded {_pairs.Count} bond pairs from save data");
+    }
+
+    /// <summary>
+    /// Get the current in-game day (implement based on your game's time system)
+    /// </summary>
+    private int currentGameDay = 0;
+
+    private int GetCurrentGameDay()
+    {
+        // TODO: Hook this to your actual in-game day/time system
+        // For now, using a simple counter
+        return currentGameDay;
+    }
+
+    private void SetCurrentGameDay(int day)
+    {
+        currentGameDay = day;
+    }
+
+    /// <summary>
+    /// Increment the game day (call this when a new day begins in your game)
+    /// </summary>
+    public void AdvanceDay()
+    {
+        currentGameDay++;
+        GD.Print($"Game day advanced to: {currentGameDay}");
+    }
+
+    #endregion
 
     // Convenience hooks you’ll call from game systems
     public void OnAllyHealed(string healerId, string targetId)    => AddPoints(healerId,targetId, 2, "heal");

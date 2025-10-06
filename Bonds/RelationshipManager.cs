@@ -2,6 +2,7 @@
 using Godot;
 using Godot.Collections;
 using System.Linq;
+using EchoesAcrossTime;
 
 public partial class RelationshipManager : Node
 {
@@ -21,6 +22,86 @@ public partial class RelationshipManager : Node
         foreach (var id in CandidateIds)
             if (!_map.ContainsKey(id))
                 _map[id] = new RelationshipState { CandidateId = id, Points = 0, Stage = "Acquaintance", LockedIn = false };
+    }
+    
+    #region Save/Load
+
+    /// <summary>
+    /// Get current relationship data for saving
+    /// </summary>
+    public RelationshipSaveData GetSaveData()
+    {
+        var saveData = new RelationshipSaveData
+        {
+            Candidates = new System.Collections.Generic.Dictionary<string, RelationshipCandidateData>(),
+            LockinWindowOpen = lockinWindowOpen,
+            LockinWindowClosed = lockinWindowClosed
+        };
+        
+        foreach (var kvp in _map)
+        {
+            var state = kvp.Value;
+            saveData.Candidates[kvp.Key] = new RelationshipCandidateData
+            {
+                CandidateId = state.CandidateId,
+                Points = state.Points,
+                Stage = state.Stage,
+                LockedIn = state.LockedIn
+            };
+            
+            if (state.LockedIn)
+            {
+                saveData.LockedInCandidateId = state.CandidateId;
+            }
+        }
+        
+        return saveData;
+    }
+
+    /// <summary>
+    /// Load relationship data from save
+    /// </summary>
+    public void LoadSaveData(RelationshipSaveData saveData)
+    {
+        if (saveData == null) return;
+        
+        _map.Clear();
+        
+        foreach (var kvp in saveData.Candidates)
+        {
+            var candidateData = kvp.Value;
+            _map[kvp.Key] = new RelationshipState
+            {
+                CandidateId = candidateData.CandidateId,
+                Points = candidateData.Points,
+                Stage = candidateData.Stage,
+                LockedIn = candidateData.LockedIn
+            };
+        }
+        
+        lockinWindowOpen = saveData.LockinWindowOpen;
+        lockinWindowClosed = saveData.LockinWindowClosed;
+        
+        GD.Print($"Loaded {_map.Count} relationship candidates from save data");
+    }
+
+    #endregion
+
+    // Add these fields to track lock-in window state
+    private bool lockinWindowOpen = false;
+    private bool lockinWindowClosed = false;
+
+    // Update the OpenLockinWindow and CloseLockinWindow methods:
+    public void OpenLockinWindow() 
+    { 
+        lockinWindowOpen = true;
+        SetGameFlag(Config.LockinOpensFlag, true);
+    }
+
+    public void CloseLockinWindow() 
+    { 
+        lockinWindowClosed = true;
+        SetGameFlag(Config.LockinClosedFlag, true);
     }
 
     public RelationshipState Get(string id) => _map[id];
@@ -46,10 +127,6 @@ public partial class RelationshipManager : Node
         EmitSignal(SignalName.RelationshipChanged, id, s.Points, s.Stage, s.LockedIn);
         if (s.Stage != before) EmitSignal(SignalName.RelationshipStageUp, id, s.Stage);
     }
-
-    // Call when Act 3 begins – opens the window where the player can "lock in"
-    public void OpenLockinWindow() => SetGameFlag(Config.LockinOpensFlag, true);
-    public void CloseLockinWindow() => SetGameFlag(Config.LockinClosedFlag, true);
 
     // UI calls this when the player commits to a route during the lock window
     public void LockIn(string id)

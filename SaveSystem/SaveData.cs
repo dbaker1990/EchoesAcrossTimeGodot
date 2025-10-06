@@ -42,6 +42,7 @@ namespace EchoesAcrossTime
         // Event state
         public List<string> CompletedEvents { get; set; } = new List<string>();
         
+        
         // Screenshot for save file
         public byte[] ScreenshotData { get; set; }
         
