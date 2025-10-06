@@ -15,6 +15,7 @@
     <Content Include="Docs\BestiarySystemGuide.md" />
     <Content Include="Docs\CompleteIntegrationGuide.md" />
     <Content Include="Docs\CoreCommandsDocumentation.md" />
+    <Content Include="Docs\InnKeeperSetUpGuide.md" />
     <Content Include="Docs\LimitBreakDocumentation.md" />
     <Content Include="Docs\MainMenuCompleteSummary.md" />
     <Content Include="Docs\MainMenuSystemGuide.md" />
