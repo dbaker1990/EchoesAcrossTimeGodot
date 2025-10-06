@@ -1,186 +1,74 @@
 ﻿using Godot;
-using System;
 using System.Collections.Generic;
-using EchoesAcrossTime;              // For GameManager
-using EchoesAcrossTime.Managers;     // For SystemManager, PartyMenuManager
-using EchoesAcrossTime.Items;        // For InventorySystem
-using EchoesAcrossTime.UI;  
+using EchoesAcrossTime.Managers;
+using EchoesAcrossTime.Items;  // ← ADD THIS LINE
 
 namespace EchoesAcrossTime.UI
 {
-    /// <summary>
-    /// Main in-game menu (pause menu) that provides access to all game systems
-    /// Press ESC/Start to open during gameplay
-    /// </summary>
     public partial class MainMenuUI : Control
     {
-        #region Node References
-        [Export] private Control menuPanel;
-        [Export] private VBoxContainer buttonContainer;
-        
-        // Menu buttons
-        [Export] private Button itemButton;
-        [Export] private Button skillButton;
-        [Export] private Button equipButton;
-        [Export] private Button statusButton;
-        [Export] private Button craftingButton;
-        [Export] private Button partyButton;
-        [Export] private Button bestiaryButton;
-        [Export] private Button questButton;
-        [Export] private Button optionsButton;
-        [Export] private Button saveButton;
-        [Export] private Button loadButton;
-        [Export] private Button endGameButton;
-        
-        // Sub-menu references (get from tree)
-        private Control itemMenuUI;
-        private Control skillMenuUI;
-        private Control equipMenuUI;
-        private Control statusMenuUI;
-        private Control craftingUI;
-        private Control partyMenuUI;
-        private Control bestiaryUI;
-        private Control questUI;
-        private Control optionsUI;
-        private Control saveUI;
-        private Control loadUI;
-        
-        // Header info
+        [Export] private GridContainer partyGrid;
         [Export] private Label locationLabel;
         [Export] private Label playtimeLabel;
         [Export] private Label goldLabel;
-        #endregion
+        [Export] private Button closeButton;
+        [Export] private PackedScene partyCharacterPanelScene;
         
-        #region State
-        private bool isOpen;
-        private int selectedButtonIndex;
-        private Button[] menuButtons;
-        #endregion
+        private List<PartyCharacterPanel> characterPanels = new List<PartyCharacterPanel>();
+        private bool isOpen = false;
         
         public override void _Ready()
         {
-            // Initialize button array
-            menuButtons = new[]
+            // Connect close button
+            if (closeButton != null)
             {
-                itemButton, skillButton, equipButton, statusButton,
-                craftingButton, partyButton, bestiaryButton, questButton,
-                optionsButton, saveButton, loadButton, endGameButton
-            };
+                closeButton.Pressed += CloseMenu;
+            }
             
-            // Connect button signals
-            itemButton.Pressed += OnItemPressed;
-            skillButton.Pressed += OnSkillPressed;
-            equipButton.Pressed += OnEquipPressed;
-            statusButton.Pressed += OnStatusPressed;
-            craftingButton.Pressed += OnCraftingPressed;
-            partyButton.Pressed += OnPartyPressed;
-            bestiaryButton.Pressed += OnBestiaryPressed;
-            questButton.Pressed += OnQuestPressed;
-            optionsButton.Pressed += OnOptionsPressed;
-            saveButton.Pressed += OnSavePressed;
-            loadButton.Pressed += OnLoadPressed;
-            endGameButton.Pressed += OnEndGamePressed;
+            // Load party panel scene if not set
+            if (partyCharacterPanelScene == null)
+            {
+                partyCharacterPanelScene = GD.Load<PackedScene>("res://UI/PartyCharacterPanel.tscn");
+            }
             
-            // Get sub-menu references
-            GetSubMenuReferences();
-            
-            // Start hidden
+            // Hide by default
             Hide();
-            isOpen = false;
-        }
-        
-        private void GetSubMenuReferences()
-        {
-            // Try to find sub-menus in the scene tree
-            itemMenuUI = GetNodeOrNull<Control>("%ItemMenuUI");
-            skillMenuUI = GetNodeOrNull<Control>("%SkillMenuUI");
-            equipMenuUI = GetNodeOrNull<Control>("%EquipMenuUI");
-            statusMenuUI = GetNodeOrNull<Control>("%StatusMenuUI");
-            craftingUI = GetNodeOrNull<Control>("%CraftingUI");
-            partyMenuUI = GetNodeOrNull<Control>("%PartyMenuUI");
-            bestiaryUI = GetNodeOrNull<Control>("%BestiaryUI");
-            questUI = GetNodeOrNull<Control>("%QuestUI");
-            optionsUI = GetNodeOrNull<Control>("%OptionsUI");
-            saveUI = GetNodeOrNull<Control>("%SaveUI");
-            loadUI = GetNodeOrNull<Control>("%LoadUI");
+            
+            // Subscribe to party changes
+            if (PartyMenuManager.Instance != null)
+            {
+                PartyMenuManager.Instance.MainPartyChanged += RefreshPartyDisplay;
+            }
         }
         
         public override void _Input(InputEvent @event)
         {
             if (!isOpen) return;
             
-            // Close menu with cancel button
+            // Close menu with ESC
             if (@event.IsActionPressed("ui_cancel"))
             {
                 CloseMenu();
                 GetViewport().SetInputAsHandled();
-                return;
-            }
-            
-            // Keyboard navigation
-            if (@event.IsActionPressed("ui_up"))
-            {
-                NavigateUp();
-                GetViewport().SetInputAsHandled();
-            }
-            else if (@event.IsActionPressed("ui_down"))
-            {
-                NavigateDown();
-                GetViewport().SetInputAsHandled();
-            }
-            else if (@event.IsActionPressed("ui_accept"))
-            {
-                ActivateSelectedButton();
-                GetViewport().SetInputAsHandled();
             }
         }
         
-        #region Navigation
-        private void NavigateUp()
-        {
-            selectedButtonIndex--;
-            if (selectedButtonIndex < 0)
-                selectedButtonIndex = menuButtons.Length - 1;
-            
-            menuButtons[selectedButtonIndex]?.GrabFocus();
-            Managers.SystemManager.Instance?.PlayCursorSE();
-        }
-        
-        private void NavigateDown()
-        {
-            selectedButtonIndex++;
-            if (selectedButtonIndex >= menuButtons.Length)
-                selectedButtonIndex = 0;
-            
-            menuButtons[selectedButtonIndex]?.GrabFocus();
-            Managers.SystemManager.Instance?.PlayCursorSE();
-        }
-        
-        private void ActivateSelectedButton()
-        {
-            menuButtons[selectedButtonIndex]?.EmitSignal("pressed");
-        }
-        #endregion
-        
-        #region Menu Control
         /// <summary>
-        /// Open the main menu
+        /// Open the main menu and display party
         /// </summary>
         public void OpenMenu()
         {
-            Show();
+            if (isOpen) return;
+            
             isOpen = true;
-            
-            // Update header info
-            UpdateHeaderInfo();
-            
-            // Focus first button
-            selectedButtonIndex = 0;
-            itemButton?.GrabFocus();
-            
-            // Pause game
+            Show();
             GetTree().Paused = true;
             
+            RefreshPartyDisplay();
+            RefreshHeaderInfo();
+            RefreshGold();
+            
+            // Play sound
             Managers.SystemManager.Instance?.PlayOkSE();
         }
         
@@ -189,290 +77,114 @@ namespace EchoesAcrossTime.UI
         /// </summary>
         public void CloseMenu()
         {
-            Hide();
+            if (!isOpen) return;
+            
             isOpen = false;
-            
-            // Close all sub-menus
-            CloseAllSubMenus();
-            
-            // Unpause game
+            Hide();
             GetTree().Paused = false;
             
+            // Play sound
             Managers.SystemManager.Instance?.PlayCancelSE();
         }
         
         /// <summary>
-        /// Close all sub-menus and return to main menu
+        /// Return to main menu from sub-menus (for compatibility with other menu UIs)
         /// </summary>
         public void ReturnToMainMenu()
         {
-            CloseAllSubMenus();
-            menuPanel?.Show();
-            itemButton?.GrabFocus();
-            Managers.SystemManager.Instance?.PlayCancelSE();
+            // Show this menu again
+            Show();
+            isOpen = true;
+            
+            // Refresh display
+            RefreshPartyDisplay();
+            RefreshHeaderInfo();
+            RefreshGold();
         }
         
-        private void CloseAllSubMenus()
+        /// <summary>
+        /// Refresh party member display
+        /// </summary>
+        private void RefreshPartyDisplay()
         {
-            itemMenuUI?.Hide();
-            skillMenuUI?.Hide();
-            equipMenuUI?.Hide();
-            statusMenuUI?.Hide();
-            craftingUI?.Hide();
-            partyMenuUI?.Hide();
-            bestiaryUI?.Hide();
-            questUI?.Hide();
-            optionsUI?.Hide();
-            saveUI?.Hide();
-            loadUI?.Hide();
+            if (partyGrid == null || partyCharacterPanelScene == null) return;
+            
+            // Clear existing panels
+            foreach (var panel in characterPanels)
+            {
+                panel.QueueFree();
+            }
+            characterPanels.Clear();
+            
+            // Get main party
+            var mainParty = PartyMenuManager.Instance?.GetMainParty();
+            if (mainParty == null || mainParty.Count == 0)
+            {
+                GD.Print("No party members to display");
+                return;
+            }
+            
+            // Create panels for each member (max 4)
+            int displayCount = Mathf.Min(mainParty.Count, 4);
+            for (int i = 0; i < displayCount; i++)
+            {
+                var member = mainParty[i];
+                var panel = partyCharacterPanelScene.Instantiate<PartyCharacterPanel>();
+                
+                partyGrid.AddChild(panel);
+                panel.Initialize(member.CharacterId, member.Stats);
+                characterPanels.Add(panel);
+            }
         }
         
-        private void UpdateHeaderInfo()
+        /// <summary>
+        /// Refresh header information (location, playtime)
+        /// </summary>
+        private void RefreshHeaderInfo()
         {
             // Update location
             if (locationLabel != null)
             {
-                // Get current map name
-                var currentScene = GetTree().CurrentScene;
-                locationLabel.Text = currentScene?.Name ?? "Unknown Location";
+                // Get current location from game manager or scene name
+                string location = "Port Capua Torim"; // Replace with actual location system
+                locationLabel.Text = location;
             }
             
             // Update playtime
             if (playtimeLabel != null)
             {
-                var playtime = GameManager.Instance?.CurrentSave?.PlayTimeSeconds ?? 0;
-                var hours = (int)(playtime / 3600);
-                var minutes = (int)((playtime % 3600) / 60);
+                // Get playtime from save system
+                float playtime = 0f; // Replace with actual playtime from SaveManager
+                int hours = (int)(playtime / 3600);
+                int minutes = (int)((playtime % 3600) / 60);
                 playtimeLabel.Text = $"{hours:D2}:{minutes:D2}";
             }
-            
-            // Update gold
+        }
+        
+        /// <summary>
+        /// Refresh gold display
+        /// </summary>
+        private void RefreshGold()
+        {
             if (goldLabel != null)
             {
-                var gold = Items.InventorySystem.Instance?.GetGold() ?? 0;
-                goldLabel.Text = $"{gold} G";
-            }
-        }
-        #endregion
-        
-        #region Button Handlers
-        private void OnItemPressed()
-        {
-            Managers.SystemManager.Instance?.PlayOkSE();
-            menuPanel?.Hide();
-            
-            if (itemMenuUI != null)
-            {
-                itemMenuUI.Show();
-                // Call OpenMenu if it exists
-                itemMenuUI.Call("OpenMenu");
-            }
-            else
-            {
-                GD.PrintErr("ItemMenuUI not found!");
-                menuPanel?.Show();
+                // Get gold from inventory
+                int gold = 0;
+                if (InventorySystem.Instance != null)
+                {
+                    gold = InventorySystem.Instance.GetGold();
+                }
+                goldLabel.Text = $"Gold: {gold}G";
             }
         }
         
-        private void OnSkillPressed()
+        public override void _ExitTree()
         {
-            Managers.SystemManager.Instance?.PlayOkSE();
-            menuPanel?.Hide();
-            
-            if (skillMenuUI != null)
+            if (PartyMenuManager.Instance != null)
             {
-                skillMenuUI.Show();
-                skillMenuUI.Call("OpenMenu");
+                PartyMenuManager.Instance.MainPartyChanged -= RefreshPartyDisplay;
             }
-            else
-            {
-                GD.PrintErr("SkillMenuUI not found!");
-                menuPanel?.Show();
-            }
+            base._ExitTree();
         }
-        
-        private void OnEquipPressed()
-        {
-            Managers.SystemManager.Instance?.PlayOkSE();
-            menuPanel?.Hide();
-            
-            if (equipMenuUI != null)
-            {
-                equipMenuUI.Show();
-                equipMenuUI.Call("OpenMenu");
-            }
-            else
-            {
-                GD.PrintErr("EquipMenuUI not found!");
-                menuPanel?.Show();
-            }
-        }
-        
-        private void OnStatusPressed()
-        {
-            Managers.SystemManager.Instance?.PlayOkSE();
-            menuPanel?.Hide();
-            
-            if (statusMenuUI != null)
-            {
-                statusMenuUI.Show();
-                statusMenuUI.Call("OpenMenu");
-            }
-            else
-            {
-                GD.PrintErr("StatusMenuUI not found!");
-                menuPanel?.Show();
-            }
-        }
-        
-        private void OnCraftingPressed()
-        {
-            Managers.SystemManager.Instance?.PlayOkSE();
-            menuPanel?.Hide();
-            
-            if (craftingUI != null)
-            {
-                craftingUI.Show();
-                craftingUI.Call("OpenMenu");
-            }
-            else
-            {
-                GD.PrintErr("CraftingUI not found!");
-                menuPanel?.Show();
-            }
-        }
-        
-        private void OnPartyPressed()
-        {
-            Managers.SystemManager.Instance?.PlayOkSE();
-            menuPanel?.Hide();
-            
-            if (partyMenuUI != null)
-            {
-                partyMenuUI.Show();
-                partyMenuUI.Call("OpenMenu");
-            }
-            else
-            {
-                GD.PrintErr("PartyMenuUI not found!");
-                menuPanel?.Show();
-            }
-        }
-        
-        private void OnBestiaryPressed()
-        {
-            Managers.SystemManager.Instance?.PlayOkSE();
-            menuPanel?.Hide();
-            
-            if (bestiaryUI != null)
-            {
-                bestiaryUI.Show();
-                bestiaryUI.Call("ShowBestiary");
-            }
-            else
-            {
-                GD.PrintErr("BestiaryUI not found!");
-                menuPanel?.Show();
-            }
-        }
-        
-        private void OnQuestPressed()
-        {
-            Managers.SystemManager.Instance?.PlayOkSE();
-            menuPanel?.Hide();
-            
-            if (questUI != null)
-            {
-                questUI.Show();
-                questUI.Call("OpenMenu");
-            }
-            else
-            {
-                GD.PrintErr("QuestUI not found!");
-                menuPanel?.Show();
-            }
-        }
-        
-        private void OnOptionsPressed()
-        {
-            Managers.SystemManager.Instance?.PlayOkSE();
-            menuPanel?.Hide();
-            
-            if (optionsUI != null)
-            {
-                optionsUI.Show();
-                optionsUI.Call("OpenMenu");
-            }
-            else
-            {
-                GD.PrintErr("OptionsUI not found!");
-                menuPanel?.Show();
-            }
-        }
-        
-        private void OnSavePressed()
-        {
-            Managers.SystemManager.Instance?.PlayOkSE();
-            menuPanel?.Hide();
-            
-            if (saveUI != null)
-            {
-                saveUI.Show();
-                saveUI.Call("OpenMenu");
-            }
-            else
-            {
-                // Fallback - quick save
-                GD.Print("Performing quick save...");
-                SaveSystem.Instance?.QuickSave();
-                menuPanel?.Show();
-            }
-        }
-        
-        private void OnLoadPressed()
-        {
-            Managers.SystemManager.Instance?.PlayOkSE();
-            menuPanel?.Hide();
-            
-            if (loadUI != null)
-            {
-                loadUI.Show();
-                loadUI.Call("OpenMenu");
-            }
-            else
-            {
-                GD.PrintErr("LoadUI not found!");
-                menuPanel?.Show();
-            }
-        }
-        
-        private void OnEndGamePressed()
-        {
-            Managers.SystemManager.Instance?.PlayOkSE();
-            
-            // Show confirmation dialog
-            ShowEndGameConfirmation();
-        }
-        
-        private void ShowEndGameConfirmation()
-        {
-            var dialog = new AcceptDialog();
-            dialog.DialogText = "Return to title screen?\n(Make sure to save first!)";
-            dialog.Title = "End Game";
-            
-            var confirmButton = new Button();
-            confirmButton.Text = "Yes, Return to Title";
-            confirmButton.Pressed += () =>
-            {
-                GetTree().Paused = false;
-                GetTree().ChangeSceneToFile("res://Scenes/TitleScreen.tscn");
-            };
-            
-            dialog.AddButton("Cancel", true, "cancel");
-            dialog.AddChild(confirmButton);
-            AddChild(dialog);
-            dialog.PopupCentered();
-        }
-        #endregion
     }
 }

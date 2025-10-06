@@ -1,0 +1,116 @@
+[gd_scene load_steps=4 format=3 uid="uid://b2pr1bksta8jg"]
+
+[ext_resource type="Script" uid="uid://kfk7b37tp6nh" path="res://UI/MainMenuUI.cs" id="1_fmev5"]
+[ext_resource type="PackedScene" uid="uid://cwrrcn214mq7c" path="res://UI/PartyCharacterPanel.tscn" id="2_dh4sd"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x7s0e"]
+bg_color = Color(0.3491902, 0.3491902, 0.42358288, 0.92)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.9063318, 0.85430586, 0.6651851, 1)
+border_blend = true
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="MainMenuUI" type="Control" node_paths=PackedStringArray("partyGrid", "locationLabel", "playtimeLabel", "goldLabel", "closeButton")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_fmev5")
+partyGrid = NodePath("CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer/PartyGrid")
+locationLabel = NodePath("CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer/HeaderSection/LocationLabel")
+playtimeLabel = NodePath("CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer/HeaderSection/PlaytimeLabel")
+goldLabel = NodePath("CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer/FooterSection/GoldLabel")
+closeButton = NodePath("CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer/FooterSection/CloseButton")
+partyCharacterPanelScene = ExtResource("2_dh4sd")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="BackgroundRect" type="ColorRect" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainPanel" type="PanelContainer" parent="CanvasLayer/CenterContainer"]
+custom_minimum_size = Vector2(1100, 700)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_x7s0e")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/CenterContainer/MainPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="HeaderSection" type="HBoxContainer" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer/HeaderSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.993522, 0.8753771, 0.34920558, 1)
+theme_override_font_sizes/font_size = 32
+text = "PARTY"
+
+[node name="Spacer" type="Control" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer/HeaderSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LocationLabel" type="Label" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer/HeaderSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Some Location"
+
+[node name="PlaytimeLabel" type="Label" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer/HeaderSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "00:00:00"
+
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="PartyGrid" type="GridContainer" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 15
+columns = 2
+
+[node name="HSeparator2" type="HSeparator" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="FooterSection" type="HBoxContainer" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="GoldLabel" type="Label" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer/FooterSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Gold: 0G"
+
+[node name="Spacer" type="Control" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer/FooterSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CloseButton" type="Button" parent="CanvasLayer/CenterContainer/MainPanel/MarginContainer/VBoxContainer/FooterSection"]
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+text = "Close [ESC]"

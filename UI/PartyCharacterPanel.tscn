@@ -1,0 +1,171 @@
+[gd_scene load_steps=7 format=3 uid="uid://cwrrcn214mq7c"]
+
+[ext_resource type="Script" uid="uid://ckf286vki2oak" path="res://UI/PartyCharacterPanel.cs" id="1_22x5v"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2y014"]
+bg_color = Color(0.42358288, 0.42358288, 0.48452926, 0.95000005)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.9063318, 0.85430586, 0.6651851, 1)
+border_blend = true
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y2ut6"]
+bg_color = Color(1, 1, 1, 0.4627451)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gtg2c"]
+bg_color = Color(0, 1, 0, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dep43"]
+bg_color = Color(0, 0, 0.6, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_01rcd"]
+bg_color = Color(0.643733, 0.6206274, 0, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="PartyCharacterPanel" type="PanelContainer" node_paths=PackedStringArray("portraitRect", "nameLabel", "levelLabel", "hpProgressBar", "hpValueLabel", "tpProgressBar", "tpValueLabel", "expProgressBar", "expValueLabel")]
+custom_minimum_size = Vector2(520, 160)
+offset_right = 117.0
+offset_bottom = 269.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_2y014")
+script = ExtResource("1_22x5v")
+portraitRect = NodePath("MarginContainer/VBoxContainer/TopSection/PortraitRect")
+nameLabel = NodePath("MarginContainer/VBoxContainer/TopSection/InfoVBox/NameLabel")
+levelLabel = NodePath("MarginContainer/VBoxContainer/TopSection/InfoVBox/LevelLabel")
+hpProgressBar = NodePath("MarginContainer/VBoxContainer/StatsSection/HPSection/HPBar/HPProgressBar")
+hpValueLabel = NodePath("MarginContainer/VBoxContainer/StatsSection/HPSection/HPBar/HPValueLabel")
+tpProgressBar = NodePath("MarginContainer/VBoxContainer/StatsSection/TPSection/TPBar/TPProgressBar")
+tpValueLabel = NodePath("MarginContainer/VBoxContainer/StatsSection/TPSection/TPBar/TPValueLabel")
+expProgressBar = NodePath("MarginContainer/VBoxContainer/StatsSection/EXPSection/EXPBar/EXPProgressBar")
+expValueLabel = NodePath("MarginContainer/VBoxContainer/StatsSection/EXPSection/EXPBar/EXPValueLabel")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TopSection" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PortraitRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopSection"]
+custom_minimum_size = Vector2(120, 150)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InfoVBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NameLabel" type="Label" parent="MarginContainer/VBoxContainer/TopSection/InfoVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+
+[node name="LevelLabel" type="Label" parent="MarginContainer/VBoxContainer/TopSection/InfoVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 0.48452926, 1)
+theme_override_font_sizes/font_size = 18
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxFlat_y2ut6")
+
+[node name="StatsSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HPSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/StatsSection"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="HPLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsSection/HPSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "HP"
+
+[node name="HPBar" type="HBoxContainer" parent="MarginContainer/VBoxContainer/StatsSection/HPSection"]
+layout_mode = 2
+
+[node name="HPProgressBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/StatsSection/HPSection/HPBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/fill = SubResource("StyleBoxFlat_gtg2c")
+show_percentage = false
+
+[node name="HPValueLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsSection/HPSection/HPBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "516/516"
+
+[node name="TPSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/StatsSection"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="TPLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsSection/TPSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "MP"
+
+[node name="TPBar" type="HBoxContainer" parent="MarginContainer/VBoxContainer/StatsSection/TPSection"]
+layout_mode = 2
+
+[node name="TPProgressBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/StatsSection/TPSection/TPBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_dep43")
+show_percentage = false
+
+[node name="TPValueLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsSection/TPSection/TPBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "423/423"
+
+[node name="EXPSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/StatsSection"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="EXPLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsSection/EXPSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Next"
+
+[node name="EXPBar" type="HBoxContainer" parent="MarginContainer/VBoxContainer/StatsSection/EXPSection"]
+layout_mode = 2
+
+[node name="EXPProgressBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/StatsSection/EXPSection/EXPBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_01rcd")
+show_percentage = false
+
+[node name="EXPValueLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsSection/EXPSection/EXPBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "60383"
