@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://3drjc7pqx5yg"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_bdp4c"]
+
+[resource]
+script = ExtResource("1_bdp4c")
+HPRestorePercent = 30.0
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "vita_tonic"
+DisplayName = "Vita Tonic"
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"
