@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="InnKeeperData" load_steps=2 format=3 uid="uid://bi7842lbmle7k"]
+
+[ext_resource type="Script" uid="uid://bta5ys037efxe" path="res://Inn/InnKeeperData.cs" id="1_28p3a"]
+
+[resource]
+script = ExtResource("1_28p3a")
+metadata/_custom_type_script = "uid://bta5ys037efxe"
