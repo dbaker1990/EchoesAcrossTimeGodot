@@ -1,0 +1,195 @@
+[gd_scene load_steps=3 format=3 uid="uid://6hfxdrl3pxp7"]
+
+[ext_resource type="Script" uid="uid://5lxtqd1lnor7" path="res://UI/FishingMinigameUI.cs" id="1_c3vn5"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_768j5"]
+bg_color = Color(1, 0, 0, 1)
+
+[node name="FishingMinigameUI" type="Control" node_paths=PackedStringArray("mainPanel", "instructionLabel", "fishInfoPanel", "fishIcon", "fishNameLabel", "rarityLabel", "tensionBar", "tensionLabel", "tensionDangerOverlay", "successLabel", "successIconsContainer", "buttonPromptPanel", "buttonPromptLabel", "promptTimerBar", "resultPanel", "resultLabel", "resultIcon")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_c3vn5")
+mainPanel = NodePath("CanvasLayer/MainPanel")
+instructionLabel = NodePath("CanvasLayer/MainPanel/VBox/InstructionLabel")
+fishInfoPanel = NodePath("CanvasLayer/FishInfoPanel")
+fishIcon = NodePath("CanvasLayer/FishInfoPanel/HBox/FishIcon")
+fishNameLabel = NodePath("CanvasLayer/FishInfoPanel/HBox/InfoVBox/FishNameLabel")
+rarityLabel = NodePath("CanvasLayer/FishInfoPanel/HBox/InfoVBox/RarityLabel")
+tensionBar = NodePath("CanvasLayer/MainPanel/VBox/TensionSection/TensionBarContainer/TensionBar")
+tensionLabel = NodePath("CanvasLayer/MainPanel/VBox/TensionSection/TensionLabel")
+tensionDangerOverlay = NodePath("CanvasLayer/MainPanel/VBox/TensionSection/TensionDangerOverlay")
+successLabel = NodePath("CanvasLayer/MainPanel/VBox/SuccessSection/SuccessLabel")
+successIconsContainer = NodePath("CanvasLayer/MainPanel/VBox/SuccessSection/SuccessIconsContainer")
+buttonPromptPanel = NodePath("CanvasLayer/ButtonPromptPanel")
+buttonPromptLabel = NodePath("CanvasLayer/ButtonPromptPanel/VBox/ButtonPromptLabel")
+promptTimerBar = NodePath("CanvasLayer/ButtonPromptPanel/VBox/PromptTimerBar")
+resultPanel = NodePath("CanvasLayer/ResultPanel")
+resultLabel = NodePath("CanvasLayer/ResultPanel/VBox/ResultLabel")
+resultIcon = NodePath("CanvasLayer/ResultPanel/VBox/ResultIcon")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MainPanel" type="PanelContainer" parent="CanvasLayer"]
+visible = false
+custom_minimum_size = Vector2(600, 400)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Background" type="ColorRect" parent="CanvasLayer/MainPanel"]
+layout_mode = 2
+color = Color(0, 0, 0, 0.78431374)
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/MainPanel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="InstructionLabel" type="Label" parent="CanvasLayer/MainPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Waiting for a bite..."
+horizontal_alignment = 1
+
+[node name="TensionSection" type="VBoxContainer" parent="CanvasLayer/MainPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TensionLabel" type="Label" parent="CanvasLayer/MainPanel/VBox/TensionSection"]
+layout_mode = 2
+text = "Tension: 0%"
+
+[node name="TensionBarContainer" type="MarginContainer" parent="CanvasLayer/MainPanel/VBox/TensionSection"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="TensionBar" type="ProgressBar" parent="CanvasLayer/MainPanel/VBox/TensionSection/TensionBarContainer"]
+visible = false
+custom_minimum_size = Vector2(400, 40)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_768j5")
+show_percentage = false
+
+[node name="TensionDangerOverlay" type="ColorRect" parent="CanvasLayer/MainPanel/VBox/TensionSection"]
+visible = false
+layout_mode = 2
+mouse_force_pass_scroll_events = false
+color = Color(1, 0, 0, 0.4392157)
+
+[node name="SuccessSection" type="VBoxContainer" parent="CanvasLayer/MainPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SuccessLabel" type="Label" parent="CanvasLayer/MainPanel/VBox/SuccessSection"]
+layout_mode = 2
+text = "Progress: 0/3"
+
+[node name="SuccessIconsContainer" type="HBoxContainer" parent="CanvasLayer/MainPanel/VBox/SuccessSection"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="FishInfoPanel" type="PanelContainer" parent="CanvasLayer"]
+visible = false
+custom_minimum_size = Vector2(200, 120)
+offset_left = 1120.0
+offset_top = 50.0
+offset_right = 1160.0
+offset_bottom = 90.0
+
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/FishInfoPanel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="FishIcon" type="TextureRect" parent="CanvasLayer/FishInfoPanel/HBox"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="InfoVBox" type="VBoxContainer" parent="CanvasLayer/FishInfoPanel/HBox"]
+layout_mode = 2
+
+[node name="FishNameLabel" type="Label" parent="CanvasLayer/FishInfoPanel/HBox/InfoVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "???"
+
+[node name="RarityLabel" type="Label" parent="CanvasLayer/FishInfoPanel/HBox/InfoVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Unknown"
+
+[node name="ButtonPromptPanel" type="PanelContainer" parent="CanvasLayer"]
+visible = false
+custom_minimum_size = Vector2(400, 150)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/ButtonPromptPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="ButtonPromptLabel" type="Label" parent="CanvasLayer/ButtonPromptPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 32
+text = "PRESS [SPACE]!"
+horizontal_alignment = 1
+
+[node name="PromptTimerBar" type="ProgressBar" parent="CanvasLayer/ButtonPromptPanel/VBox"]
+custom_minimum_size = Vector2(300, 20)
+layout_mode = 2
+show_percentage = false
+
+[node name="ResultPanel" type="PanelContainer" parent="CanvasLayer"]
+visible = false
+custom_minimum_size = Vector2(400, 300)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -180.0
+offset_right = 200.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/ResultPanel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="ResultIcon" type="TextureRect" parent="CanvasLayer/ResultPanel/VBox"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="ResultLabel" type="Label" parent="CanvasLayer/ResultPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Result"
+horizontal_alignment = 1
