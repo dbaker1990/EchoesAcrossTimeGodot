@@ -31,7 +31,10 @@ namespace EchoesAcrossTime.Events
         ControlSelfSwitch,
         NameInput,
         ChangeTransparency,
-        ShowBalloonIcon
+        ShowBalloonIcon,
+        ChangeBattleBGM,
+        InitiateBattle,
+        InitiateShop
     }
 
     /// <summary>
@@ -365,6 +368,71 @@ namespace EchoesAcrossTime.Events
         public override async Task Execute(EventCommandExecutor executor)
         {
             await executor.TintScreen(TintColor, Duration);
+        }
+    }
+    
+    /// <summary>
+    /// Change the battle BGM
+    /// </summary>
+    [GlobalClass]
+    public partial class ChangeBattleBGMCommand : EventCommand
+    {
+        [Export] public AudioStream BattleBGM { get; set; }
+    
+        public ChangeBattleBGMCommand()
+        {
+            Type = EventCommandType.ChangeBattleBGM;
+            WaitForCompletion = false;
+        }
+    
+        public override async Task Execute(EventCommandExecutor executor)
+        {
+            executor.ChangeBattleBGM(BattleBGM);
+            await Task.CompletedTask;
+        }
+    }
+
+    /// <summary>
+    /// Initiate a battle encounter
+    /// </summary>
+    [GlobalClass]
+    public partial class InitiateBattleCommand : EventCommand
+    {
+        [Export] public string TroopId { get; set; } = "";
+        [Export] public bool CanEscape { get; set; } = true;
+        [Export] public bool CanLose { get; set; } = false;
+        [Export] public AudioStream BattleBGM { get; set; }
+    
+        public InitiateBattleCommand()
+        {
+            Type = EventCommandType.InitiateBattle;
+        }
+    
+        public override async Task Execute(EventCommandExecutor executor)
+        {
+            await executor.InitiateBattle(TroopId, CanEscape, CanLose, BattleBGM);
+        }
+    }
+
+    /// <summary>
+    /// Open the shop interface
+    /// </summary>
+    [GlobalClass]
+    public partial class InitiateShopCommand : EventCommand
+    {
+        [Export] public Godot.Collections.Array<string> ItemIds { get; set; }
+        [Export] public bool CanSell { get; set; } = true;
+        [Export] public bool CanBuy { get; set; } = true;
+    
+        public InitiateShopCommand()
+        {
+            Type = EventCommandType.InitiateShop;
+            ItemIds = new Godot.Collections.Array<string>();
+        }
+    
+        public override async Task Execute(EventCommandExecutor executor)
+        {
+            await executor.InitiateShop(ItemIds, CanBuy, CanSell);
         }
     }
 

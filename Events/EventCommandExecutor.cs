@@ -285,6 +285,103 @@ namespace EchoesAcrossTime.Events
                 character.Visible = !isHidden;
             }
         }
+        
+        // Add these methods to your Events/EventCommandExecutor.cs file
+
+        #region Battle & Shop Commands
+
+        private AudioStream currentBattleBGM;
+
+        /// <summary>
+        /// Change the battle BGM that will be used in future battles
+        /// </summary>
+        public void ChangeBattleBGM(AudioStream battleBGM)
+        {
+            currentBattleBGM = battleBGM;
+        }
+
+        /// <summary>
+        /// Initiate a battle encounter
+        /// </summary>
+        public async Task InitiateBattle(string troopId, bool canEscape, bool canLose, AudioStream battleBGM)
+        {
+            if (string.IsNullOrEmpty(troopId))
+            {
+                GD.PrintErr("Battle troop ID is empty");
+                return;
+            }
+            
+            // Use provided BGM or fall back to current battle BGM
+            var bgmToUse = battleBGM ?? currentBattleBGM;
+            
+            // TODO: Implement battle system integration
+            // When you have a BattleManager, uncomment and modify this code:
+            /*
+            var tcs = new TaskCompletionSource<bool>();
+            var battleManager = GetNode<Node>("/root/BattleManager");
+            if (battleManager == null)
+            {
+                GD.PrintErr("BattleManager not found");
+                return;
+            }
+            
+            void OnBattleEnd(bool victory)
+            {
+                tcs.TrySetResult(victory);
+            }
+            
+            battleManager.Connect("BattleEnded", Callable.From<bool>(OnBattleEnd));
+            battleManager.Call("StartBattle", troopId, canEscape, canLose, bgmToUse);
+            
+            await tcs.Task;
+            
+            battleManager.Disconnect("BattleEnded", Callable.From<bool>(OnBattleEnd));
+            */
+            
+            GD.Print($"InitiateBattle called: TroopId={troopId}, CanEscape={canEscape}, CanLose={canLose}");
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Open the shop interface
+        /// </summary>
+        public async Task InitiateShop(Godot.Collections.Array<string> itemIds, bool canBuy, bool canSell)
+        {
+            if (itemIds == null || itemIds.Count == 0)
+            {
+                GD.PrintErr("Shop has no items");
+                return;
+            }
+            
+            // TODO: Implement shop system integration
+            // When you have a ShopManager, uncomment and modify this code:
+            /*
+            var tcs = new TaskCompletionSource<bool>();
+            var shopManager = GetNode<Node>("/root/ShopManager");
+            if (shopManager == null)
+            {
+                GD.PrintErr("ShopManager not found");
+                return;
+            }
+            
+            void OnShopClosed()
+            {
+                tcs.TrySetResult(true);
+            }
+            
+            shopManager.Connect("ShopClosed", Callable.From(OnShopClosed));
+            shopManager.Call("OpenShop", itemIds, canBuy, canSell);
+            
+            await tcs.Task;
+            
+            shopManager.Disconnect("ShopClosed", Callable.From(OnShopClosed));
+            */
+            
+            GD.Print($"InitiateShop called: Items={itemIds.Count}, CanBuy={canBuy}, CanSell={canSell}");
+            await Task.CompletedTask;
+        }
+
+        #endregion
 
         public async Task ProcessNameInput(string characterId, int maxLength)
         {
