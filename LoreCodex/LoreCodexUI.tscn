@@ -1,0 +1,283 @@
+[gd_scene load_steps=2 format=3 uid="uid://cm4077rx78xvu"]
+
+[ext_resource type="Script" uid="uid://bprnnb1yuompy" path="res://LoreCodex/LoreCodexUI.cs" id="1_r7uu1"]
+
+[node name="LoreCodexUI" type="Control" node_paths=PackedStringArray("MainPanel", "TitleLabel", "CompletionLabel", "CompletionBar", "CloseButton", "SearchBar", "CategoryFilter", "EraFilter", "SortOption", "EntryList", "DetailPanel", "EntryPortrait", "EntryBanner", "EntryNameLabel", "EntryCategoryLabel", "EntryEraLabel", "EntryLocationLabel", "EntryAuthorLabel", "ShortDescLabel", "DetailedDescLabel", "SectionContainer", "PrevSectionButton", "NextSectionButton", "SectionTitleLabel", "SectionContentLabel", "SectionImage", "RelatedEntriesContainer", "NewIndicator", "UnreadCount")]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_r7uu1")
+MainPanel = NodePath("MainPanel")
+TitleLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/TopBar/TitleLabel")
+CompletionLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/TopBar/CompletionLabel")
+CompletionBar = NodePath("MainPanel/MarginContainer/VBoxContainer/TopBar/CompletionBar")
+CloseButton = NodePath("MainPanel/MarginContainer/VBoxContainer/TopBar/CloseButton")
+SearchBar = NodePath("MainPanel/MarginContainer/VBoxContainer/FilterBar/SearchBar")
+CategoryFilter = NodePath("MainPanel/MarginContainer/VBoxContainer/FilterBar/CategoryFilter")
+EraFilter = NodePath("MainPanel/MarginContainer/VBoxContainer/FilterBar/EraFilter")
+SortOption = NodePath("MainPanel/MarginContainer/VBoxContainer/FilterBar/SortOption")
+EntryList = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/LeftPanel/EntryList")
+DetailPanel = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel")
+EntryPortrait = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/EntryPortrait")
+EntryBanner = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/EntryBanner")
+EntryNameLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/InfoVBox/EntryNameLabel")
+EntryCategoryLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/InfoVBox/EntryCategoryLabel")
+EntryEraLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/InfoVBox/EntryEraLabel")
+EntryLocationLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/InfoVBox/EntryLocationLabel")
+EntryAuthorLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/InfoVBox/EntryAuthorLabel")
+ShortDescLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/ShortDescLabel")
+DetailedDescLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/DetailedDescLabel")
+SectionContainer = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer")
+PrevSectionButton = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer/SectionNav/PrevSectionButton")
+NextSectionButton = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer/SectionNav/NextSectionButton")
+SectionTitleLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer/SectionNav/SectionTitleLabel")
+SectionContentLabel = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer/SectionContentLabel")
+SectionImage = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer/SectionImage")
+RelatedEntriesContainer = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/RelatedSection/RelatedEntriesContainer")
+NewIndicator = NodePath("MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/InfoVBox/NewIndicator")
+UnreadCount = NodePath("MainPanel/MarginContainer/VBoxContainer/FilterBar/UnreadCount")
+
+[node name="MainPanel" type="Panel" parent="."]
+custom_minimum_size = Vector2(1000, 600)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MainPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TopBar" type="HBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Lore Codex"
+
+[node name="Spacer" type="Control" parent="MainPanel/MarginContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CompletionLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Completion: 0/0 (0%)"
+
+[node name="CompletionBar" type="ProgressBar" parent="MainPanel/MarginContainer/VBoxContainer/TopBar"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+show_percentage = false
+
+[node name="CloseButton" type="Button" parent="MainPanel/MarginContainer/VBoxContainer/TopBar"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "Close"
+
+[node name="Separator1" type="HSeparator" parent="MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="FilterBar" type="HBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SearchBar" type="LineEdit" parent="MainPanel/MarginContainer/VBoxContainer/FilterBar"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+placeholder_text = "Search lore..."
+
+[node name="CategoryFilter" type="OptionButton" parent="MainPanel/MarginContainer/VBoxContainer/FilterBar"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+
+[node name="EraFilter" type="OptionButton" parent="MainPanel/MarginContainer/VBoxContainer/FilterBar"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+
+[node name="SortOption" type="OptionButton" parent="MainPanel/MarginContainer/VBoxContainer/FilterBar"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+
+[node name="UnreadCount" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/FilterBar"]
+modulate = Color(1, 0.78431374, 0, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+
+[node name="Separator2" type="HSeparator" parent="MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Content" type="HSplitContainer" parent="MainPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/Content"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="ListTitle" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/Content/LeftPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Entries"
+
+[node name="EntryList" type="ItemList" parent="MainPanel/MarginContainer/VBoxContainer/Content/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+fixed_icon_size = Vector2i(48, 48)
+
+[node name="DetailPanel" type="ScrollContainer" parent="MainPanel/MarginContainer/VBoxContainer/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+
+[node name="DetailVBox" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EntryBanner" type="TextureRect" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Sep3" type="HSeparator" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox"]
+layout_mode = 2
+
+[node name="ShortDescLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Short description..."
+autowrap_mode = 2
+
+[node name="Sep4" type="HSeparator" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox"]
+layout_mode = 2
+
+[node name="DetailedDescLabel" type="RichTextLabel" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Detailed description..."
+fit_content = true
+
+[node name="Sep5" type="HSeparator" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox"]
+layout_mode = 2
+
+[node name="SectionContainer" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SectionHeader" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Additional Sections"
+
+[node name="SectionNav" type="HBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer"]
+layout_mode = 2
+
+[node name="PrevSectionButton" type="Button" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer/SectionNav"]
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+text = "◀ Previous Section"
+
+[node name="SectionTitleLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer/SectionNav"]
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_font_sizes/font_size = 18
+text = "Section Title"
+
+[node name="NextSectionButton" type="Button" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer/SectionNav"]
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+text = "Next Section ▶"
+
+[node name="SectionImage" type="TextureRect" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[node name="SectionContentLabel" type="RichTextLabel" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/SectionContainer"]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+
+[node name="Sep6" type="HSeparator" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox"]
+layout_mode = 2
+
+[node name="RelatedSection" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox"]
+layout_mode = 2
+
+[node name="RelatedHeader" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/RelatedSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Related Entries"
+
+[node name="RelatedEntriesContainer" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/DetailVBox/RelatedSection"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="ProfileSection" type="HBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel"]
+layout_mode = 2
+
+[node name="EntryPortrait" type="TextureRect" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection"]
+custom_minimum_size = Vector2(150, 200)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="InfoVBox" type="VBoxContainer" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EntryNameLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/InfoVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Entry Name"
+
+[node name="EntryCategoryLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/InfoVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Category:"
+
+[node name="EntryEraLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/InfoVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Era:
+"
+
+[node name="EntryLocationLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/InfoVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Location:"
+
+[node name="EntryAuthorLabel" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/InfoVBox"]
+modulate = Color(0.9063318, 0.9063318, 0.9063318, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Author:"
+
+[node name="NewIndicator" type="Label" parent="MainPanel/MarginContainer/VBoxContainer/Content/DetailPanel/ProfileSection/InfoVBox"]
+visible = false
+modulate = Color(1, 1, 0.58383155, 1)
+layout_mode = 2
+text = "[NEW]"

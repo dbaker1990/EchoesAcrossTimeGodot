@@ -1,0 +1,64 @@
+[gd_scene load_steps=2 format=3 uid="uid://bw6kr5vyqjrft"]
+
+[ext_resource type="Script" uid="uid://c60ffb8nbrty7" path="res://LoreCodex/LoreCodexNotification.cs" id="1_o74fy"]
+
+[node name="LoreCodexNotification" type="Control" node_paths=PackedStringArray("NotificationPanel", "IconRect", "TitleLabel", "DescriptionLabel", "CategoryLabel")]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+script = ExtResource("1_o74fy")
+NotificationPanel = NodePath("NotificationPanel")
+IconRect = NodePath("NotificationPanel/MarginContainer/HBoxContainer/IconRect")
+TitleLabel = NodePath("NotificationPanel/MarginContainer/HBoxContainer/TextVBox/TitleLabel")
+DescriptionLabel = NodePath("NotificationPanel/MarginContainer/HBoxContainer/TextVBox/DescriptionLabel")
+CategoryLabel = NodePath("NotificationPanel/MarginContainer/HBoxContainer/TextVBox/CategoryLabel")
+
+[node name="NotificationPanel" type="Panel" parent="."]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MarginContainer" type="MarginContainer" parent="NotificationPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="NotificationPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="IconRect" type="TextureRect" parent="NotificationPanel/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextVBox" type="VBoxContainer" parent="NotificationPanel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TitleLabel" type="Label" parent="NotificationPanel/MarginContainer/HBoxContainer/TextVBox"]
+modulate = Color(1, 0.9063318, 0, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "New Lore Discovered!"
+
+[node name="DescriptionLabel" type="Label" parent="NotificationPanel/MarginContainer/HBoxContainer/TextVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Entry Name"
+
+[node name="CategoryLabel" type="Label" parent="NotificationPanel/MarginContainer/HBoxContainer/TextVBox"]
+modulate = Color(0.85430586, 0.85430586, 0.85430586, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "[Category]"
