@@ -31,7 +31,8 @@ namespace EchoesAcrossTime.Combat
         Physical,
         Magical,
         Fixed,              // Ignores defense
-        Percentage          // % of target's HP
+        Percentage,          // % of target's HP
+        Recovery
     }
     
     

@@ -745,34 +745,28 @@ namespace EchoesAcrossTime.Combat.UI
         
         private void ExecuteItemAction(BattleMember[] targets)
         {
-            if (selectedItem == null)
-                return;
-            
-            if (!InventorySystem.Instance.HasItem(selectedItem.ItemId))
-            {
-                GD.Print($"No {selectedItem.DisplayName} in inventory!");
-                selectedItem = null;
-                actionMenuPanel.Show();
-                return;
-            }
-            
+            if (selectedItem == null) return;
+    
+            // FIX 1: Use battleManager.CurrentActor instead of currentActor
             var action = new BattleAction(battleManager.CurrentActor, BattleActionType.Item)
             {
                 ItemData = selectedItem
             };
             action = action.WithTargets(targets);
-            
-            var result = battleManager.ExecuteAction(action);
-            
-            if (result.Success)
-            {
-                InventorySystem.Instance.RemoveItem(selectedItem.ItemId, 1);
-                int remaining = InventorySystem.Instance.GetItemCount(selectedItem.ItemId);
-                GD.Print($"Used {selectedItem.DisplayName}, {remaining} remaining");
-            }
-            
+    
+            // FIX 2: Don't assign to var - ExecuteAction returns void
+            battleManager.ExecuteAction(action);
+    
+            // FIX 3: Always remove item (or check if BattleItemSystem already does this)
+            InventorySystem.Instance.RemoveItem(selectedItem.ItemId, 1);
+            int remaining = InventorySystem.Instance.GetItemCount(selectedItem.ItemId);
+            GD.Print($"Used {selectedItem.DisplayName}, {remaining} remaining");
+    
+            // FIX 4: Instead of HideAllMenus(), manually hide the relevant panels
             selectedItem = null;
             waitingForItemTarget = false;
+            itemMenuPanel.Hide();
+            actionMenuPanel.Hide();
         }
         
         private void OnBackFromItemsPressed()

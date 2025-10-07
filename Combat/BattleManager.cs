@@ -517,7 +517,7 @@ namespace EchoesAcrossTime.Combat
             
             // Set guard state
             action.Actor.GuardState.IsGuarding = true;
-            action.Actor.GuardState.GuardPower = 0.5f; // 50% damage reduction
+            action.Actor.GuardState.DamageReduction = 0.5f; // 50% damage reduction
             
             GD.Print($">>> {action.Actor.Stats.CharacterName} guards! <<<");
             
@@ -988,7 +988,7 @@ namespace EchoesAcrossTime.Combat
             int finalDamage = baseDamage;
             if (target.GuardState.IsGuarding)
             {
-                finalDamage = (int)(finalDamage * (1.0f - target.GuardState.GuardPower));
+                finalDamage = (int)(finalDamage * (1.0f - target.GuardState.DamageReduction));
                 GD.Print($"  → Guard blocked {baseDamage - finalDamage} damage!");
             }
             
@@ -1035,10 +1035,11 @@ namespace EchoesAcrossTime.Combat
         private async Task ApplySkillDamage(BattleMember attacker, BattleMember target, SkillData skill, BattleActionResult result)
         {
             // Check for technical damage opportunity
-            bool isTechnical = technicalSystem.IsTechnicalOpportunity(
-                target.Stats.ActiveStatuses,
+            TechnicalResult technicalResult = technicalSystem.CheckTechnical(
+                target.Stats, 
                 skill.Element
             );
+            bool isTechnical = technicalResult.IsTechnical;
             
             // Calculate damage
             int baseDamage = CalculateMagicDamage(attacker, target, skill);
@@ -1065,24 +1066,15 @@ namespace EchoesAcrossTime.Combat
             // Apply technical multiplier
             if (isTechnical)
             {
-                baseDamage = (int)(baseDamage * 1.5f);
-                string comboType = technicalSystem.GetTechnicalComboName(
-                    target.Stats.ActiveStatuses,
-                    skill.Element
-                );
-                GD.Print($"  ⚡ TECHNICAL! {comboType}");
-                EmitSignal(SignalName.TechnicalDamage,
-                    attacker.Stats.CharacterName,
-                    target.Stats.CharacterName,
-                    comboType
-                );
+                baseDamage = (int)(baseDamage * technicalResult.DamageMultiplier);
+                GD.Print($"  ⚡ TECHNICAL! {technicalResult.Message}");
             }
             
             // Apply guard reduction
             int finalDamage = baseDamage;
             if (target.GuardState.IsGuarding)
             {
-                finalDamage = (int)(finalDamage * (1.0f - target.GuardState.GuardPower));
+                finalDamage = (int)(finalDamage * (1.0f - target.GuardState.DamageReduction));
                 GD.Print($"  → Guard blocked {baseDamage - finalDamage} damage!");
             }
             
