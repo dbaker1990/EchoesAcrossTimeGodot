@@ -295,6 +295,56 @@ namespace EchoesAcrossTime.Combat
             return result;
         }
         
+        
+        /// <summary>
+        /// Check if a showtime can be activated for two characters
+        /// </summary>
+        public bool CanShowtimeActivate(ShowtimeAttackData showtime, BattleMember char1, BattleMember char2)
+        {
+            if (showtime == null || char1 == null || char2 == null)
+                return false;
+    
+            // Check if characters match the showtime requirement
+            bool char1Match = char1.Stats.CharacterName == showtime.Character1Id || 
+                              char1.Stats.CharacterName == showtime.Character2Id;
+            bool char2Match = char2.Stats.CharacterName == showtime.Character1Id || 
+                              char2.Stats.CharacterName == showtime.Character2Id;
+    
+            if (!char1Match || !char2Match)
+                return false;
+    
+            // Check if both characters are alive
+            if (char1.Stats.CurrentHP <= 0 || char2.Stats.CurrentHP <= 0)
+                return false;
+    
+            // Check if showtime is off cooldown
+            string key = GetPairKey(char1.Stats.CharacterName, char2.Stats.CharacterName);
+            if (showtimeStates.TryGetValue(key, out var state))
+            {
+                return state.IsAvailable;
+            }
+    
+            return false;
+        }
+
+        /// <summary>
+        /// Put a showtime on cooldown after use
+        /// </summary>
+        public void PutOnCooldown(ShowtimeAttackData showtime)
+        {
+            if (showtime == null)
+                return;
+    
+            string key = GetPairKey(showtime.Character1Id, showtime.Character2Id);
+    
+            if (showtimeStates.TryGetValue(key, out var state))
+            {
+                state.UseShowtime();
+                GD.Print($"Showtime '{showtime.AttackName}' put on cooldown for {showtime.CooldownTurns} turns");
+            }
+        }
+        
+        
         /// <summary>
         /// Increment turn counters for cooldowns
         /// </summary>

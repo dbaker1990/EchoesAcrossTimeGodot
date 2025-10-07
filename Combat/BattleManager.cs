@@ -900,48 +900,48 @@ namespace EchoesAcrossTime.Combat
         }
         
         /// <summary>
-        /// Execute a showtime attack
-        /// </summary>
-        public void ExecuteShowtime(ShowtimeAttackData showtime)
-        {
-            if (showtime == null || showtimeManager == null)  // ← Changed from ShowtimeSystem.Instance
-            {
-                GD.PrintErr("Invalid showtime data!");
-                return;
-            }
+/// Execute a showtime attack
+/// </summary>
+public void ExecuteShowtime(ShowtimeAttackData showtime)
+{
+    if (showtime == null || showtimeManager == null)  // ← Changed from ShowtimeSystem.Instance
+    {
+        GD.PrintErr("Invalid showtime data!");
+        return;
+    }
     
-            var livingAllies = GetLivingAllies();
-            var char1 = livingAllies.FirstOrDefault(a => a.Stats.CharacterName == showtime.Character1Id);
-            var char2 = livingAllies.FirstOrDefault(a => a.Stats.CharacterName == showtime.Character2Id);
+    var livingAllies = GetLivingAllies();
+    var char1 = livingAllies.FirstOrDefault(a => a.Stats.CharacterName == showtime.Character1Id);
+    var char2 = livingAllies.FirstOrDefault(a => a.Stats.CharacterName == showtime.Character2Id);
     
-            if (char1 == null || char2 == null)
-            {
-                GD.PrintErr("Showtime characters not found!");
-                return;
-            }
+    if (char1 == null || char2 == null)
+    {
+        GD.PrintErr("Showtime characters not found!");
+        return;
+    }
     
-            // Get targets
-            var targets = showtime.HitsAllEnemies  // ← Changed from HitsAllTargets
-                ? GetLivingEnemies()
-                : new List<BattleMember> { GetLivingEnemies().FirstOrDefault() };
+    // Get targets
+    var targets = showtime.HitsAllEnemies  // ← Changed from HitsAllTargets
+        ? GetLivingEnemies()
+        : new List<BattleMember> { GetLivingEnemies().FirstOrDefault() };
     
-            if (targets.Count == 0 || targets[0] == null)
-            {
-                GD.Print("No valid targets for showtime!");
-                return;
-            }
+    if (targets.Count == 0 || targets[0] == null)
+    {
+        GD.Print("No valid targets for showtime!");
+        return;
+    }
     
-            // Execute using internal manager
-            var result = showtimeManager.ExecuteShowtime(showtime, char1, char2, targets);  // ← Changed
+    // Execute using internal manager
+    var result = showtimeManager.ExecuteShowtime(showtime, char1, char2, targets);  // ← Changed
     
-            // Emit signal
-            EmitSignal(SignalName.ShowtimeTriggered, showtime.AttackName, char1.Stats.CharacterName, char2.Stats.CharacterName);
+    // Emit signal
+    EmitSignal(SignalName.ShowtimeTriggered, showtime.AttackName, char1.Stats.CharacterName, char2.Stats.CharacterName);
     
-            // Put showtime on cooldown
-            showtimeManager.PutOnCooldown(showtime);  // ← Changed
+    // Put showtime on cooldown
+    showtimeManager.PutOnCooldown(showtime);  // ← Changed
     
-            GD.Print($"Showtime complete! Total damage: {result.DamageDealt}");
-        }
+    GD.Print($"Showtime complete! Total damage: {result.DamageDealt}");
+}
         
         /// <summary>
         /// Check if limit break is ready for a character
