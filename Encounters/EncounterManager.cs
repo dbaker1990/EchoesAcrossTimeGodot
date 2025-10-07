@@ -69,6 +69,26 @@ namespace EchoesAcrossTime.Encounters
             Instance = this;
             ProcessMode = ProcessModeEnum.Always;
             
+            var root = GetTree().Root;
+            if (root.HasMeta("EncounterData"))
+            {
+                var encounterData = root.GetMeta("EncounterData").AsGodotDictionary();
+        
+                if (encounterData.ContainsKey("BattleBackground"))
+                {
+                    var bgPath = encounterData["BattleBackground"].AsString();
+                    if (!string.IsNullOrEmpty(bgPath))
+                    {
+                        var bgTexture = GD.Load<Texture2D>(bgPath);
+                        var bgTint = encounterData.ContainsKey("BackgroundTint") 
+                            ? encounterData["BackgroundTint"].AsColor() 
+                            : Colors.White;
+                
+                        SetBattleBackground(bgTexture, bgTint);
+                    }
+                }
+            }
+            
             GD.Print("[EncounterManager] Initialized");
         }
         
@@ -274,7 +294,7 @@ namespace EchoesAcrossTime.Encounters
             {
                 enemyIdsArray.Add(id);
             }
-            
+    
             // Store encounter data as dictionary for battle scene to access
             var encounterDict = new Dictionary
             {
@@ -282,11 +302,15 @@ namespace EchoesAcrossTime.Encounters
                 { "EnemyIds", enemyIdsArray },
                 { "IsBossBattle", encounterData.IsBossBattle },
                 { "CanEscape", encounterData.CanEscape },
-                { "BattleScenePath", encounterData.BattleScenePath }
+                { "BattleScenePath", encounterData.BattleScenePath },
+        
+                // ADD THESE:
+                { "BattleBackground", encounterData.BattleBackground?.ResourcePath ?? "" },
+                { "BackgroundTint", encounterData.BackgroundTint }
             };
-            
+    
             GetTree().Root.SetMeta("EncounterData", encounterDict);
-            
+    
             // Change scene
             GetTree().ChangeSceneToFile(encounterData.BattleScenePath);
         }
@@ -318,6 +342,20 @@ namespace EchoesAcrossTime.Encounters
             ResetStepCount();
             
             GD.Print($"[EncounterManager] Returned to overworld - Victory: {victory}");
+        }
+        
+        /// <summary>
+        /// Set the battle background
+        /// </summary>
+        public void SetBattleBackground(Texture2D background, Color tint)
+        {
+            var bgNode = GetNode<TextureRect>("../Background");
+            if (bgNode != null && background != null)
+            {
+                bgNode.Texture = background;
+                bgNode.Modulate = tint;
+                GD.Print($"[BattleManager] Background set: {background.ResourcePath}");
+            }
         }
         
         #endregion

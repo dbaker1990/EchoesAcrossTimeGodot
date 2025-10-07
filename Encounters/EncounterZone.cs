@@ -41,6 +41,9 @@ namespace EchoesAcrossTime.Encounters
         [Export] public string BattleScenePath { get; set; } = "res://Scenes/BattleScene.tscn";
         [Export] public AudioStream BattleMusic { get; set; }
         
+        [Export] public Texture2D BattleBackground { get; set; }
+        [Export] public Color BackgroundTint { get; set; } = Colors.White;
+        
         #endregion
         
         #region Private Fields
@@ -178,7 +181,9 @@ namespace EchoesAcrossTime.Encounters
                 IsBossBattle = IsBossBattle,
                 CanEscape = CanEscape,
                 BattleScenePath = BattleScenePath,
-                BattleMusic = BattleMusic
+                BattleMusic = BattleMusic,
+                BattleBackground = BattleBackground,
+                BackgroundTint = BackgroundTint
             };
         }
         
@@ -196,5 +201,8 @@ namespace EchoesAcrossTime.Encounters
         public bool CanEscape { get; set; }
         public string BattleScenePath { get; set; }
         public AudioStream BattleMusic { get; set; }
+        
+        public Texture2D BattleBackground { get; set; }
+        public Color BackgroundTint { get; set; } = Colors.White;
     }
 }
