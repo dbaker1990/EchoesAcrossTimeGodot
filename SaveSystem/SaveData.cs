@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using EchoesAcrossTime.Database;
 using EchoesAcrossTime.Combat;
 using EchoesAcrossTime.Items;
+using EchoesAcrossTime.Quests;
 
 namespace EchoesAcrossTime
 {
@@ -77,6 +78,36 @@ namespace EchoesAcrossTime
             CurrentMapPath = "res://Maps/StartingMap.tscn";
             PlayerPosition = new Vector2Data(100, 100);
             
+            // Initialize quest system
+            Quests = new QuestSaveData
+            {
+                ActiveQuestIds = new List<string>(),
+                CompletedQuestIds = new List<string>(),
+                ObjectiveProgress = new Dictionary<string, Dictionary<string, int>>(),
+                CurrentChapter = 1
+            };
+            
+            // Initialize bond system
+            Bonds = new BondSaveData
+            {
+                BondPairs = new Dictionary<string, BondPairData>(),
+                CurrentGameDay = 0
+            };
+            
+            // Initialize relationship system
+            Relationships = new RelationshipSaveData
+            {
+                Candidates = new Dictionary<string, RelationshipCandidateData>
+                {
+                    { "elara", new RelationshipCandidateData { CandidateId = "elara", Points = 0, Stage = "Acquaintance" } },
+                    { "seraphine", new RelationshipCandidateData { CandidateId = "seraphine", Points = 0, Stage = "Acquaintance" } },
+                    { "naledi", new RelationshipCandidateData { CandidateId = "naledi", Points = 0, Stage = "Acquaintance" } }
+                },
+                LockedInCandidateId = "",
+                LockinWindowOpen = false,
+                LockinWindowClosed = false
+            };
+            
             GD.Print("New game initialized");
         }
         
@@ -100,6 +131,32 @@ namespace EchoesAcrossTime
                 foreach (var kvp in Variables)
                 {
                     Events.EventCommandExecutor.Instance.SetVariable(kvp.Key, kvp.Value);
+                }
+            }
+            
+            // Apply quest data
+            if (Quests != null && QuestManager.Instance != null)
+            {
+                QuestManager.Instance.LoadSaveData(Quests);
+            }
+            
+            // Apply bond data - accessed via GameManager tree
+            if (Bonds != null && GameManager.Instance != null)
+            {
+                var bondManager = GameManager.Instance.GetNodeOrNull<BondManager>("/root/BondManager");
+                if (bondManager != null)
+                {
+                    bondManager.LoadSaveData(Bonds);
+                }
+            }
+            
+            // Apply relationship data - accessed via GameManager tree
+            if (Relationships != null && GameManager.Instance != null)
+            {
+                var relationshipManager = GameManager.Instance.GetNodeOrNull<RelationshipManager>("/root/RelationshipManager");
+                if (relationshipManager != null)
+                {
+                    relationshipManager.LoadSaveData(Relationships);
                 }
             }
             
@@ -146,6 +203,32 @@ namespace EchoesAcrossTime
             if (Events.EventCommandExecutor.Instance != null)
             {
                 // You'll need to expose variables from EventCommandExecutor
+            }
+            
+            // Capture quest data
+            if (QuestManager.Instance != null)
+            {
+                Quests = QuestManager.Instance.GetSaveData();
+            }
+            
+            // Capture bond data - accessed via GameManager tree
+            if (GameManager.Instance != null)
+            {
+                var bondManager = GameManager.Instance.GetNodeOrNull<BondManager>("/root/BondManager");
+                if (bondManager != null)
+                {
+                    Bonds = bondManager.GetSaveData();
+                }
+            }
+            
+            // Capture relationship data - accessed via GameManager tree
+            if (GameManager.Instance != null)
+            {
+                var relationshipManager = GameManager.Instance.GetNodeOrNull<RelationshipManager>("/root/RelationshipManager");
+                if (relationshipManager != null)
+                {
+                    Relationships = relationshipManager.GetSaveData();
+                }
             }
             
             GD.Print("Game state captured");
