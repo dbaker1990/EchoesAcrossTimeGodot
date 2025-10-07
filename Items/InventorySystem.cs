@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using EchoesAcrossTime.Combat;
+using RPG.Items;
 
 namespace EchoesAcrossTime.Items
 {

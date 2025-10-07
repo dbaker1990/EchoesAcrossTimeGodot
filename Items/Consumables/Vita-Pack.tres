@@ -7,6 +7,7 @@ script = ExtResource("1_j4aq0")
 HPRestorePercent = 30.0
 CuresStatuses = null
 InflictsStatus = null
+TargetType = 1
 ItemId = "vita_pack"
 DisplayName = "Vita Pack"
 Description = "Field medic kit, pre-measured for squads. Restores 30% HP to all allies."

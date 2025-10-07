@@ -1,83 +1,140 @@
 ﻿using Godot;
+using Godot.Collections;
+using System.Linq;
 using EchoesAcrossTime.Combat;
+using EchoesAcrossTime.Items;
 
-namespace EchoesAcrossTime.Items
+namespace RPG.Items
 {
-    public enum ConsumableEffect
+    /// <summary>
+    /// Target type for consumable items
+    /// </summary>
+    public enum ConsumableTargetType
     {
-        RestoreHP,
-        RestoreMP,
-        RestoreHPPercent,
-        RestoreMPPercent,
-        ReviveCharacter,
-        CureStatus,
-        BuffStat,
-        DamageEnemy
+        OneAlly,
+        AllAllies,
+        OneEnemy,
+        AllEnemies,
+        RandomEnemy
     }
 
     [GlobalClass]
     public partial class ConsumableData : ItemData
     {
-        [ExportGroup("Healing")]
+        [ExportGroup("Restoration")]
         [Export] public int HPRestore { get; set; } = 0;
+        [Export(PropertyHint.Range, "0,1")] public float HPRestorePercent { get; set; } = 0f;
         [Export] public int MPRestore { get; set; } = 0;
-        [Export] public float HPRestorePercent { get; set; } = 0f;  // 0-1
-        [Export] public float MPRestorePercent { get; set; } = 0f;  // 0-1
+        [Export(PropertyHint.Range, "0,1")] public float MPRestorePercent { get; set; } = 0f;
 
-        // Backward compatibility properties
-        public int RestoresHP { get => HPRestore; set => HPRestore = value; }
-        public int RestoresMP { get => MPRestore; set => MPRestore = value; }
-        public float RestoresHPPercent { get => HPRestorePercent; set => HPRestorePercent = value; }
-        public float RestoresMPPercent { get => MPRestorePercent; set => MPRestorePercent = value; }
+        [ExportGroup("Status Effects")]
+        [Export] public Array<StatusEffect> CuresStatuses { get; set; }
+        [Export] public bool CuresAllStatuses { get; set; } = false;
 
         [ExportGroup("Revival")]
         [Export] public bool CanRevive { get; set; } = false;
-        [Export] public float ReviveHPPercent { get; set; } = 0.25f;  // Revive with 25% HP
+        [Export(PropertyHint.Range, "0,1")] public float ReviveHPPercent { get; set; } = 0.5f;
 
-        // Backward compatibility
-        public bool Revives { get => CanRevive; set => CanRevive = value; }
-
-        [ExportGroup("Status Effects")]
-        [Export] public Godot.Collections.Array<StatusEffect> CuresStatuses { get; set; }
-        [Export] public bool CuresAllStatuses { get; set; } = false;
-
-        // Backward compatibility
-        public Godot.Collections.Array<StatusEffect> CuresStatus => CuresStatuses;
-        public bool CuresAllDebuffs { get => CuresAllStatuses; set => CuresAllStatuses = value; }
-
-        [ExportGroup("Buffs (Temporary)")]
+        [ExportGroup("Buffs")]
         [Export] public int AttackBuff { get; set; } = 0;
         [Export] public int DefenseBuff { get; set; } = 0;
-        [Export] public int MagicAttackBuff { get; set; } = 0;
-        [Export] public int MagicDefenseBuff { get; set; } = 0;
+        [Export] public int MagicBuff { get; set; } = 0;
+        [Export] public int ResistanceBuff { get; set; } = 0;
         [Export] public int SpeedBuff { get; set; } = 0;
-        [Export] public int BuffDuration { get; set; } = 3;  // Number of turns
+        [Export] public int BuffDuration { get; set; } = 3;
 
-        // Backward compatibility
+        // Legacy properties for backward compatibility
+        public bool Revives { get => CanRevive; set => CanRevive = value; }
+        public int RestoresHP { get => HPRestore; set => HPRestore = value; }
+        public int RestoresMP { get => MPRestore; set => MPRestore = value; }
+        public Array<StatusEffect> CuresStatus { get => CuresStatuses; set => CuresStatuses = value; }
         public int TemporaryAttackBoost { get => AttackBuff; set => AttackBuff = value; }
         public int TemporaryDefenseBoost { get => DefenseBuff; set => DefenseBuff = value; }
+        public int TemporaryMagicBoost { get => MagicBuff; set => MagicBuff = value; }
+        public int TemporaryResistanceBoost { get => ResistanceBuff; set => ResistanceBuff = value; }
         public int TemporarySpeedBoost { get => SpeedBuff; set => SpeedBuff = value; }
 
         [ExportGroup("Offensive Items")]
         [Export] public int DamageAmount { get; set; } = 0;
         [Export] public ElementType DamageElement { get; set; } = ElementType.Physical;
-        [Export] public Godot.Collections.Array<StatusEffect> InflictsStatus { get; set; }
+        [Export] public Array<StatusEffect> InflictsStatus { get; set; }
         [Export] public int StatusChance { get; set; } = 0;
         [Export] public int StatusDuration { get; set; } = 0;
 
         [ExportGroup("Target")]
-        [Export] public bool TargetAllies { get; set; } = true;
-        [Export] public bool TargetAll { get; set; } = false;  // All allies or all enemies
+        [Export] public ConsumableTargetType TargetType { get; set; } = ConsumableTargetType.OneAlly;
 
         [ExportGroup("Animation")]
         [Export] public string UseAnimationPath { get; set; } = "";
+
+        // Legacy properties for backward compatibility
+        public bool TargetAllies 
+        { 
+            get => TargetType == ConsumableTargetType.OneAlly || TargetType == ConsumableTargetType.AllAllies;
+            set 
+            {
+                // When setting via legacy, maintain single/all distinction
+                if (value)
+                    TargetType = TargetAll ? ConsumableTargetType.AllAllies : ConsumableTargetType.OneAlly;
+                else
+                    TargetType = TargetAll ? ConsumableTargetType.AllEnemies : ConsumableTargetType.OneEnemy;
+            }
+        }
+
+        public bool TargetAll 
+        { 
+            get => TargetType == ConsumableTargetType.AllAllies || TargetType == ConsumableTargetType.AllEnemies;
+            set
+            {
+                // When setting via legacy, maintain ally/enemy distinction
+                bool isAlly = TargetAllies;
+                if (value)
+                    TargetType = isAlly ? ConsumableTargetType.AllAllies : ConsumableTargetType.AllEnemies;
+                else
+                    TargetType = isAlly ? ConsumableTargetType.OneAlly : ConsumableTargetType.OneEnemy;
+            }
+        }
 
         public ConsumableData()
         {
             Type = ItemType.Consumable;
             IsConsumable = true;
-            CuresStatuses = new Godot.Collections.Array<StatusEffect>();
-            InflictsStatus = new Godot.Collections.Array<StatusEffect>();
+            CuresStatuses = new Array<StatusEffect>();
+            InflictsStatus = new Array<StatusEffect>();
+        }
+
+        /// <summary>
+        /// Check if this item targets allies
+        /// </summary>
+        public bool IsAllyTargeting()
+        {
+            return TargetType == ConsumableTargetType.OneAlly || TargetType == ConsumableTargetType.AllAllies;
+        }
+
+        /// <summary>
+        /// Check if this item targets enemies
+        /// </summary>
+        public bool IsEnemyTargeting()
+        {
+            return TargetType == ConsumableTargetType.OneEnemy || 
+                   TargetType == ConsumableTargetType.AllEnemies || 
+                   TargetType == ConsumableTargetType.RandomEnemy;
+        }
+
+        /// <summary>
+        /// Check if this item targets all (allies or enemies)
+        /// </summary>
+        public bool TargetsAll()
+        {
+            return TargetType == ConsumableTargetType.AllAllies || TargetType == ConsumableTargetType.AllEnemies;
+        }
+
+        /// <summary>
+        /// Check if this item targets randomly
+        /// </summary>
+        public bool TargetsRandom()
+        {
+            return TargetType == ConsumableTargetType.RandomEnemy;
         }
 
         /// <summary>

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using EchoesAcrossTime.Combat;
 using EchoesAcrossTime.Database;
 using EchoesAcrossTime.Items;
+using RPG.Items;
 
 namespace EchoesAcrossTime.Combat
 {

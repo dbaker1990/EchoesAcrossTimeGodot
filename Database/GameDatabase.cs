@@ -6,6 +6,7 @@ using EchoesAcrossTime.Events;
 using EchoesAcrossTime.Items;
 using Godot;
 using Godot.Collections;
+using RPG.Items;
 
 namespace EchoesAcrossTime.Database
 {

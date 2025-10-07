@@ -5,6 +5,7 @@ using Godot;
 using System.Linq;
 using EchoesAcrossTime.Combat;
 using EchoesAcrossTime.Items;
+using RPG.Items;
 
 namespace EchoesAcrossTime.Combat.UI
 {
@@ -661,12 +662,12 @@ namespace EchoesAcrossTime.Combat.UI
             
             if (item.RestoresHP > 0)
                 effects.Add($"+{item.RestoresHP} HP");
-            if (item.RestoresHPPercent > 0)
-                effects.Add($"+{item.RestoresHPPercent * 100:F0}% HP");
+            if (item.HPRestorePercent > 0)
+                effects.Add($"+{item.HPRestorePercent * 100:F0}% HP");
             if (item.RestoresMP > 0)
                 effects.Add($"+{item.RestoresMP} MP");
-            if (item.RestoresMPPercent > 0)
-                effects.Add($"+{item.RestoresMPPercent * 100:F0}% MP");
+            if (item.MPRestorePercent > 0)
+                effects.Add($"+{item.MPRestorePercent * 100:F0}% MP");
             if (item.Revives)
                 effects.Add($"Revive ({item.ReviveHPPercent * 100:F0}% HP)");
             if (item.CuresStatuses.Count > 0)

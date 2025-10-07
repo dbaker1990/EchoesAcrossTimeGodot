@@ -8,6 +8,7 @@ HPRestorePercent = 100.0
 MPRestorePercent = 100.0
 CuresStatuses = null
 InflictsStatus = null
+TargetType = 1
 ItemId = "grand_omni_elixir"
 DisplayName = "Grand Omni Elixir"
 Description = "Rally the whole party at once. Full HP & MP to all allies."

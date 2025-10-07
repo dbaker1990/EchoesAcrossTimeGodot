@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1_4mfnv")
+CuresStatuses = null
 CanRevive = true
 ReviveHPPercent = 1.0
-CuresStatuses = null
 InflictsStatus = null
 ItemId = "phoenix_ashe"
 DisplayName = "Phoenix Ashe"

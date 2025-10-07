@@ -4,9 +4,8 @@
 
 [resource]
 script = ExtResource("1_jyssi")
-CanRevive = true
-ReviveHPPercent = 0.5
 CuresStatuses = null
+CanRevive = true
 InflictsStatus = null
 ItemId = "phoenix_plum"
 DisplayName = "Phoenix Plum"

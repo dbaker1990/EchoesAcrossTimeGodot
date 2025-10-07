@@ -6,6 +6,7 @@ using EchoesAcrossTime;
 using EchoesAcrossTime.Combat;
 using EchoesAcrossTime.Items;
 using EchoesAcrossTime.Managers;
+using RPG.Items;
 
 /// <summary>
 /// Main controller for the Battle UI - manages all UI interactions and updates
@@ -914,12 +915,12 @@ public partial class BattleUIController : Node
     
         if (item.RestoresHP > 0)
             effects.Add($"+{item.RestoresHP} HP");
-        if (item.RestoresHPPercent > 0)
-            effects.Add($"+{item.RestoresHPPercent * 100:F0}% HP");
+        if (item.HPRestorePercent > 0)
+            effects.Add($"+{item.HPRestorePercent * 100:F0}% HP");
         if (item.RestoresMP > 0)
             effects.Add($"+{item.RestoresMP} MP");
-        if (item.RestoresMPPercent > 0)
-            effects.Add($"+{item.RestoresMPPercent * 100:F0}% MP");
+        if (item.MPRestorePercent > 0)
+            effects.Add($"+{item.MPRestorePercent * 100:F0}% MP");
         if (item.Revives)
             effects.Add($"Revive ({item.ReviveHPPercent * 100:F0}% HP)");
         if (item.CuresStatus?.Count > 0)
@@ -944,7 +945,7 @@ public partial class BattleUIController : Node
     {
         if (selectedItem == null || itemList.GetSelectedItems().Length == 0)
             return;
-    
+
         // Verify we still have the item
         if (!InventorySystem.Instance.HasItem(selectedItem.ItemId))
         {
@@ -952,13 +953,13 @@ public partial class BattleUIController : Node
             PopulateItemList();
             return;
         }
-    
+
         // Hide item menu
         itemMenu.Hide();
-    
+
         // Get valid targets
         var validTargets = GetValidItemTargets(selectedItem);
-    
+
         if (validTargets.Count == 0)
         {
             GD.Print("No valid targets for this item!");
@@ -966,44 +967,70 @@ public partial class BattleUIController : Node
             selectedItem = null;
             return;
         }
-    
-        // If item targets all, execute immediately
-        if (selectedItem.TargetAll)
+
+        // Check target type
+        switch (selectedItem.TargetType)
         {
-            ExecuteItemAction(validTargets.ToArray());
-        }
-        else
-        {
-            // Show target selection
-            ShowTargetSelection(validTargets);
-            waitingForItemTarget = true;
+            case ConsumableTargetType.AllAllies:
+            case ConsumableTargetType.AllEnemies:
+                // Execute immediately on all targets
+                ExecuteItemAction(validTargets.ToArray());
+                break;
+
+            case ConsumableTargetType.RandomEnemy:
+                // Select random enemy and execute
+                if (validTargets.Count > 0)
+                {
+                    var randomIndex = GD.RandRange(0, validTargets.Count - 1);
+                    var randomTarget = validTargets[randomIndex];
+                    ExecuteItemAction(new[] { randomTarget });
+                }
+                break;
+
+            case ConsumableTargetType.OneAlly:
+            case ConsumableTargetType.OneEnemy:
+                // Show target selection for single target
+                ShowTargetSelection(validTargets);
+                waitingForItemTarget = true;
+                break;
         }
     }
     
-    /// <summary>
-    /// Get valid targets for an item
+    // <summary>
+    /// Get valid targets for an item based on its TargetType
     /// </summary>
     private List<BattleMember> GetValidItemTargets(ConsumableData item)
     {
         var targets = new List<BattleMember>();
-    
-        // Offensive items target living enemies
-        if (item.DamageAmount > 0)
+
+        if (item == null)
+            return targets;
+
+        switch (item.TargetType)
         {
-            targets.AddRange(battleManager.GetLivingEnemies());
+            case ConsumableTargetType.OneAlly:
+            case ConsumableTargetType.AllAllies:
+                // Revival items target dead allies
+                if (item.Revives)
+                {
+                    var allAllies = battleManager.GetPlayerParty();
+                    targets.AddRange(allAllies.Where(a => !a.Stats.IsAlive));
+                }
+                // Healing/support items target living allies
+                else
+                {
+                    targets.AddRange(battleManager.GetLivingAllies());
+                }
+                break;
+
+            case ConsumableTargetType.OneEnemy:
+            case ConsumableTargetType.AllEnemies:
+            case ConsumableTargetType.RandomEnemy:
+                // Offensive items target living enemies
+                targets.AddRange(battleManager.GetLivingEnemies());
+                break;
         }
-        // Revival items target dead allies
-        else if (item.Revives)
-        {
-            var allAllies = battleManager.GetPlayerParty();
-            targets.AddRange(allAllies.Where(a => !a.Stats.IsAlive));
-        }
-        // Healing/support items target living allies
-        else
-        {
-            targets.AddRange(battleManager.GetLivingAllies());
-        }
-    
+
         return targets;
     }
 

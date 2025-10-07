@@ -5,6 +5,7 @@ using System.Linq;
 using EchoesAcrossTime.Combat;
 using EchoesAcrossTime.Items;
 using EchoesAcrossTime.Managers;
+using RPG.Items;
 
 namespace EchoesAcrossTime.UI
 {
