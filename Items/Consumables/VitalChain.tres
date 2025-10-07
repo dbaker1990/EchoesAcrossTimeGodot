@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://bhcdmu37whc7p"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_yqmdk"]
+
+[resource]
+script = ExtResource("1_yqmdk")
+HPRestorePercent = 100.0
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "vital_chain"
+DisplayName = "Vital Chain"
+Description = "A string of beads that shares the blessing around. Full HP to all allies."
+Rarity = 4
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://dk3jb6tr132dd"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_g21ju"]
+
+[resource]
+script = ExtResource("1_g21ju")
+HPRestorePercent = 60.0
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "hi_vita"
+DisplayName = "Hi Vita Tonic"
+Description = "Concentrated restorative with a clean aftertaste. Restores 60% HP to 1 ally."
+Rarity = 1
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

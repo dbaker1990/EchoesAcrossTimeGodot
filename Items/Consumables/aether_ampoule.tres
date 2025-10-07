@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://bysp68jlygkxe"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_fvdpo"]
+
+[resource]
+script = ExtResource("1_fvdpo")
+MPRestore = 100
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "aether_ampoule"
+DisplayName = "Aether Ampoule"
+Description = "Heavy charge of raw focus. Restores 100 MP to 1 ally."
+Rarity = 2
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

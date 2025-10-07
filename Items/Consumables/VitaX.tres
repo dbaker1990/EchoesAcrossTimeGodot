@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://cr6xyji1n8os0"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_6frfp"]
+
+[resource]
+script = ExtResource("1_6frfp")
+HPRestorePercent = 100.0
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "vitax"
+DisplayName = "Vita X"
+Description = "Crystal-clear panacea in a single dose. Full HP to 1 ally."
+Rarity = 3
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://s4h2mpf1ijn4"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_jyssi"]
+
+[resource]
+script = ExtResource("1_jyssi")
+CanRevive = true
+ReviveHPPercent = 0.5
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "phoenix_plum"
+DisplayName = "Phoenix Plum"
+Description = "A warm feather that stirs the heart back to life. Revive 1 ally with 50% HP."
+Rarity = 3
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://bc32uvc72qepi"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_4rwwa"]
+
+[resource]
+script = ExtResource("1_4rwwa")
+CuresStatuses = Array[int]([13])
+InflictsStatus = null
+ItemId = "virtue_charm"
+DisplayName = "Virtue Charm"
+Description = "A gentle ward against beguiling eyes. Cures Charm."
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://d0vpmh54x5udi"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_4mfnv"]
+
+[resource]
+script = ExtResource("1_4mfnv")
+CanRevive = true
+ReviveHPPercent = 1.0
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "phoenix_ashe"
+DisplayName = "Phoenix Ashe"
+Description = "Fragrant salve for souls as much as wounds. Revive to full HP (1 ally)."
+Rarity = 4
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

@@ -23,6 +23,9 @@ namespace EchoesAcrossTime.Combat
         private int currentRound = 0;
         private bool isBossBattle = false;
         private bool isPinnedDown = false;
+        // Escape system
+        private int escapeAttempts = 0;
+        private bool escapeBlocked = false;
         
         // Systems
         private RandomNumberGenerator rng;
@@ -842,68 +845,124 @@ namespace EchoesAcrossTime.Combat
         }
         
         /// <summary>
-        /// Get available showtimes for current actor
+        /// Get all available showtime attacks
         /// </summary>
         public List<ShowtimeAttackData> GetAvailableShowtimes()
         {
-            if (CurrentActor == null) return new List<ShowtimeAttackData>();
-            return showtimeManager.GetAvailableShowtimes();
+            var showtimes = new List<ShowtimeAttackData>();
+    
+            if (showtimeManager == null)  // ← Changed from ShowtimeSystem.Instance
+                return showtimes;
+    
+            var livingAllies = GetLivingAllies();
+    
+            // Get available showtimes from manager
+            var availableShowtimes = showtimeManager.GetAvailableShowtimes();  // ← Changed
+    
+            foreach (var showtime in availableShowtimes)
+            {
+                var char1 = livingAllies.FirstOrDefault(a => a.Stats.CharacterName == showtime.Character1Id);
+                var char2 = livingAllies.FirstOrDefault(a => a.Stats.CharacterName == showtime.Character2Id);
+        
+                if (char1 != null && char2 != null)
+                {
+                    if (showtimeManager.CanShowtimeActivate(showtime, char1, char2))  // ← Changed
+                    {
+                        showtimes.Add(showtime);
+                    }
+                }
+            }
+    
+            return showtimes;
         }
         
         /// <summary>
-        /// Execute showtime attack
+        /// Get all available limit breaks for a character
         /// </summary>
-        public BattleActionResult ExecuteShowtime(ShowtimeAttackData showtime)
+        public List<LimitBreakData> GetAvailableLimitBreaks(BattleMember member)
         {
-            if (CurrentActor == null)
+            var limitBreaks = new List<LimitBreakData>();
+    
+            if (member == null || !member.IsLimitBreakReady)
+                return limitBreaks;
+    
+            // Use internal limitBreakSystem field
+            if (limitBreakSystem != null)  // ← Changed from LimitBreakSystem.Instance
             {
-                return new BattleActionResult { Success = false };
+                var limitBreak = limitBreakSystem.GetLimitBreak(member.Stats.CharacterName);  // ← Changed
+                if (limitBreak != null)
+                {
+                    limitBreaks.Add(limitBreak);
+                }
             }
-            
-            // Find partner
-            var partner = playerParty.FirstOrDefault(p =>
-                p.Stats.CharacterName == showtime.Character2Id &&
-                p != CurrentActor);
-            
-            if (partner == null)
-            {
-                return new BattleActionResult { Success = false };
-            }
-            
-            rewardsManager.RecordEvent("showtime");
-            
-            EmitSignal(SignalName.ShowtimeTriggered,
-                showtime.AttackName,
-                showtime.Character1Id,
-                showtime.Character2Id);
-            
-            var targets = showtime.HitsAllEnemies ?
-                enemyParty.Where(e => e.Stats.IsAlive).ToList() :
-                new List<BattleMember> { enemyParty.First(e => e.Stats.IsAlive) };
-            
-            var result = showtimeManager.ExecuteShowtime(showtime, CurrentActor, partner, targets);
-            
-            // Both characters end their turns
-            CurrentActor.EndTurn();
-            partner.EndTurn();
-            
-            return result;
+    
+            return limitBreaks;
         }
         
         /// <summary>
-        /// Check if limit break is ready
+        /// Execute a showtime attack
+        /// </summary>
+        public void ExecuteShowtime(ShowtimeAttackData showtime)
+        {
+            if (showtime == null || showtimeManager == null)  // ← Changed from ShowtimeSystem.Instance
+            {
+                GD.PrintErr("Invalid showtime data!");
+                return;
+            }
+    
+            var livingAllies = GetLivingAllies();
+            var char1 = livingAllies.FirstOrDefault(a => a.Stats.CharacterName == showtime.Character1Id);
+            var char2 = livingAllies.FirstOrDefault(a => a.Stats.CharacterName == showtime.Character2Id);
+    
+            if (char1 == null || char2 == null)
+            {
+                GD.PrintErr("Showtime characters not found!");
+                return;
+            }
+    
+            // Get targets
+            var targets = showtime.HitsAllEnemies  // ← Changed from HitsAllTargets
+                ? GetLivingEnemies()
+                : new List<BattleMember> { GetLivingEnemies().FirstOrDefault() };
+    
+            if (targets.Count == 0 || targets[0] == null)
+            {
+                GD.Print("No valid targets for showtime!");
+                return;
+            }
+    
+            // Execute using internal manager
+            var result = showtimeManager.ExecuteShowtime(showtime, char1, char2, targets);  // ← Changed
+    
+            // Emit signal
+            EmitSignal(SignalName.ShowtimeTriggered, showtime.AttackName, char1.Stats.CharacterName, char2.Stats.CharacterName);
+    
+            // Put showtime on cooldown
+            showtimeManager.PutOnCooldown(showtime);  // ← Changed
+    
+            GD.Print($"Showtime complete! Total damage: {result.DamageDealt}");
+        }
+        
+        /// <summary>
+        /// Check if limit break is ready for a character
         /// </summary>
         public bool IsLimitBreakReady(BattleMember member)
         {
+            if (member == null)
+                return false;
+            
             return member.IsLimitBreakReady;
         }
         
         /// <summary>
-        /// Get limit gauge percent
+        /// Get limit gauge percentage for UI display
         /// </summary>
         public float GetLimitGaugePercent(BattleMember member)
         {
-            return (float)member.LimitGauge / 100f * 100f; // 100 is the max limit gauge
+            if (member == null)
+                return 0f;
+            
+            return (member.LimitGauge / 100f) * 100f; // Convert to percentage
         }
         
         /// <summary>
@@ -911,7 +970,16 @@ namespace EchoesAcrossTime.Combat
         /// </summary>
         public bool CanEscape()
         {
-            return !isBossBattle && !isPinnedDown;
+            // Cannot escape if blocked (boss battle, story battle, etc.)
+            if (escapeBlocked)
+                return false;
+            
+            // Cannot escape if all party members are dead
+            if (!GetPlayerParty().Any(p => p.Stats.IsAlive))
+                return false;
+            
+            // Can always attempt escape in normal battles
+            return true;
         }
         
         /// <summary>
@@ -919,8 +987,74 @@ namespace EchoesAcrossTime.Combat
         /// </summary>
         public int GetEscapeChance()
         {
-            return escapeSystem.GetEscapeChanceDisplay(playerParty, enemyParty);
+            if (!CanEscape())
+                return 0;
+            
+            // Base chance
+            int chance = 25;
+            
+            // +10% per failed attempt
+            chance += escapeAttempts * 10;
+            
+            // Speed difference bonus
+            var livingAllies = GetLivingAllies();
+            var livingEnemies = GetLivingEnemies();
+            
+            if (livingAllies.Count > 0 && livingEnemies.Count > 0)
+            {
+                int avgPartySpeed = (int)livingAllies.Average(a => a.Stats.Speed);
+                int avgEnemySpeed = (int)livingEnemies.Average(e => e.Stats.Speed);
+                
+                int speedDiff = avgPartySpeed - avgEnemySpeed;
+                chance += speedDiff / 2; // +1% per 2 speed difference
+            }
+            
+            // Cap at 95%
+            return Mathf.Min(95, chance);
         }
+        
+        /// <summary>
+        /// Attempt to escape from battle
+        /// </summary>
+        public bool TryEscape()
+        {
+            if (!CanEscape())
+            {
+                GD.Print("Cannot escape from this battle!");
+                return false;
+            }
+            
+            int chance = GetEscapeChance();
+            int roll = (int)(GD.Randf() * 100);
+            
+            if (roll < chance)
+            {
+                GD.Print($"✓ Escape successful! (rolled {roll} vs {chance}%)");
+                EmitSignal(SignalName.BattleEnded, false); // false = no victory
+                return true;
+            }
+            else
+            {
+                escapeAttempts++;
+                GD.Print($"✗ Escape failed! (rolled {roll} vs {chance}%)");
+                GD.Print($"  Next attempt: {GetEscapeChance()}% chance");
+                return false;
+            }
+        }
+        
+        /// <summary>
+        /// Block escape attempts (for boss battles, etc.)
+        /// </summary>
+        public void SetEscapeBlocked(bool blocked)
+        {
+            escapeBlocked = blocked;
+            if (blocked)
+            {
+                GD.Print("⚠ Escape is BLOCKED for this battle!");
+            }
+        }
+        
+        
         
         #endregion
         

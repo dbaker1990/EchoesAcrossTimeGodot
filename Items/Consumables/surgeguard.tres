@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://i823r0ycssey"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_5brv4"]
+
+[resource]
+script = ExtResource("1_5brv4")
+CuresStatuses = Array[int]([10])
+InflictsStatus = null
+ItemId = "surge_guard"
+DisplayName = "Surge Guard"
+Description = "Insulating draught for frayed nerves. Cures Shock."
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

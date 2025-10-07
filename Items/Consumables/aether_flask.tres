@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://cxx3t8sms60fo"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_oxdtk"]
+
+[resource]
+script = ExtResource("1_oxdtk")
+MPRestore = 50
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "aether_flask"
+DisplayName = "Aether Flask"
+Description = "Balanced distillate for longer fights. Restores 50 MP to 1 ally."
+Rarity = 1
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

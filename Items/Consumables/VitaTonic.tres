@@ -9,5 +9,6 @@ CuresStatuses = null
 InflictsStatus = null
 ItemId = "vita_tonic"
 DisplayName = "Vita Tonic"
+Description = "A brisk herbal draught that bites back. Restores 30% HP to 1 ally."
 IsConsumable = true
 metadata/_custom_type_script = "uid://dgprv037bfubk"

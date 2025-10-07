@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://38cf6uur4fce"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_8n77k"]
+
+[resource]
+script = ExtResource("1_8n77k")
+CuresStatuses = Array[int]([12])
+InflictsStatus = null
+ItemId = "temper_draft"
+DisplayName = "Temper Draft"
+Description = "Cools the blood before it boils over. Cures Berserk."
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

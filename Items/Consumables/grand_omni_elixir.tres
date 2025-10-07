@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://2ugc542ycxjg"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_1aq1x"]
+
+[resource]
+script = ExtResource("1_1aq1x")
+HPRestorePercent = 100.0
+MPRestorePercent = 100.0
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "grand_omni_elixir"
+DisplayName = "Grand Omni Elixir"
+Description = "Rally the whole party at once. Full HP & MP to all allies."
+Rarity = 4
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

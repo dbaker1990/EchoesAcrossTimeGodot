@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://bfm6t23trbj7a"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_4r6ms"]
+
+[resource]
+script = ExtResource("1_4r6ms")
+CuresStatuses = Array[int]([14])
+InflictsStatus = null
+ItemId = "auric_needles"
+DisplayName = "Auric Needles"
+Description = "Gold-tipped charm that frees bound stone. Cures Petrify."
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

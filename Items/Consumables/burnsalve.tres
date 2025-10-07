@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://cmncjps1wwskq"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_76ssl"]
+
+[resource]
+script = ExtResource("1_76ssl")
+CuresStatuses = Array[int]([8])
+InflictsStatus = null
+ItemId = "burn_salve"
+DisplayName = "Burn Salve"
+Description = "Cool gel that draws out the heat. Cures Burn."
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

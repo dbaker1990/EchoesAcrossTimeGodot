@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://cyrllvui16ifg"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_j4aq0"]
+
+[resource]
+script = ExtResource("1_j4aq0")
+HPRestorePercent = 30.0
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "vita_pack"
+DisplayName = "Vita Pack"
+Description = "Field medic kit, pre-measured for squads. Restores 30% HP to all allies."
+Rarity = 2
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

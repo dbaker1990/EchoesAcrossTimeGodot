@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://352yb2jkuqo3"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_mfyhp"]
+
+[resource]
+script = ExtResource("1_mfyhp")
+CuresStatuses = Array[int]([5])
+InflictsStatus = null
+ItemId = "echo_leaf"
+DisplayName = "Echo Leaf"
+Description = "Herb that loosens a locked voice. Cures Silence."
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

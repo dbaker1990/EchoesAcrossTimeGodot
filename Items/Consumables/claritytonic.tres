@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://cngoxcnr4opar"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_loisv"]
+
+[resource]
+script = ExtResource("1_loisv")
+CuresStatuses = Array[int]([4])
+InflictsStatus = null
+ItemId = "clarity_tonic"
+DisplayName = "Clarity Tonic"
+Description = "Steadies the mind, sorts the noise. Cures Confusion."
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

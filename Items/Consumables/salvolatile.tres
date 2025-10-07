@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://0pxamkfaic5n"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_5sv7q"]
+
+[resource]
+script = ExtResource("1_5sv7q")
+CuresStatuses = Array[int]([7])
+InflictsStatus = null
+ItemId = "sal_volatile"
+DisplayName = "Sal Volatile"
+Description = "Pungent salts to snap you back. Cures Stun."
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

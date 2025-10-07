@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://siiqylpdbmmp"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_e54wb"]
+
+[resource]
+script = ExtResource("1_e54wb")
+CuresStatuses = Array[int]([])
+CuresAllStatuses = true
+InflictsStatus = null
+ItemId = "remedy_kit"
+DisplayName = "Remedy Kit"
+Description = "One case, many cures. Cures most common ailments on 1 ally."
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

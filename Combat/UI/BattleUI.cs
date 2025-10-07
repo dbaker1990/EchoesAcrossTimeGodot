@@ -1,5 +1,5 @@
 ﻿// ============================================================================
-// FILE: Combat/UI/BattleUI.cs (WITH ITEMS, BATON PASS & FULL FEATURES)
+// FILE: Combat/UI/BattleUI.cs (ENHANCED WITH ALL REFINEMENTS)
 // ============================================================================
 using Godot;
 using System.Linq;
@@ -29,7 +29,9 @@ namespace EchoesAcrossTime.Combat.UI
         private Button skillsButton;
         private Button itemsButton;
         private Button guardButton;
+        private Button limitBreakButton;
         private Button batonPassButton;
+        private Button escapeButton;
         
         // Item Menu components
         private Panel itemMenuPanel;
@@ -40,13 +42,35 @@ namespace EchoesAcrossTime.Combat.UI
         private Button useItemButton;
         private Button backFromItemsButton;
         
+        // Limit Break Selection
+        private Panel limitBreakPanel;
+        private VBoxContainer limitBreakList;
+        private Label limitBreakInfoLabel;
+        private Button useLimitBreakButton;
+        private Button backFromLimitBreakButton;
+        
+        // Showtime Selection
+        private Panel showtimePanel;
+        private VBoxContainer showtimeList;
+        private Label showtimeInfoLabel;
+        private Button useShowtimeButton;
+        private Button backFromShowtimeButton;
+        
         // State tracking
         private SkillData selectedSkill;
         private ConsumableData selectedItem;
+        private LimitBreakData selectedLimitBreak;
+        private ShowtimeAttackData selectedShowtime;
         private bool waitingForTarget;
         private bool waitingForSkillMenu;
         private bool selectingBatonPassTarget;
         private bool waitingForItemTarget;
+        private bool waitingForLimitBreakTarget;
+        private bool waitingForShowtimeConfirmation;
+        
+        // Visual effects
+        private CpuParticles2D hitParticles;
+        private CpuParticles2D criticalParticles;
         
         public override void _Ready()
         {
@@ -55,14 +79,57 @@ namespace EchoesAcrossTime.Combat.UI
             battleManager = GetNode<BattleManager>("/root/BattleScene/BattleManager");
             
             CreateAllUI();
+            CreateParticleEffects();
             
             if (battleManager != null)
             {
-                battleManager.TurnStarted += OnTurnStarted;
-                battleManager.BattleEnded += OnBattleEnded;
-                battleManager.BatonPassExecuted += OnBatonPassExecuted;
-                battleManager.OneMoreTriggered += OnOneMoreTriggered;
+                ConnectSignals();
             }
+        }
+        
+        private void ConnectSignals()
+        {
+            battleManager.TurnStarted += OnTurnStarted;
+            battleManager.BattleEnded += OnBattleEnded;
+            battleManager.BatonPassExecuted += OnBatonPassExecuted;
+            battleManager.OneMoreTriggered += OnOneMoreTriggered;
+            battleManager.AllOutAttackReady += OnAllOutAttackReady;
+            battleManager.TechnicalDamage += OnTechnicalDamage;
+            battleManager.ShowtimeTriggered += OnShowtimeTriggered;
+            battleManager.LimitBreakReady += OnLimitBreakReady;
+        }
+        
+        private void CreateParticleEffects()
+        {
+            // Hit particles (general damage)
+            hitParticles = new CpuParticles2D();
+            hitParticles.Amount = 20;
+            hitParticles.Lifetime = 0.5f;
+            hitParticles.OneShot = true;
+            hitParticles.Explosiveness = 0.8f;
+            hitParticles.Spread = Mathf.DegToRad(360); // Godot 4 uses radians
+            hitParticles.InitialVelocityMin = 100;
+            hitParticles.InitialVelocityMax = 200;
+            hitParticles.Scale = new Vector2(2, 2);
+            hitParticles.Color = Colors.White;
+            hitParticles.ZIndex = 150;
+            hitParticles.Emitting = false;
+            AddChild(hitParticles);
+            
+            // Critical hit particles (gold sparkles)
+            criticalParticles = new CpuParticles2D();
+            criticalParticles.Amount = 40;
+            criticalParticles.Lifetime = 0.8f;
+            criticalParticles.OneShot = true;
+            criticalParticles.Explosiveness = 0.9f;
+            criticalParticles.Spread = Mathf.DegToRad(360); // Godot 4 uses radians
+            criticalParticles.InitialVelocityMin = 150;
+            criticalParticles.InitialVelocityMax = 300;
+            criticalParticles.Scale = new Vector2(3, 3);
+            criticalParticles.Color = Colors.Gold;
+            criticalParticles.ZIndex = 150;
+            criticalParticles.Emitting = false;
+            AddChild(criticalParticles);
         }
         
         private void CreateAllUI()
@@ -96,51 +163,65 @@ namespace EchoesAcrossTime.Combat.UI
             AddChild(showtimePrompt);
             
             CreateItemMenu();
+            CreateLimitBreakMenu();
+            CreateShowtimeMenu();
             CreateActionMenu();
         }
         
         private void CreateActionMenu()
         {
             actionMenuPanel = new Panel();
-            actionMenuPanel.Position = new Vector2(900, 500);
-            actionMenuPanel.CustomMinimumSize = new Vector2(280, 300);
+            actionMenuPanel.Position = new Vector2(900, 450);
+            actionMenuPanel.CustomMinimumSize = new Vector2(280, 360);
             AddChild(actionMenuPanel);
             
             var vbox = new VBoxContainer();
             vbox.Position = new Vector2(15, 15);
-            vbox.AddThemeConstantOverride("separation", 10);
+            vbox.AddThemeConstantOverride("separation", 8);
             actionMenuPanel.AddChild(vbox);
             
             attackButton = new Button();
             attackButton.Text = "Attack";
-            attackButton.CustomMinimumSize = new Vector2(250, 40);
+            attackButton.CustomMinimumSize = new Vector2(250, 35);
             attackButton.Pressed += OnAttackPressed;
             vbox.AddChild(attackButton);
             
             skillsButton = new Button();
             skillsButton.Text = "Skills";
-            skillsButton.CustomMinimumSize = new Vector2(250, 40);
+            skillsButton.CustomMinimumSize = new Vector2(250, 35);
             skillsButton.Pressed += OnSkillsPressed;
             vbox.AddChild(skillsButton);
             
             itemsButton = new Button();
             itemsButton.Text = "Items";
-            itemsButton.CustomMinimumSize = new Vector2(250, 40);
+            itemsButton.CustomMinimumSize = new Vector2(250, 35);
             itemsButton.Pressed += OnItemsPressed;
             vbox.AddChild(itemsButton);
             
             guardButton = new Button();
             guardButton.Text = "Guard";
-            guardButton.CustomMinimumSize = new Vector2(250, 40);
+            guardButton.CustomMinimumSize = new Vector2(250, 35);
             guardButton.Pressed += OnGuardPressed;
             vbox.AddChild(guardButton);
             
+            limitBreakButton = new Button();
+            limitBreakButton.Text = "Limit Break";
+            limitBreakButton.CustomMinimumSize = new Vector2(250, 35);
+            limitBreakButton.Pressed += OnLimitBreakPressed;
+            vbox.AddChild(limitBreakButton);
+            
             batonPassButton = new Button();
             batonPassButton.Text = "Baton Pass";
-            batonPassButton.CustomMinimumSize = new Vector2(250, 40);
+            batonPassButton.CustomMinimumSize = new Vector2(250, 35);
             batonPassButton.Pressed += OnBatonPassPressed;
             batonPassButton.Disabled = true;
             vbox.AddChild(batonPassButton);
+            
+            escapeButton = new Button();
+            escapeButton.Text = "Escape";
+            escapeButton.CustomMinimumSize = new Vector2(250, 35);
+            escapeButton.Pressed += OnEscapePressed;
+            vbox.AddChild(escapeButton);
             
             actionMenuPanel.Hide();
         }
@@ -158,20 +239,17 @@ namespace EchoesAcrossTime.Combat.UI
             vbox.AddThemeConstantOverride("separation", 10);
             itemMenuPanel.AddChild(vbox);
             
-            // Title
             var titleLabel = new Label();
             titleLabel.Text = "Items";
             titleLabel.AddThemeFontSizeOverride("font_size", 28);
             titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
             vbox.AddChild(titleLabel);
             
-            // Item list
             itemList = new ItemList();
             itemList.CustomMinimumSize = new Vector2(390, 250);
             itemList.ItemSelected += OnItemListSelected;
             vbox.AddChild(itemList);
             
-            // Item info panel
             var infoPanel = new Panel();
             infoPanel.CustomMinimumSize = new Vector2(390, 120);
             vbox.AddChild(infoPanel);
@@ -194,7 +272,6 @@ namespace EchoesAcrossTime.Combat.UI
             itemQuantityLabel.AddThemeFontSizeOverride("font_size", 16);
             infoVBox.AddChild(itemQuantityLabel);
             
-            // Buttons
             var buttonHBox = new HBoxContainer();
             buttonHBox.AddThemeConstantOverride("separation", 15);
             vbox.AddChild(buttonHBox);
@@ -212,6 +289,108 @@ namespace EchoesAcrossTime.Combat.UI
             buttonHBox.AddChild(backFromItemsButton);
         }
         
+        private void CreateLimitBreakMenu()
+        {
+            limitBreakPanel = new Panel();
+            limitBreakPanel.Position = new Vector2(350, 150);
+            limitBreakPanel.CustomMinimumSize = new Vector2(600, 450);
+            limitBreakPanel.Hide();
+            AddChild(limitBreakPanel);
+            
+            var vbox = new VBoxContainer();
+            vbox.Position = new Vector2(15, 15);
+            vbox.AddThemeConstantOverride("separation", 10);
+            limitBreakPanel.AddChild(vbox);
+            
+            var titleLabel = new Label();
+            titleLabel.Text = "⚡ LIMIT BREAK ⚡";
+            titleLabel.AddThemeFontSizeOverride("font_size", 36);
+            titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            titleLabel.Modulate = Colors.Yellow;
+            vbox.AddChild(titleLabel);
+            
+            var scrollContainer = new ScrollContainer();
+            scrollContainer.CustomMinimumSize = new Vector2(570, 240);
+            vbox.AddChild(scrollContainer);
+            
+            limitBreakList = new VBoxContainer();
+            limitBreakList.AddThemeConstantOverride("separation", 8);
+            scrollContainer.AddChild(limitBreakList);
+            
+            limitBreakInfoLabel = new Label();
+            limitBreakInfoLabel.CustomMinimumSize = new Vector2(570, 80);
+            limitBreakInfoLabel.AutowrapMode = TextServer.AutowrapMode.Word;
+            limitBreakInfoLabel.AddThemeFontSizeOverride("font_size", 16);
+            vbox.AddChild(limitBreakInfoLabel);
+            
+            var buttonHBox = new HBoxContainer();
+            buttonHBox.AddThemeConstantOverride("separation", 15);
+            vbox.AddChild(buttonHBox);
+            
+            useLimitBreakButton = new Button();
+            useLimitBreakButton.Text = "Use Limit Break!";
+            useLimitBreakButton.CustomMinimumSize = new Vector2(270, 50);
+            useLimitBreakButton.Pressed += OnUseLimitBreakPressed;
+            buttonHBox.AddChild(useLimitBreakButton);
+            
+            backFromLimitBreakButton = new Button();
+            backFromLimitBreakButton.Text = "Back";
+            backFromLimitBreakButton.CustomMinimumSize = new Vector2(270, 50);
+            backFromLimitBreakButton.Pressed += OnBackFromLimitBreakPressed;
+            buttonHBox.AddChild(backFromLimitBreakButton);
+        }
+        
+        private void CreateShowtimeMenu()
+        {
+            showtimePanel = new Panel();
+            showtimePanel.Position = new Vector2(350, 150);
+            showtimePanel.CustomMinimumSize = new Vector2(600, 450);
+            showtimePanel.Hide();
+            AddChild(showtimePanel);
+            
+            var vbox = new VBoxContainer();
+            vbox.Position = new Vector2(15, 15);
+            vbox.AddThemeConstantOverride("separation", 10);
+            showtimePanel.AddChild(vbox);
+            
+            var titleLabel = new Label();
+            titleLabel.Text = "★ SHOWTIME ATTACK ★";
+            titleLabel.AddThemeFontSizeOverride("font_size", 36);
+            titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            titleLabel.Modulate = Colors.Orange;
+            vbox.AddChild(titleLabel);
+            
+            var scrollContainer = new ScrollContainer();
+            scrollContainer.CustomMinimumSize = new Vector2(570, 240);
+            vbox.AddChild(scrollContainer);
+            
+            showtimeList = new VBoxContainer();
+            showtimeList.AddThemeConstantOverride("separation", 8);
+            scrollContainer.AddChild(showtimeList);
+            
+            showtimeInfoLabel = new Label();
+            showtimeInfoLabel.CustomMinimumSize = new Vector2(570, 80);
+            showtimeInfoLabel.AutowrapMode = TextServer.AutowrapMode.Word;
+            showtimeInfoLabel.AddThemeFontSizeOverride("font_size", 16);
+            vbox.AddChild(showtimeInfoLabel);
+            
+            var buttonHBox = new HBoxContainer();
+            buttonHBox.AddThemeConstantOverride("separation", 15);
+            vbox.AddChild(buttonHBox);
+            
+            useShowtimeButton = new Button();
+            useShowtimeButton.Text = "Use Showtime!";
+            useShowtimeButton.CustomMinimumSize = new Vector2(270, 50);
+            useShowtimeButton.Pressed += OnUseShowtimePressed;
+            buttonHBox.AddChild(useShowtimeButton);
+            
+            backFromShowtimeButton = new Button();
+            backFromShowtimeButton.Text = "Back";
+            backFromShowtimeButton.CustomMinimumSize = new Vector2(270, 50);
+            backFromShowtimeButton.Pressed += OnBackFromShowtimePressed;
+            buttonHBox.AddChild(backFromShowtimeButton);
+        }
+        
         #region Action Menu Handlers
         
         private void OnTurnStarted(string characterName)
@@ -220,7 +399,7 @@ namespace EchoesAcrossTime.Combat.UI
             if (currentActor != null && currentActor.IsPlayerControlled)
             {
                 actionMenuPanel.Show();
-                UpdateBatonPassButton();
+                UpdateActionMenuButtons();
             }
             else
             {
@@ -228,17 +407,18 @@ namespace EchoesAcrossTime.Combat.UI
             }
         }
         
-        private void UpdateBatonPassButton()
+        private void UpdateActionMenuButtons()
         {
+            var currentActor = battleManager.CurrentActor;
+            
+            // Update Baton Pass
             bool canBatonPass = battleManager.CanBatonPass();
             batonPassButton.Disabled = !canBatonPass;
             
             if (canBatonPass)
             {
-                var currentActor = battleManager.CurrentActor;
                 int passLevel = currentActor.BatonPassData.PassCount + 1;
                 float multiplier = 1.0f + (passLevel * 0.5f);
-                
                 batonPassButton.Text = $"Baton Pass (x{multiplier:F1})";
                 batonPassButton.Modulate = Colors.Orange;
             }
@@ -247,12 +427,44 @@ namespace EchoesAcrossTime.Combat.UI
                 batonPassButton.Text = "Baton Pass";
                 batonPassButton.Modulate = Colors.White;
             }
+            
+            // Update Limit Break
+            bool limitReady = battleManager.IsLimitBreakReady(currentActor);
+            limitBreakButton.Disabled = !limitReady;
+            
+            if (limitReady)
+            {
+                limitBreakButton.Text = "⚡ LIMIT BREAK! ⚡";
+                limitBreakButton.Modulate = Colors.Yellow;
+            }
+            else
+            {
+                float gaugePercent = battleManager.GetLimitGaugePercent(currentActor);
+                limitBreakButton.Text = $"Limit Break ({gaugePercent:F0}%)";
+                limitBreakButton.Modulate = Colors.White;
+            }
+            
+            // Update Escape
+            bool canEscape = battleManager.CanEscape();
+            escapeButton.Disabled = !canEscape;
+            
+            if (canEscape)
+            {
+                int escapeChance = battleManager.GetEscapeChance();
+                escapeButton.Text = $"Escape ({escapeChance}%)";
+            }
+            else
+            {
+                escapeButton.Text = "Escape (Blocked)";
+            }
         }
         
         private void OnOneMoreTriggered(string characterName)
         {
-            UpdateBatonPassButton();
+            UpdateActionMenuButtons();
             ShowOneMoreBanner();
+            ShakeScreen(5.0f, 0.3f);
+            TriggerHitParticles(new Vector2(640, 360), Colors.Yellow);
         }
         
         private void ShowOneMoreBanner()
@@ -292,6 +504,7 @@ namespace EchoesAcrossTime.Combat.UI
             waitingForTarget = true;
             selectingBatonPassTarget = false;
             waitingForItemTarget = false;
+            waitingForLimitBreakTarget = false;
         }
         
         private void OnSkillsPressed()
@@ -305,13 +518,25 @@ namespace EchoesAcrossTime.Combat.UI
         {
             actionMenuPanel.Hide();
             ShowItemMenu();
-            waitingForItemTarget = false;
         }
         
         private void OnGuardPressed()
         {
             var action = new BattleAction(battleManager.CurrentActor, BattleActionType.Guard);
             battleManager.ExecuteAction(action);
+        }
+        
+        private void OnLimitBreakPressed()
+        {
+            var currentActor = battleManager.CurrentActor;
+            if (!battleManager.IsLimitBreakReady(currentActor))
+            {
+                GD.Print("Limit Break not ready!");
+                return;
+            }
+            
+            actionMenuPanel.Hide();
+            ShowLimitBreakMenu();
         }
         
         private void OnBatonPassPressed()
@@ -337,8 +562,21 @@ namespace EchoesAcrossTime.Combat.UI
             selectingBatonPassTarget = true;
             waitingForTarget = true;
             waitingForItemTarget = false;
+            waitingForLimitBreakTarget = false;
             
             GD.Print($"Select Baton Pass target from {validTargets.Count} party members");
+        }
+        
+        private void OnEscapePressed()
+        {
+            if (!battleManager.CanEscape())
+            {
+                GD.Print("Cannot escape!");
+                return;
+            }
+            
+            var action = new BattleAction(battleManager.CurrentActor, BattleActionType.Escape);
+            battleManager.ExecuteAction(action);
         }
         
         #endregion
@@ -364,12 +602,10 @@ namespace EchoesAcrossTime.Combat.UI
                 return;
             }
             
-            // Get all consumable items (no CanUseInBattle property - just check if consumable)
             var items = InventorySystem.Instance.GetItemsByType(ItemType.Consumable);
             
             foreach (var slot in items)
             {
-                // Cast to ConsumableData to access consumable-specific properties
                 if (slot.Item is ConsumableData consumable)
                 {
                     string displayText = $"{consumable.DisplayName} x{slot.Quantity}";
@@ -482,6 +718,7 @@ namespace EchoesAcrossTime.Combat.UI
                 waitingForTarget = true;
                 waitingForItemTarget = true;
                 selectingBatonPassTarget = false;
+                waitingForLimitBreakTarget = false;
             }
         }
         
@@ -489,18 +726,15 @@ namespace EchoesAcrossTime.Combat.UI
         {
             var targets = new System.Collections.Generic.List<BattleMember>();
             
-            // Offensive items target living enemies
             if (item.DamageAmount > 0)
             {
                 targets.AddRange(battleManager.GetLivingEnemies());
             }
-            // Revival items target dead allies
             else if (item.Revives)
             {
                 var allAllies = battleManager.GetPlayerParty();
                 targets.AddRange(allAllies.Where(a => !a.Stats.IsAlive));
             }
-            // Support items target living allies
             else
             {
                 targets.AddRange(battleManager.GetLivingAllies());
@@ -522,7 +756,6 @@ namespace EchoesAcrossTime.Combat.UI
                 return;
             }
             
-            // Create action with ItemData property (no WithItem method exists)
             var action = new BattleAction(battleManager.CurrentActor, BattleActionType.Item)
             {
                 ItemData = selectedItem
@@ -547,6 +780,377 @@ namespace EchoesAcrossTime.Combat.UI
             itemMenuPanel.Hide();
             selectedItem = null;
             actionMenuPanel.Show();
+        }
+        
+        #endregion
+        
+        #region Limit Break Menu Methods
+        
+        private void ShowLimitBreakMenu()
+        {
+            limitBreakPanel.Show();
+            PopulateLimitBreakList();
+        }
+        
+        private void PopulateLimitBreakList()
+        {
+            // Clear existing buttons
+            foreach (var child in limitBreakList.GetChildren())
+            {
+                child.QueueFree();
+            }
+            
+            var currentActor = battleManager.CurrentActor;
+            var limitBreaks = GetAvailableLimitBreaks(currentActor);
+            
+            if (limitBreaks.Count == 0)
+            {
+                var noLBLabel = new Label();
+                noLBLabel.Text = "No Limit Breaks available!";
+                noLBLabel.HorizontalAlignment = HorizontalAlignment.Center;
+                limitBreakList.AddChild(noLBLabel);
+                
+                useLimitBreakButton.Disabled = true;
+                limitBreakInfoLabel.Text = "";
+                return;
+            }
+            
+            // Auto-select first one
+            selectedLimitBreak = limitBreaks[0];
+            
+            foreach (var lb in limitBreaks)
+            {
+                var button = new Button();
+                button.Text = $"⚡ {lb.DisplayName}";
+                button.CustomMinimumSize = new Vector2(540, 50);
+                button.AddThemeFontSizeOverride("font_size", 20);
+                
+                // Highlight selected
+                if (lb == selectedLimitBreak)
+                {
+                    button.Modulate = Colors.Yellow;
+                }
+                
+                button.Pressed += () => OnLimitBreakSelected(lb);
+                limitBreakList.AddChild(button);
+            }
+            
+            UpdateLimitBreakInfo();
+            useLimitBreakButton.Disabled = false;
+        }
+        
+        private void OnLimitBreakSelected(LimitBreakData lb)
+        {
+            selectedLimitBreak = lb;
+            
+            // Update button highlights
+            foreach (var child in limitBreakList.GetChildren())
+            {
+                if (child is Button btn)
+                {
+                    btn.Modulate = Colors.White;
+                }
+            }
+            
+            // Highlight selected
+            foreach (var child in limitBreakList.GetChildren())
+            {
+                if (child is Button btn && btn.Text.Contains(lb.DisplayName))
+                {
+                    btn.Modulate = Colors.Yellow;
+                }
+            }
+            
+            UpdateLimitBreakInfo();
+        }
+        
+        private void UpdateLimitBreakInfo()
+        {
+            if (selectedLimitBreak == null)
+            {
+                limitBreakInfoLabel.Text = "";
+                return;
+            }
+            
+            var info = new System.Text.StringBuilder();
+            info.AppendLine($"Power: {selectedLimitBreak.BasePower} x{selectedLimitBreak.PowerMultiplier}");
+            info.AppendLine($"Type: {selectedLimitBreak.Type}");
+            
+            if (selectedLimitBreak.HitsAllEnemies)
+                info.AppendLine("Targets: All Enemies");
+            else
+                info.AppendLine("Targets: Single Enemy");
+            
+            if (selectedLimitBreak.IgnoresDefense)
+                info.AppendLine("Ignores Defense!");
+            
+            if (selectedLimitBreak.StopsTime)
+                info.AppendLine($"Stops time for {selectedLimitBreak.TimeStopDuration} turn(s)!");
+            
+            info.AppendLine();
+            info.Append(selectedLimitBreak.Description);
+            
+            limitBreakInfoLabel.Text = info.ToString();
+        }
+        
+        private void OnUseLimitBreakPressed()
+        {
+            var currentActor = battleManager.CurrentActor;
+            if (!currentActor.IsLimitBreakReady)
+                return;
+            
+            if (selectedLimitBreak == null)
+            {
+                GD.PrintErr("No limit break selected!");
+                return;
+            }
+            
+            limitBreakPanel.Hide();
+            
+            var targets = selectedLimitBreak.HitsAllEnemies 
+                ? battleManager.GetLivingEnemies().ToArray()
+                : new[] { battleManager.GetLivingEnemies().FirstOrDefault() };
+            
+            if (targets.Length == 0 || targets[0] == null)
+            {
+                GD.Print("No valid targets!");
+                actionMenuPanel.Show();
+                return;
+            }
+            
+            var action = new BattleAction(currentActor, BattleActionType.LimitBreak)
+                .WithTargets(targets);
+            
+            // Trigger visual effects
+            ShakeScreen(15.0f, 0.8f);
+            TriggerCriticalParticles(new Vector2(640, 360));
+            
+            battleManager.ExecuteAction(action);
+            selectedLimitBreak = null;
+        }
+        
+        private void OnBackFromLimitBreakPressed()
+        {
+            limitBreakPanel.Hide();
+            selectedLimitBreak = null;
+            actionMenuPanel.Show();
+        }
+        
+        #endregion
+        
+        #region Showtime Methods
+        
+        private void ShowShowtimeMenu()
+        {
+            showtimePanel.Show();
+            PopulateShowtimeList();
+        }
+        
+        private void PopulateShowtimeList()
+        {
+            // Clear existing buttons
+            foreach (var child in showtimeList.GetChildren())
+            {
+                child.QueueFree();
+            }
+            
+            var showtimes = battleManager.GetAvailableShowtimes();
+            
+            if (showtimes.Count == 0)
+            {
+                var noShowtimeLabel = new Label();
+                noShowtimeLabel.Text = "No Showtimes available!";
+                noShowtimeLabel.HorizontalAlignment = HorizontalAlignment.Center;
+                showtimeList.AddChild(noShowtimeLabel);
+                
+                useShowtimeButton.Disabled = true;
+                showtimeInfoLabel.Text = "";
+                return;
+            }
+            
+            // Auto-select first one
+            selectedShowtime = showtimes[0];
+            
+            foreach (var showtime in showtimes)
+            {
+                var button = new Button();
+                button.Text = $"★ {showtime.AttackName}";
+                button.CustomMinimumSize = new Vector2(540, 50);
+                button.AddThemeFontSizeOverride("font_size", 20);
+                
+                // Highlight selected
+                if (showtime == selectedShowtime)
+                {
+                    button.Modulate = Colors.Orange;
+                }
+                
+                button.Pressed += () => OnShowtimeSelected(showtime);
+                showtimeList.AddChild(button);
+                
+                // Add participant info
+                var participants = new Label();
+                participants.Text = $"   {showtime.Character1Id} + {showtime.Character2Id}";
+                participants.AddThemeFontSizeOverride("font_size", 14);
+                participants.Modulate = Colors.Gray;
+                showtimeList.AddChild(participants);
+            }
+            
+            UpdateShowtimeInfo();
+            useShowtimeButton.Disabled = false;
+        }
+        
+        private void OnShowtimeSelected(ShowtimeAttackData showtime)
+        {
+            selectedShowtime = showtime;
+            
+            // Update button highlights
+            foreach (var child in showtimeList.GetChildren())
+            {
+                if (child is Button btn)
+                {
+                    btn.Modulate = Colors.White;
+                }
+            }
+            
+            // Highlight selected
+            foreach (var child in showtimeList.GetChildren())
+            {
+                if (child is Button btn && btn.Text.Contains(showtime.AttackName))
+                {
+                    btn.Modulate = Colors.Orange;
+                }
+            }
+            
+            UpdateShowtimeInfo();
+        }
+        
+        private void UpdateShowtimeInfo()
+        {
+            if (selectedShowtime == null)
+            {
+                showtimeInfoLabel.Text = "";
+                return;
+            }
+            
+            var info = new System.Text.StringBuilder();
+            info.AppendLine($"Power: {selectedShowtime.BasePower} x{selectedShowtime.DamageMultiplier}");
+            info.AppendLine($"Element: {selectedShowtime.Element}");
+            info.AppendLine($"Crit Chance: +{selectedShowtime.CriticalChance}%");
+            
+            if (selectedShowtime.HitsAllEnemies)
+                info.AppendLine("Targets: All Enemies");
+            else
+                info.AppendLine("Targets: Single Enemy");
+            
+            if (selectedShowtime.IgnoresDefense)
+                info.AppendLine("Ignores Defense!");
+            
+            info.AppendLine();
+            info.Append($"\"{selectedShowtime.FlavorText}\"");
+            
+            showtimeInfoLabel.Text = info.ToString();
+        }
+        
+        private void OnUseShowtimePressed()
+        {
+            if (selectedShowtime == null)
+                return;
+            
+            showtimePanel.Hide();
+            
+            // Trigger visual effects
+            ShakeScreen(12.0f, 0.6f);
+            TriggerCriticalParticles(new Vector2(640, 360));
+            
+            battleManager.ExecuteShowtime(selectedShowtime);
+            selectedShowtime = null;
+        }
+        
+        private void OnBackFromShowtimePressed()
+        {
+            showtimePanel.Hide();
+            selectedShowtime = null;
+            actionMenuPanel.Show();
+        }
+        
+        #endregion
+        
+        #region Signal Handlers
+        
+        private void OnAllOutAttackReady()
+        {
+            GD.Print("All-Out Attack is ready!");
+            ShakeScreen(8.0f, 0.4f);
+        }
+        
+        private void OnTechnicalDamage(string attackerName, string targetName, string comboType)
+        {
+            var techLabel = new Label();
+            techLabel.Text = $"⚡ TECHNICAL!\n{comboType}";
+            techLabel.AddThemeFontSizeOverride("font_size", 48);
+            techLabel.Modulate = Colors.Purple;
+            techLabel.Position = new Vector2(450, 300);
+            techLabel.ZIndex = 180;
+            techLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            
+            techLabel.AddThemeColorOverride("font_outline_color", Colors.Black);
+            techLabel.AddThemeConstantOverride("outline_size", 4);
+            
+            AddChild(techLabel);
+            
+            var tween = CreateTween();
+            tween.TweenProperty(techLabel, "scale", Vector2.One * 1.4f, 0.3f);
+            tween.TweenProperty(techLabel, "modulate:a", 0.0f, 0.5f).SetDelay(1.0f);
+            tween.TweenCallback(Callable.From(() => techLabel.QueueFree()));
+            
+            ShakeScreen(6.0f, 0.3f);
+            TriggerHitParticles(new Vector2(640, 360), Colors.Purple);
+        }
+        
+        private void OnShowtimeTriggered(string showtimeName, string char1, string char2)
+        {
+            var showtimeLabel = new Label();
+            showtimeLabel.Text = $"★ SHOWTIME! ★\n{showtimeName}";
+            showtimeLabel.AddThemeFontSizeOverride("font_size", 52);
+            showtimeLabel.Modulate = Colors.Orange;
+            showtimeLabel.Position = new Vector2(400, 280);
+            showtimeLabel.ZIndex = 190;
+            showtimeLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            
+            showtimeLabel.AddThemeColorOverride("font_outline_color", Colors.Black);
+            showtimeLabel.AddThemeConstantOverride("outline_size", 5);
+            
+            AddChild(showtimeLabel);
+            
+            var tween = CreateTween();
+            tween.TweenProperty(showtimeLabel, "scale", Vector2.One * 1.3f, 0.4f);
+            tween.TweenProperty(showtimeLabel, "modulate:a", 0.0f, 0.6f).SetDelay(1.5f);
+            tween.TweenCallback(Callable.From(() => showtimeLabel.QueueFree()));
+        }
+        
+        private void OnLimitBreakReady(string characterName)
+        {
+            var readyLabel = new Label();
+            readyLabel.Text = $"⚡ {characterName}\nLIMIT BREAK READY!";
+            readyLabel.AddThemeFontSizeOverride("font_size", 42);
+            readyLabel.Modulate = Colors.Yellow;
+            readyLabel.Position = new Vector2(420, 320);
+            readyLabel.ZIndex = 185;
+            readyLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            
+            readyLabel.AddThemeColorOverride("font_outline_color", Colors.Black);
+            readyLabel.AddThemeConstantOverride("outline_size", 4);
+            
+            AddChild(readyLabel);
+            
+            var tween = CreateTween();
+            tween.SetParallel(true);
+            tween.TweenProperty(readyLabel, "scale", Vector2.One * 1.2f, 0.3f);
+            tween.TweenProperty(readyLabel, "modulate:a", 1.0f, 0.3f);
+            tween.Chain().TweenProperty(readyLabel, "modulate:a", 0.0f, 0.5f).SetDelay(1.2f);
+            tween.TweenCallback(Callable.From(() => readyLabel.QueueFree()));
+            
+            UpdateActionMenuButtons();
         }
         
         #endregion
@@ -585,6 +1189,49 @@ namespace EchoesAcrossTime.Combat.UI
             tween.TweenProperty(effectLabel, "scale", Vector2.One, 0.3f).SetDelay(0.3f);
             tween.Chain().TweenProperty(effectLabel, "modulate:a", 0.0f, 0.5f).SetDelay(0.5f);
             tween.TweenCallback(Callable.From(() => effectLabel.QueueFree()));
+            
+            ShakeScreen(4.0f * passLevel, 0.2f);
+            TriggerHitParticles(new Vector2(640, 360), effectLabel.Modulate);
+        }
+        
+        #endregion
+        
+        #region Visual Effects (Screen Shake & Particles)
+        
+        private void ShakeScreen(float intensity, float duration)
+        {
+            var camera = GetViewport().GetCamera2D();
+            if (camera == null) return;
+            
+            var originalOffset = camera.Offset;
+            var tween = CreateTween();
+            
+            int shakes = Mathf.RoundToInt(duration * 30); // 30 shakes per second
+            
+            for (int i = 0; i < shakes; i++)
+            {
+                var randomOffset = new Vector2(
+                    (float)GD.RandRange(-intensity, intensity),
+                    (float)GD.RandRange(-intensity, intensity)
+                );
+                
+                tween.TweenProperty(camera, "offset", randomOffset, duration / shakes);
+            }
+            
+            tween.TweenProperty(camera, "offset", originalOffset, 0.1f);
+        }
+        
+        private void TriggerHitParticles(Vector2 position, Color color)
+        {
+            hitParticles.Position = position;
+            hitParticles.Color = color;
+            hitParticles.Emitting = true;
+        }
+        
+        private void TriggerCriticalParticles(Vector2 position)
+        {
+            criticalParticles.Position = position;
+            criticalParticles.Emitting = true;
         }
         
         #endregion
@@ -593,21 +1240,17 @@ namespace EchoesAcrossTime.Combat.UI
         
         private void HandleSkillTargeting(SkillData skill)
         {
-            // Handle different skill target types
             switch (skill.Target)
             {
                 case SkillTarget.AllEnemies:
-                    // Automatically target all living enemies
                     ExecuteSkillAction(battleManager.GetLivingEnemies().ToArray());
                     break;
                     
                 case SkillTarget.AllAllies:
-                    // Automatically target all living allies
                     ExecuteSkillAction(battleManager.GetLivingAllies().ToArray());
                     break;
                     
                 case SkillTarget.Everyone:
-                    // Target everyone on the battlefield
                     var everyone = new System.Collections.Generic.List<BattleMember>();
                     everyone.AddRange(battleManager.GetPlayerParty().Where(p => p.Stats.IsAlive));
                     everyone.AddRange(battleManager.GetEnemyParty().Where(e => e.Stats.IsAlive));
@@ -615,12 +1258,10 @@ namespace EchoesAcrossTime.Combat.UI
                     break;
                     
                 case SkillTarget.Self:
-                    // Automatically target the caster
                     ExecuteSkillAction(new[] { battleManager.CurrentActor });
                     break;
                     
                 case SkillTarget.DeadAlly:
-                    // Show target selection for dead allies only
                     var deadAllies = battleManager.GetPlayerParty()
                         .Where(p => !p.Stats.IsAlive)
                         .ToList();
@@ -637,12 +1278,12 @@ namespace EchoesAcrossTime.Combat.UI
                         waitingForTarget = true;
                         selectingBatonPassTarget = false;
                         waitingForItemTarget = false;
+                        waitingForLimitBreakTarget = false;
                     }
                     break;
                     
                 case SkillTarget.SingleEnemy:
                 case SkillTarget.RandomEnemy:
-                    // Show target selection for enemies
                     var enemies = battleManager.GetLivingEnemies();
                     
                     if (enemies.Count == 0)
@@ -653,16 +1294,15 @@ namespace EchoesAcrossTime.Combat.UI
                     }
                     else
                     {
-                        // RandomEnemy still lets player choose in player-controlled mode
                         targetSelector.ShowSelection(enemies);
                         waitingForTarget = true;
                         selectingBatonPassTarget = false;
                         waitingForItemTarget = false;
+                        waitingForLimitBreakTarget = false;
                     }
                     break;
                     
                 case SkillTarget.SingleAlly:
-                    // Show target selection for living allies
                     var allies = battleManager.GetLivingAllies();
                     
                     if (allies.Count == 0)
@@ -677,6 +1317,7 @@ namespace EchoesAcrossTime.Combat.UI
                         waitingForTarget = true;
                         selectingBatonPassTarget = false;
                         waitingForItemTarget = false;
+                        waitingForLimitBreakTarget = false;
                     }
                     break;
                     
@@ -707,7 +1348,6 @@ namespace EchoesAcrossTime.Combat.UI
         
         public override void _Process(double delta)
         {
-            // Check if skill menu completed
             if (waitingForSkillMenu && !skillMenu.Visible)
             {
                 waitingForSkillMenu = false;
@@ -723,7 +1363,6 @@ namespace EchoesAcrossTime.Combat.UI
                 }
             }
             
-            // Check if target selection completed
             if (waitingForTarget && !targetSelector.Visible && targetSelector.WasSelectionMade())
             {
                 waitingForTarget = false;
@@ -747,7 +1386,6 @@ namespace EchoesAcrossTime.Combat.UI
                 }
                 else
                 {
-                    // Cancelled - return to appropriate menu
                     if (waitingForItemTarget)
                     {
                         itemMenuPanel.Show();
@@ -760,6 +1398,7 @@ namespace EchoesAcrossTime.Combat.UI
                 
                 selectingBatonPassTarget = false;
                 waitingForItemTarget = false;
+                waitingForLimitBreakTarget = false;
             }
         }
         
@@ -800,6 +1439,19 @@ namespace EchoesAcrossTime.Combat.UI
                 
                 battleManager.ExecuteAction(action);
             }
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        /// <summary>
+        /// Get available limit breaks for a character - delegates to BattleManager
+        /// </summary>
+        private System.Collections.Generic.List<LimitBreakData> GetAvailableLimitBreaks(BattleMember member)
+        {
+            // Delegate to BattleManager which has access to internal systems
+            return battleManager.GetAvailableLimitBreaks(member);
         }
         
         #endregion

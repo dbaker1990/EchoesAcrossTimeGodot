@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://b0s4n1r0ki60c"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_ad8ne"]
+
+[resource]
+script = ExtResource("1_ad8ne")
+HPRestorePercent = 100.0
+MPRestorePercent = 100.0
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "omni_elixir"
+DisplayName = "Omni Elixir"
+Description = "Life and focus in one breath. Full HP & MP to 1 ally."
+Rarity = 4
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

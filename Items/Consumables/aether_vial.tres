@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://cwry5ustb3akg"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_8xgns"]
+
+[resource]
+script = ExtResource("1_8xgns")
+MPRestore = 25
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "aether_vial"
+DisplayName = "Aether Vial"
+Description = "Thin, sharp, and efficient. Restores 25 MP to 1 ally."
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

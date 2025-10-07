@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://dubqig03recxj"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_drag2"]
+
+[resource]
+script = ExtResource("1_drag2")
+CuresStatuses = Array[int]([1])
+InflictsStatus = null
+ItemId = "anti_toxin"
+DisplayName = "Anti Toxin"
+Description = "Cuts venom at the source. Cures Poison."
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"

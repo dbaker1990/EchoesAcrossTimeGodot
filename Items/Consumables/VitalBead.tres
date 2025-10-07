@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ConsumableData" load_steps=2 format=3 uid="uid://frky6ehjle4t"]
+
+[ext_resource type="Script" uid="uid://dgprv037bfubk" path="res://Items/ConsumableData.cs" id="1_n434w"]
+
+[resource]
+script = ExtResource("1_n434w")
+HPRestorePercent = 100.0
+CuresStatuses = null
+InflictsStatus = null
+ItemId = "vital_bead"
+DisplayName = "Vital Bead"
+Description = "A prayer bead that dissolves into warm light. Full HP to 1 ally."
+Rarity = 3
+IsConsumable = true
+metadata/_custom_type_script = "uid://dgprv037bfubk"
