@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using EchoesAcrossTime.Bestiary;
 using EchoesAcrossTime.Events;
+using System.Threading.Tasks;
+using EchoesAcrossTime.Combat;
+using EchoesAcrossTime.Database;
+using EchoesAcrossTime.Items;
 
 namespace EchoesAcrossTime.Combat
 {
@@ -39,6 +43,17 @@ namespace EchoesAcrossTime.Combat
         private EscapeSystem escapeSystem;
         private BattleRewardsManager rewardsManager;
         
+        private class PendingAction
+        {
+            public BattleMember Attacker { get; set; }
+            public BattleMember Target { get; set; }
+            public SkillData Skill { get; set; }
+            public BattleActionResult Result { get; set; }
+        }
+        
+        private PendingAction pendingSkillAction;
+        private PendingAction pendingAttackAction;
+        
         #endregion
         
         #region Properties
@@ -46,6 +61,8 @@ namespace EchoesAcrossTime.Combat
         public BattlePhase CurrentPhase { get; private set; } = BattlePhase.NotStarted;
         public BattleMember CurrentActor { get; private set; }
         public bool AllOutAttackAvailable { get; private set; } = false;
+        
+        private BattlefieldVisuals battlefieldVisuals;
         
         #endregion
         
@@ -83,6 +100,19 @@ namespace EchoesAcrossTime.Combat
             itemSystem = new BattleItemSystem(statusManager);
             escapeSystem = new EscapeSystem();
             
+            // Get BattlefieldVisuals reference
+            battlefieldVisuals = GetNode<BattlefieldVisuals>("BattlefieldVisuals");
+            
+            if (battlefieldVisuals != null)
+            {
+                battlefieldVisuals.HitTimingReached += OnHitTimingReached;
+                battlefieldVisuals.AnimationFinished += OnBattleAnimationFinished;
+            }
+            else
+            {
+                GD.PrintErr("BattlefieldVisuals node not found! Add it to the scene.");
+            }
+            
             // Initialize rewards manager
             rewardsManager = new BattleRewardsManager();
             AddChild(rewardsManager);
@@ -113,13 +143,13 @@ namespace EchoesAcrossTime.Combat
             playerParty = new List<BattleMember>();
             for (int i = 0; i < playerStats.Count; i++)
             {
-                playerParty.Add(new BattleMember(playerStats[i], false, i));
+                playerParty.Add(new BattleMember(playerStats[i], true, i));
             }
             
             enemyParty = new List<BattleMember>();
             for (int i = 0; i < enemyStats.Count; i++)
             {
-                enemyParty.Add(new BattleMember(enemyStats[i], true, i));
+                enemyParty.Add(new BattleMember(enemyStats[i], false, i));
             }
             
             // Register showtimes if available
@@ -140,12 +170,15 @@ namespace EchoesAcrossTime.Combat
                 }
             }
             
-            var battlefieldVisuals = GetNode<BattlefieldVisuals>("../BattleField");
-            battlefieldVisuals.SetupPartySprites(playerParty);
-            battlefieldVisuals.SetupEnemySprites(enemyParty);
-            
             // Calculate turn order
             CalculateTurnOrder();
+            
+            // Setup battlefield sprites
+            if (battlefieldVisuals != null)
+            {
+                battlefieldVisuals.SetupPartySprites(playerParty);
+                battlefieldVisuals.SetupEnemySprites(enemyParty);
+            }
             
             TrackEnemyEncounters();
             
@@ -237,7 +270,7 @@ namespace EchoesAcrossTime.Combat
         /// <summary>
         /// End the current round and start a new one
         /// </summary>
-        private void EndRound()
+        private async void EndRound()
         {
             currentRound++;
             GD.Print($"\n═══ Round {currentRound} Complete ═══\n");
@@ -252,13 +285,7 @@ namespace EchoesAcrossTime.Combat
             batonPassManager.ResetForNewRound();
             
             // Stand up knocked down members
-            foreach (var member in turnOrder)
-            {
-                if (member.IsKnockedDown)
-                {
-                    member.StandUp();
-                }
-            }
+            await RecoverKnockedDownMembers();
             
             // Process end-of-round status effects
             foreach (var member in turnOrder.Where(m => m.Stats.IsAlive))
@@ -293,12 +320,12 @@ namespace EchoesAcrossTime.Combat
         /// <summary>
         /// Execute a battle action
         /// </summary>
-        public BattleActionResult ExecuteAction(BattleAction action)
+        public async void ExecuteAction(BattleAction action)
         {
             if (!action.IsValid())
             {
                 GD.PrintErr($"Invalid action: {action}");
-                return new BattleActionResult { Success = false, Message = "Invalid action" };
+                return;
             }
             
             CurrentPhase = BattlePhase.Processing;
@@ -306,10 +333,10 @@ namespace EchoesAcrossTime.Combat
             
             BattleActionResult result = action.ActionType switch
             {
-                BattleActionType.Attack => ExecuteBasicAttack(action),
-                BattleActionType.Skill => ExecuteSkill(action),
+                BattleActionType.Attack => await ExecuteBasicAttack(action),
+                BattleActionType.Skill => await ExecuteSkill(action),
                 BattleActionType.Guard => ExecuteGuard(action),
-                BattleActionType.Item => ExecuteItem(action),
+                BattleActionType.Item => await ExecuteItem(action),
                 BattleActionType.Escape => ExecuteEscape(action),
                 BattleActionType.AllOutAttack => ExecuteAllOutAttack(action),
                 BattleActionType.LimitBreak => ExecuteLimitBreak(action),
@@ -373,223 +400,102 @@ namespace EchoesAcrossTime.Combat
                     StartNextTurn();
                 }
             }
-            
-            return result;
         }
         
         /// <summary>
         /// Execute a basic attack
         /// </summary>
-        private BattleActionResult ExecuteBasicAttack(BattleAction action)
+        private async Task<BattleActionResult> ExecuteBasicAttack(BattleAction action)
         {
             var result = new BattleActionResult();
-            var attacker = action.Actor.Stats;
+            var attacker = action.Actor;
+            var target = action.Targets[0];
             
-            foreach (var targetMember in action.Targets)
+            GD.Print($">>> {attacker.Stats.CharacterName} attacks {target.Stats.CharacterName} <<<");
+            
+            // Play attack animation sequence
+            if (battlefieldVisuals != null)
             {
-                var target = targetMember.Stats;
-                
-                // Check if attack hits
-                bool hits = attacker.BattleStats.RollHit(attacker.BattleStats.AccuracyRate, rng);
-                
-                if (!hits)
-                {
-                    result.Missed = true;
-                    result.Message = $"{attacker.CharacterName}'s attack missed!";
-                    GD.Print($"  MISS!");
-                    continue;
-                }
-                
-                // Calculate damage
-                int damage = CalculatePhysicalDamage(action.Actor, targetMember);
-                
-                // Check critical
-                bool isCritical = attacker.BattleStats.RollCritical(attacker.BattleStats.CriticalRate, rng);
-                if (isCritical)
-                {
-                    damage = Mathf.RoundToInt(damage * 2.0f);
-                    result.WasCritical = true;
-                    rewardsManager.RecordEvent("critical_hit");
-                }
-                
-                // Apply guard reduction
-                damage = guardSystem.ApplyGuardReduction(targetMember, damage);
-                
-                // Deal damage
-                int actualDamage = target.TakeDamage(damage, ElementType.Physical);
-                result.DamageDealt += actualDamage;
-                
-                GD.Print($"  {attacker.CharacterName} → {target.CharacterName}: {actualDamage} damage" +
-                    (isCritical ? " CRITICAL!" : ""));
-                
-                // Build limit gauge
-                limitBreakSystem.AddGaugeFromDamage(action.Actor, actualDamage);
-                
-                // Track KO
-                if (!target.IsAlive)
-                {
-                    if (playerParty.Any(p => p.Stats == target))
-                    {
-                        rewardsManager.RecordEvent("character_ko");
-                    }
-                    else if (enemyParty.Any(e => e.Stats == target))
-                    {
-                        BestiaryManager.Instance?.RecordDefeat(target.CharacterId);
-                    }
-                }
+                await battlefieldVisuals.PlayAttackSequence(attacker, target);
             }
             
-            result.Success = true;
+            // Apply damage
+            await ApplyAttackDamage(attacker, target, result);
+            
             return result;
         }
         
         /// <summary>
         /// Execute a skill
         /// </summary>
-        private BattleActionResult ExecuteSkill(BattleAction action)
+        private async Task<BattleActionResult> ExecuteSkill(BattleAction action)
         {
-            var skill = action.Skill;
-            var attacker = action.Actor.Stats;
             var result = new BattleActionResult();
+            var attacker = action.Actor;
+            var skill = action.Skill;
             
             // Check MP cost
-            if (attacker.CurrentMP < skill.MPCost)
+            if (attacker.Stats.CurrentMP < skill.MPCost)
             {
                 result.Success = false;
                 result.Message = "Not enough MP!";
                 return result;
             }
             
-            // Consume MP
-            attacker.ConsumeMP(skill.MPCost);
+            // Deduct MP
+            attacker.Stats.CurrentMP -= skill.MPCost;
             
-            GD.Print($"{attacker.CharacterName} uses {skill.DisplayName}!");
+            GD.Print($">>> {attacker.Stats.CharacterName} casts {skill.DisplayName}! <<<");
             
-            foreach (var targetMember in action.Targets)
+            // Play casting animation
+            if (battlefieldVisuals != null)
             {
-                var target = targetMember.Stats;
-                
-                // Healing skills (check SkillCategory or similar property instead)
-                if (skill.BasePower < 0 || skill.DisplayName.ToLower().Contains("heal"))
+                await battlefieldVisuals.PlayCastSequence(attacker);
+            }
+            
+            // Apply to all targets
+            foreach (var target in action.Targets)
+            {
+                if (skill.DamageType == DamageType.Recovery)
                 {
-                    int healing = CalculateHealing(action.Actor, targetMember, skill);
+                    // Healing skill
+                    int healAmount = skill.BasePower;
                     
-                    // Apply baton pass bonus
-                    healing = batonPassManager.ApplyHealingBonus(action.Actor, healing);
-                    
-                    int actualHealing = target.Heal(healing);
-                    result.HealingDone += actualHealing;
-                    GD.Print($"  {target.CharacterName} healed for {actualHealing} HP!");
-                    continue;
-                }
-                
-                // Check hit
-                bool hits = attacker.BattleStats.RollHit(skill.Accuracy, rng);
-                if (!hits)
-                {
-                    result.Missed = true;
-                    GD.Print($"  MISS!");
-                    continue;
-                }
-                
-                // Calculate damage
-                int damage = CalculateMagicDamage(action.Actor, targetMember, skill);
-                
-                // Check for technical damage
-                var technicalResult = technicalSystem.CheckTechnical(targetMember.Stats, skill.Element);
-                if (technicalResult.IsTechnical)
-                {
-                    damage = Mathf.RoundToInt(damage * 1.5f); // Technical multiplier
-                    
-                    EmitSignal(SignalName.TechnicalDamage,
-                        attacker.CharacterName,
-                        target.CharacterName,
-                        technicalResult.ComboType.ToString());
-                    
-                    rewardsManager.RecordEvent("technical_hit");
-                    
-                    GD.Print($"  ⚡ TECHNICAL! ({technicalResult.ComboType})");
-                }
-                
-                // Apply baton pass bonus
-                damage = batonPassManager.ApplyDamageBonus(action.Actor, damage);
-                
-                // Check critical
-                int critBonus = batonPassManager.GetCriticalBonus(action.Actor);
-                bool isCritical = attacker.BattleStats.RollCritical(
-                    attacker.BattleStats.CriticalRate + critBonus, rng);
-                
-                if (isCritical)
-                {
-                    damage = Mathf.RoundToInt(damage * 2.0f);
-                    result.WasCritical = true;
-                    rewardsManager.RecordEvent("critical_hit");
-                }
-                
-                // Check weakness
-                var affinity = target.ElementAffinities.GetAffinity(skill.Element);
-                result.HitWeakness = affinity == ElementAffinity.Weak;
-                
-                if (result.HitWeakness)
-                {
-                    damage = Mathf.RoundToInt(damage * 1.5f);
-                    EmitSignal(SignalName.WeaknessHit, attacker.CharacterName, target.CharacterName);
-                    rewardsManager.RecordEvent("weakness_hit");
-                    GD.Print($"  ★ WEAKNESS!");
-                }
-                else if (affinity == ElementAffinity.Resist)
-                {
-                    damage = Mathf.RoundToInt(damage * 0.5f);
-                    GD.Print($"  Resisted...");
-                }
-                else if (affinity == ElementAffinity.Immune)
-                {
-                    damage = 0;
-                    GD.Print($"  Nullified!");
-                }
-                else if (affinity == ElementAffinity.Absorb)
-                {
-                    target.Heal(damage);
-                    GD.Print($"  Absorbed!");
-                    continue;
-                }
-                
-                // Apply guard reduction
-                damage = guardSystem.ApplyGuardReduction(targetMember, damage);
-                
-                // Deal damage
-                int actualDamage = target.TakeDamage(damage, skill.Element);
-                result.DamageDealt += actualDamage;
-                
-                GD.Print($"  {target.CharacterName} took {actualDamage} damage" +
-                    (isCritical ? " CRITICAL!" : ""));
-                
-                // Build limit gauge
-                limitBreakSystem.AddGaugeFromDamage(action.Actor, actualDamage);
-                
-                // Apply status effects
-                if (skill.InflictsStatuses != null && skill.InflictsStatuses.Count > 0)
-                {
-                    for (int i = 0; i < skill.InflictsStatuses.Count; i++)
+                    // Apply baton pass bonus if active
+                    if (attacker.BatonPassData.IsActive)
                     {
-                        var status = skill.InflictsStatuses[i];
-                        int chance = skill.StatusChances != null && i < skill.StatusChances.Count ?
-                            skill.StatusChances[i] : 30;
-                        
-                        statusManager.ApplyStatus(targetMember.Stats, status, 3, 5, attacker.CharacterName);
+                        healAmount = batonPassManager.ApplyHealingBonus(attacker, healAmount);
+                    }
+                    
+                    int actualHeal = target.Stats.Heal(healAmount);
+                    result.HealingDone += actualHeal;
+                    
+                    GD.Print($"  {target.Stats.CharacterName} healed for {actualHeal} HP!");
+                    
+                    // Show heal effect
+                    if (battlefieldVisuals != null)
+                    {
+                        await battlefieldVisuals.ShowHealEffect(target);
                     }
                 }
-                
-                // Track KO
-                if (!target.IsAlive)
+                else if (skill.BasePower > 0)
                 {
-                    if (playerParty.Any(p => p.Stats == target))
+                    // Damaging skill
+                    await ApplySkillDamage(attacker, target, skill, result);
+                }
+                else
+                {
+                    // Buff/Debuff skill
+                    ApplySkillEffects(attacker, target, skill, result);
+                    
+                    // Show buff/debuff effect
+                    if (battlefieldVisuals != null)
                     {
-                        rewardsManager.RecordEvent("character_ko");
-                    }
-                    else if (enemyParty.Any(e => e.Stats == target))
-                    {
-                        BestiaryManager.Instance?.RecordDefeat(target.CharacterId);
+                        string skillName = skill.DisplayName.ToLower();
+                        if (skillName.Contains("debuff") || skillName.Contains("down") || skillName.Contains("curse"))
+                            battlefieldVisuals.ShowDebuffEffect(target);
+                        else if (skillName.Contains("buff") || skillName.Contains("up") || skillName.Contains("boost"))
+                            battlefieldVisuals.ShowBuffEffect(target);
                     }
                 }
             }
@@ -603,10 +509,23 @@ namespace EchoesAcrossTime.Combat
         /// </summary>
         private BattleActionResult ExecuteGuard(BattleAction action)
         {
-            var result = guardSystem.ExecuteGuard(action.Actor);
+            var result = new BattleActionResult
+            {
+                Success = true,
+                Message = $"{action.Actor.Stats.CharacterName} guards!"
+            };
             
-            // Guarding builds limit gauge
-            limitBreakSystem.AddGaugeFromDealingDamage(action.Actor, 0, false);
+            // Set guard state
+            action.Actor.GuardState.IsGuarding = true;
+            action.Actor.GuardState.GuardPower = 0.5f; // 50% damage reduction
+            
+            GD.Print($">>> {action.Actor.Stats.CharacterName} guards! <<<");
+            
+            // Play defend animation
+            if (battlefieldVisuals != null)
+            {
+                battlefieldVisuals.PlayDefend(action.Actor);
+            }
             
             return result;
         }
@@ -614,26 +533,39 @@ namespace EchoesAcrossTime.Combat
         /// <summary>
         /// Execute item usage
         /// </summary>
-        private BattleActionResult ExecuteItem(BattleAction action)
+        private async Task<BattleActionResult> ExecuteItem(BattleAction action)
         {
-            var item = action.ItemData as EchoesAcrossTime.Items.ConsumableData;
+            var item = action.ItemData as ConsumableData;
             
             if (item == null)
             {
                 return new BattleActionResult
                 {
                     Success = false,
-                    Message = "No item selected!"
+                    Message = "Invalid item"
                 };
+            }
+            
+            // Play item animation
+            if (battlefieldVisuals != null)
+            {
+                await battlefieldVisuals.PlayItemSequence(action.Actor);
             }
             
             // Use item via item system
             var result = itemSystem.UseItem(action.Actor, item, action.Targets);
             
-            // Track item usage
+            // Show heal effect if item heals
+            if (result.HealingDone > 0 && battlefieldVisuals != null)
+            {
+                foreach (var target in action.Targets)
+                {
+                    await battlefieldVisuals.ShowHealEffect(target);
+                }
+            }
+            
             rewardsManager.RecordEvent("item_used");
             
-            // Note: Inventory deduction should be handled by caller
             return result;
         }
         
@@ -766,17 +698,6 @@ namespace EchoesAcrossTime.Combat
             return Mathf.Max(1, Mathf.RoundToInt(baseDamage));
         }
         
-        /// <summary>
-        /// Calculate healing
-        /// </summary>
-        private int CalculateHealing(BattleMember caster, BattleMember target, SkillData skill)
-        {
-            float magicPower = caster.Stats.MagicAttack;
-            float baseHealing = magicPower * (Mathf.Abs(skill.BasePower) / 100.0f);
-            
-            return Mathf.Max(1, Mathf.RoundToInt(baseHealing));
-        }
-        
         #endregion
         
         #region Advanced Mechanics
@@ -855,13 +776,11 @@ namespace EchoesAcrossTime.Combat
         {
             var showtimes = new List<ShowtimeAttackData>();
     
-            if (showtimeManager == null)  // ← Changed from ShowtimeSystem.Instance
+            if (showtimeManager == null)
                 return showtimes;
     
             var livingAllies = GetLivingAllies();
-    
-            // Get available showtimes from manager
-            var availableShowtimes = showtimeManager.GetAvailableShowtimes();  // ← Changed
+            var availableShowtimes = showtimeManager.GetAvailableShowtimes();
     
             foreach (var showtime in availableShowtimes)
             {
@@ -870,7 +789,7 @@ namespace EchoesAcrossTime.Combat
         
                 if (char1 != null && char2 != null)
                 {
-                    if (showtimeManager.CanShowtimeActivate(showtime, char1, char2))  // ← Changed
+                    if (showtimeManager.CanShowtimeActivate(showtime, char1, char2))
                     {
                         showtimes.Add(showtime);
                     }
@@ -890,10 +809,9 @@ namespace EchoesAcrossTime.Combat
             if (member == null || !member.IsLimitBreakReady)
                 return limitBreaks;
     
-            // Use internal limitBreakSystem field
-            if (limitBreakSystem != null)  // ← Changed from LimitBreakSystem.Instance
+            if (limitBreakSystem != null)
             {
-                var limitBreak = limitBreakSystem.GetLimitBreak(member.Stats.CharacterName);  // ← Changed
+                var limitBreak = limitBreakSystem.GetLimitBreak(member.Stats.CharacterName);
                 if (limitBreak != null)
                 {
                     limitBreaks.Add(limitBreak);
@@ -904,48 +822,48 @@ namespace EchoesAcrossTime.Combat
         }
         
         /// <summary>
-/// Execute a showtime attack
-/// </summary>
-public void ExecuteShowtime(ShowtimeAttackData showtime)
-{
-    if (showtime == null || showtimeManager == null)  // ← Changed from ShowtimeSystem.Instance
-    {
-        GD.PrintErr("Invalid showtime data!");
-        return;
-    }
-    
-    var livingAllies = GetLivingAllies();
-    var char1 = livingAllies.FirstOrDefault(a => a.Stats.CharacterName == showtime.Character1Id);
-    var char2 = livingAllies.FirstOrDefault(a => a.Stats.CharacterName == showtime.Character2Id);
-    
-    if (char1 == null || char2 == null)
-    {
-        GD.PrintErr("Showtime characters not found!");
-        return;
-    }
-    
-    // Get targets
-    var targets = showtime.HitsAllEnemies  // ← Changed from HitsAllTargets
-        ? GetLivingEnemies()
-        : new List<BattleMember> { GetLivingEnemies().FirstOrDefault() };
-    
-    if (targets.Count == 0 || targets[0] == null)
-    {
-        GD.Print("No valid targets for showtime!");
-        return;
-    }
-    
-    // Execute using internal manager
-    var result = showtimeManager.ExecuteShowtime(showtime, char1, char2, targets);  // ← Changed
-    
-    // Emit signal
-    EmitSignal(SignalName.ShowtimeTriggered, showtime.AttackName, char1.Stats.CharacterName, char2.Stats.CharacterName);
-    
-    // Put showtime on cooldown
-    showtimeManager.PutOnCooldown(showtime);  // ← Changed
-    
-    GD.Print($"Showtime complete! Total damage: {result.DamageDealt}");
-}
+        /// Execute a showtime attack
+        /// </summary>
+        public void ExecuteShowtime(ShowtimeAttackData showtime)
+        {
+            if (showtime == null || showtimeManager == null)
+            {
+                GD.PrintErr("Invalid showtime data!");
+                return;
+            }
+            
+            var livingAllies = GetLivingAllies();
+            var char1 = livingAllies.FirstOrDefault(a => a.Stats.CharacterName == showtime.Character1Id);
+            var char2 = livingAllies.FirstOrDefault(a => a.Stats.CharacterName == showtime.Character2Id);
+            
+            if (char1 == null || char2 == null)
+            {
+                GD.PrintErr("Showtime characters not found!");
+                return;
+            }
+            
+            // Get targets
+            var targets = showtime.HitsAllEnemies
+                ? GetLivingEnemies()
+                : new List<BattleMember> { GetLivingEnemies().FirstOrDefault() };
+            
+            if (targets.Count == 0 || targets[0] == null)
+            {
+                GD.Print("No valid targets for showtime!");
+                return;
+            }
+            
+            // Execute using internal manager
+            var result = showtimeManager.ExecuteShowtime(showtime, char1, char2, targets);
+            
+            // Emit signal
+            EmitSignal(SignalName.ShowtimeTriggered, showtime.AttackName, char1.Stats.CharacterName, char2.Stats.CharacterName);
+            
+            // Put showtime on cooldown
+            showtimeManager.PutOnCooldown(showtime);
+            
+            GD.Print($"Showtime complete! Total damage: {result.DamageDealt}");
+        }
         
         /// <summary>
         /// Check if limit break is ready for a character
@@ -966,7 +884,7 @@ public void ExecuteShowtime(ShowtimeAttackData showtime)
             if (member == null)
                 return 0f;
             
-            return (member.LimitGauge / 100f) * 100f; // Convert to percentage
+            return (member.LimitGauge / 100f) * 100f;
         }
         
         /// <summary>
@@ -974,15 +892,12 @@ public void ExecuteShowtime(ShowtimeAttackData showtime)
         /// </summary>
         public bool CanEscape()
         {
-            // Cannot escape if blocked (boss battle, story battle, etc.)
             if (escapeBlocked)
                 return false;
             
-            // Cannot escape if all party members are dead
             if (!GetPlayerParty().Any(p => p.Stats.IsAlive))
                 return false;
             
-            // Can always attempt escape in normal battles
             return true;
         }
         
@@ -994,13 +909,9 @@ public void ExecuteShowtime(ShowtimeAttackData showtime)
             if (!CanEscape())
                 return 0;
             
-            // Base chance
             int chance = 25;
-            
-            // +10% per failed attempt
             chance += escapeAttempts * 10;
             
-            // Speed difference bonus
             var livingAllies = GetLivingAllies();
             var livingEnemies = GetLivingEnemies();
             
@@ -1010,44 +921,14 @@ public void ExecuteShowtime(ShowtimeAttackData showtime)
                 int avgEnemySpeed = (int)livingEnemies.Average(e => e.Stats.Speed);
                 
                 int speedDiff = avgPartySpeed - avgEnemySpeed;
-                chance += speedDiff / 2; // +1% per 2 speed difference
+                chance += speedDiff / 2;
             }
             
-            // Cap at 95%
             return Mathf.Min(95, chance);
         }
         
         /// <summary>
-        /// Attempt to escape from battle
-        /// </summary>
-        public bool TryEscape()
-        {
-            if (!CanEscape())
-            {
-                GD.Print("Cannot escape from this battle!");
-                return false;
-            }
-            
-            int chance = GetEscapeChance();
-            int roll = (int)(GD.Randf() * 100);
-            
-            if (roll < chance)
-            {
-                GD.Print($"✓ Escape successful! (rolled {roll} vs {chance}%)");
-                EmitSignal(SignalName.BattleEnded, false); // false = no victory
-                return true;
-            }
-            else
-            {
-                escapeAttempts++;
-                GD.Print($"✗ Escape failed! (rolled {roll} vs {chance}%)");
-                GD.Print($"  Next attempt: {GetEscapeChance()}% chance");
-                return false;
-            }
-        }
-        
-        /// <summary>
-        /// Block escape attempts (for boss battles, etc.)
+        /// Block escape attempts
         /// </summary>
         public void SetEscapeBlocked(bool blocked)
         {
@@ -1058,8 +939,276 @@ public void ExecuteShowtime(ShowtimeAttackData showtime)
             }
         }
         
+        /// <summary>
+        /// Called when sprite reaches hit timing during attack animation
+        /// </summary>
+        private async void OnHitTimingReached(string attackerName, string targetName)
+        {
+            if (pendingAttackAction != null)
+            {
+                await ApplyAttackDamage(
+                    pendingAttackAction.Attacker,
+                    pendingAttackAction.Target,
+                    pendingAttackAction.Result
+                );
+                pendingAttackAction = null;
+            }
+        }
         
+        /// <summary>
+        /// Called when battle animation completes
+        /// </summary>
+        private void OnBattleAnimationFinished(string animName, string memberName)
+        {
+            GD.Print($"Animation '{animName}' finished for {memberName}");
+        }
         
+        /// <summary>
+        /// Apply attack damage and effects
+        /// </summary>
+        private async Task ApplyAttackDamage(BattleMember attacker, BattleMember target, BattleActionResult result)
+        {
+            // Calculate damage
+            int baseDamage = CalculatePhysicalDamage(attacker, target);
+            
+            // Apply baton pass bonus if active
+            if (attacker.BatonPassData.IsActive)
+            {
+                baseDamage = batonPassManager.ApplyDamageBonus(attacker, baseDamage);
+            }
+            
+            // Check for critical
+            bool isCritical = rng.RandiRange(1, 100) <= attacker.Stats.BattleStats.CriticalRate;
+            if (isCritical)
+            {
+                baseDamage = (int)(baseDamage * (attacker.Stats.BattleStats.CriticalDamageMultiplier / 100f));
+            }
+            
+            // Apply guard reduction
+            int finalDamage = baseDamage;
+            if (target.GuardState.IsGuarding)
+            {
+                finalDamage = (int)(finalDamage * (1.0f - target.GuardState.GuardPower));
+                GD.Print($"  → Guard blocked {baseDamage - finalDamage} damage!");
+            }
+            
+            // Deal damage
+            target.Stats.TakeDamage(finalDamage, ElementType.Physical);
+            result.DamageDealt += finalDamage;
+            result.WasCritical = isCritical;
+            
+            GD.Print($"  💥 {finalDamage} damage!");
+            
+            // Show hit effect
+            if (battlefieldVisuals != null)
+            {
+                await battlefieldVisuals.ShowHitEffect(target, isCritical);
+            }
+            
+            // Handle death
+            if (!target.Stats.IsAlive)
+            {
+                GD.Print($"  ☠️ {target.Stats.CharacterName} was defeated!");
+                
+                if (battlefieldVisuals != null)
+                {
+                    await battlefieldVisuals.ShowDeathEffect(target);
+                }
+            }
+            
+            // Track metrics
+            rewardsManager.RecordDamage(finalDamage, attacker.IsPlayerControlled);
+            
+            // Emit signal
+            EmitSignal(SignalName.ActionExecuted,
+                attacker.Stats.CharacterName,
+                "Attack",
+                finalDamage,
+                false,
+                isCritical
+            );
+        }
+        
+        /// <summary>
+        /// Apply skill damage with all mechanics
+        /// </summary>
+        private async Task ApplySkillDamage(BattleMember attacker, BattleMember target, SkillData skill, BattleActionResult result)
+        {
+            // Check for technical damage opportunity
+            bool isTechnical = technicalSystem.IsTechnicalOpportunity(
+                target.Stats.ActiveStatuses,
+                skill.Element
+            );
+            
+            // Calculate damage
+            int baseDamage = CalculateMagicDamage(attacker, target, skill);
+            
+            // Apply baton pass bonus if active
+            if (attacker.BatonPassData.IsActive)
+            {
+                baseDamage = batonPassManager.ApplyDamageBonus(attacker, baseDamage);
+            }
+            
+            // Check for weakness
+            ElementAffinity affinity = target.Stats.ElementAffinities.GetAffinity(skill.Element);
+            bool hitWeakness = affinity == ElementAffinity.Weak;
+            float multiplier = target.Stats.ElementAffinities.GetDamageMultiplier(skill.Element);
+            baseDamage = (int)(baseDamage * multiplier);
+            
+            // Check for critical
+            bool isCritical = rng.RandiRange(1, 100) <= (attacker.Stats.BattleStats.CriticalRate + skill.CriticalBonus);
+            if (isCritical)
+            {
+                baseDamage = (int)(baseDamage * (attacker.Stats.BattleStats.CriticalDamageMultiplier / 100f));
+            }
+            
+            // Apply technical multiplier
+            if (isTechnical)
+            {
+                baseDamage = (int)(baseDamage * 1.5f);
+                string comboType = technicalSystem.GetTechnicalComboName(
+                    target.Stats.ActiveStatuses,
+                    skill.Element
+                );
+                GD.Print($"  ⚡ TECHNICAL! {comboType}");
+                EmitSignal(SignalName.TechnicalDamage,
+                    attacker.Stats.CharacterName,
+                    target.Stats.CharacterName,
+                    comboType
+                );
+            }
+            
+            // Apply guard reduction
+            int finalDamage = baseDamage;
+            if (target.GuardState.IsGuarding)
+            {
+                finalDamage = (int)(finalDamage * (1.0f - target.GuardState.GuardPower));
+                GD.Print($"  → Guard blocked {baseDamage - finalDamage} damage!");
+            }
+            
+            // Deal damage
+            target.Stats.TakeDamage(finalDamage, skill.Element);
+            result.DamageDealt += finalDamage;
+            result.HitWeakness = hitWeakness;
+            result.WasCritical = isCritical;
+            
+            GD.Print($"  💥 {finalDamage} {skill.Element} damage!");
+            
+            // Show hit effect
+            if (battlefieldVisuals != null)
+            {
+                await battlefieldVisuals.ShowHitEffect(target, isCritical);
+            }
+            
+            // Handle weakness
+            if (hitWeakness)
+            {
+                GD.Print($"  💥 WEAKNESS EXPLOITED!");
+                target.KnockDown();
+                HandleOneMore(attacker, result);
+                
+                // Show knocked down effect
+                if (battlefieldVisuals != null)
+                {
+                    battlefieldVisuals.ShowKnockedDown(target);
+                }
+                
+                EmitSignal(SignalName.WeaknessHit,
+                    attacker.Stats.CharacterName,
+                    target.Stats.CharacterName
+                );
+                EmitSignal(SignalName.Knockdown, target.Stats.CharacterName);
+            }
+            
+            // Handle critical
+            if (isCritical && !hitWeakness)
+            {
+                GD.Print($"  ⭐ CRITICAL HIT!");
+                target.KnockDown();
+                HandleOneMore(attacker, result);
+                
+                // Show knocked down effect
+                if (battlefieldVisuals != null)
+                {
+                    battlefieldVisuals.ShowKnockedDown(target);
+                }
+                
+                EmitSignal(SignalName.Knockdown, target.Stats.CharacterName);
+            }
+            
+            // Handle death
+            if (!target.Stats.IsAlive)
+            {
+                GD.Print($"  ☠️ {target.Stats.CharacterName} was defeated!");
+                
+                if (battlefieldVisuals != null)
+                {
+                    await battlefieldVisuals.ShowDeathEffect(target);
+                }
+            }
+            
+            // Apply status effects
+            ApplySkillEffects(attacker, target, skill, result);
+            
+            // Track metrics
+            rewardsManager.RecordDamage(finalDamage, attacker.IsPlayerControlled);
+            if (hitWeakness) rewardsManager.RecordEvent("weakness_hit");
+            if (isCritical) rewardsManager.RecordEvent("critical_hit");
+            if (isTechnical) rewardsManager.RecordEvent("technical_damage");
+            
+            // Emit signal
+            EmitSignal(SignalName.ActionExecuted,
+                attacker.Stats.CharacterName,
+                skill.DisplayName,
+                finalDamage,
+                hitWeakness,
+                isCritical
+            );
+        }
+        
+        /// <summary>
+        /// Apply non-damage skill effects
+        /// </summary>
+        private void ApplySkillEffects(BattleMember attacker, BattleMember target, SkillData skill, BattleActionResult result)
+        {
+            // Apply status effects
+            if (skill.InflictsStatuses != null && skill.InflictsStatuses.Count > 0)
+            {
+                for (int i = 0; i < skill.InflictsStatuses.Count; i++)
+                {
+                    var status = skill.InflictsStatuses[i];
+                    int chance = skill.StatusChances != null && i < skill.StatusChances.Count
+                        ? skill.StatusChances[i]
+                        : 100;
+                    
+                    if (rng.RandiRange(1, 100) <= chance)
+                    {
+                        statusManager.ApplyStatus(target.Stats, status, skill.BuffDuration);
+                        GD.Print($"  {target.Stats.CharacterName} is now {status}!");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Recover knocked down members at round end
+        /// </summary>
+        private async Task RecoverKnockedDownMembers()
+        {
+            foreach (var member in playerParty.Concat(enemyParty))
+            {
+                if (member.IsKnockedDown && member.Stats.IsAlive)
+                {
+                    member.StandUp();
+
+                    if (battlefieldVisuals != null)
+                    {
+                        await battlefieldVisuals.RecoverFromKnockedDown(member);
+                    }
+                }
+            }
+        }
+
         #endregion
         
         #region Battle State Queries
@@ -1082,44 +1231,13 @@ public void ExecuteShowtime(ShowtimeAttackData showtime)
             
             if (allPlayersDead)
             {
-                CurrentPhase = BattlePhase.Defeat;
-                EmitSignal(SignalName.BattleEnded, false);
-                GD.Print("\n*** DEFEAT ***\n");
+                OnBattleDefeat();
                 return true;
             }
             
             if (allEnemiesDead)
             {
-                CurrentPhase = BattlePhase.Victory;
-                
-                // Calculate and distribute rewards!
-                var defeatedEnemies = enemyParty.ToList();
-                var partyStats = playerParty.Select(p => p.Stats).ToList();
-                
-                var rewards = rewardsManager.CalculateRewards(
-                    partyStats,
-                    defeatedEnemies,
-                    isBossBattle
-                );
-                
-                // Log rewards
-                GD.Print("\n╔═══════════════════════════════════════╗");
-                GD.Print("║          VICTORY!                    ║");
-                GD.Print("╚═══════════════════════════════════════╝");
-                GD.Print($"\n⭐ Battle Rank: {BattleRewardsManager.GetRankDisplay(rewards.Rank)}");
-                GD.Print($"💰 Gold: {rewards.TotalGold}");
-                GD.Print($"✨ EXP: {rewards.TotalExp}");
-                
-                if (rewards.ItemDrops.Count > 0)
-                {
-                    GD.Print($"🎁 Items:");
-                    foreach (var drop in rewards.ItemDrops)
-                    {
-                        GD.Print($"   • {drop.itemId} x{drop.quantity}");
-                    }
-                }
-                
-                EmitSignal(SignalName.BattleEnded, true);
+                OnBattleVictory();
                 return true;
             }
             
@@ -1138,7 +1256,7 @@ public void ExecuteShowtime(ShowtimeAttackData showtime)
         public bool CanUseAllOutAttack() => AllOutAttackAvailable;
         
         /// <summary>
-        /// Get current battle metrics (for UI display)
+        /// Get current battle metrics
         /// </summary>
         public BattleMetrics GetCurrentMetrics()
         {
@@ -1146,7 +1264,7 @@ public void ExecuteShowtime(ShowtimeAttackData showtime)
         }
         
         /// <summary>
-        /// Get predicted battle rank based on current performance
+        /// Get predicted battle rank
         /// </summary>
         public BattleRank GetPredictedRank()
         {
@@ -1241,7 +1359,6 @@ public void ExecuteShowtime(ShowtimeAttackData showtime)
         {
             if (rewardsManager == null) return;
             
-            // Track damage
             bool isPlayer = playerParty?.Any(p => p.Stats.CharacterName == actorName) ?? false;
             if (damage > 0)
             {
@@ -1255,36 +1372,59 @@ public void ExecuteShowtime(ShowtimeAttackData showtime)
         }
         
         /// <summary>
-        /// Call this when battle ends with victory
+        /// Called when battle ends with victory
         /// </summary>
         private void OnBattleVictory()
         {
             GD.Print("=== BATTLE VICTORY ===");
+            
+            if (battlefieldVisuals != null)
+            {
+                battlefieldVisuals.PlayVictoryAnimation();
+            }
+            
+            // Calculate rewards
+            var rewards = rewardsManager.CalculateRewards(
+                playerParty.Select(p => p.Stats).ToList(),
+                enemyParty,
+                isBossBattle
+            );
         
-            // Set result for event system
             if (EventCommandExecutor.Instance != null)
             {
                 EventCommandExecutor.Instance.SetBattleResult(
                     EventCommandExecutor.BattleResult.Victory
                 );
             }
+            
+            // Log rewards
+            GD.Print("\n╔═══════════════════════════════════════╗");
+            GD.Print("║          VICTORY!                    ║");
+            GD.Print("╚═══════════════════════════════════════╝");
+            GD.Print($"\n⭐ Battle Rank: {BattleRewardsManager.GetRankDisplay(rewards.Rank)}");
+            GD.Print($"💰 Gold: {rewards.TotalGold}");
+            GD.Print($"✨ EXP: {rewards.TotalExp}");
+            
+            if (rewards.ItemDrops.Count > 0)
+            {
+                GD.Print($"🎁 Items:");
+                foreach (var drop in rewards.ItemDrops)
+                {
+                    GD.Print($"   • {drop.itemId} x{drop.quantity}");
+                }
+            }
         
-            // Your existing victory code...
-            // ShowVictoryScreen();
-            // GiveRewards();
-            // etc.
-        
+            CurrentPhase = BattlePhase.Victory;
             EmitSignal(SignalName.BattleEnded, true);
         }
         
         /// <summary>
-        /// Call this when battle ends with escape
+        /// Called when battle ends with escape
         /// </summary>
         private void OnBattleEscape()
         {
             GD.Print("=== BATTLE ESCAPED ===");
         
-            // Set result for event system
             if (EventCommandExecutor.Instance != null)
             {
                 EventCommandExecutor.Instance.SetBattleResult(
@@ -1297,27 +1437,27 @@ public void ExecuteShowtime(ShowtimeAttackData showtime)
         }
         
         /// <summary>
-        /// Call this when battle ends with defeat
+        /// Called when battle ends with defeat
         /// </summary>
         private void OnBattleDefeat()
         {
             GD.Print("=== BATTLE DEFEAT ===");
+            
+            if (battlefieldVisuals != null)
+            {
+                battlefieldVisuals.PlayDefeatAnimation();
+            }
         
-            // Set result for event system
             if (EventCommandExecutor.Instance != null)
             {
                 EventCommandExecutor.Instance.SetBattleResult(
                     EventCommandExecutor.BattleResult.Defeat
                 );
             }
-            
-            // Your existing defeat code...
-            // ShowGameOverScreen();
-            // etc.
         
+            CurrentPhase = BattlePhase.Defeat;
             EmitSignal(SignalName.BattleEnded, false);
         }
-
         
         #endregion
     }
