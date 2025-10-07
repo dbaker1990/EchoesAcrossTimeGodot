@@ -1,13 +1,10 @@
 [gd_scene load_steps=3 format=3 uid="uid://cjlth5qe7gg7j"]
 
-[ext_resource type="Script" uid="uid://brn5x78cj0tqp" path="res://Combat/BattleManager.cs" id="1_12f34"]
-[ext_resource type="Script" uid="uid://dve3x6tte3h4u" path="res://Scripts/UI/BattleUIController.cs" id="2_hip74"]
+[ext_resource type="Script" uid="uid://rgkk87qmgnn3" path="res://Combat/BattleSceneController.cs" id="1_hip74"]
+[ext_resource type="Script" uid="uid://brn5x78cj0tqp" path="res://Combat/BattleManager.cs" id="2_b2eky"]
 
 [node name="BattleScene" type="Node2D"]
-
-[node name="BattleManager" type="Node" parent="."]
-unique_name_in_owner = true
-script = ExtResource("1_12f34")
+script = ExtResource("1_hip74")
 
 [node name="Background" type="TextureRect" parent="."]
 anchors_preset = 15
@@ -15,42 +12,39 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 expand_mode = 1
+stretch_mode = 6
+
+[node name="BattleField" type="Node2D" parent="Background"]
+
+[node name="PartySpritesContainer" type="Node2D" parent="Background/BattleField"]
+
+[node name="EnemySpritesContainer" type="Node2D" parent="Background/BattleField"]
+
+[node name="BattleManager" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_b2eky")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="PartyPanel" type="VBoxContainer" parent="UI"]
 custom_minimum_size = Vector2(400, 800)
-offset_left = 50.0
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -500.0
 offset_top = 50.0
-offset_right = 90.0
-offset_bottom = 90.0
-theme_override_constants/separation = 10
-
-[node name="Character1Panel" type="PanelContainer" parent="UI/PartyPanel"]
-custom_minimum_size = Vector2(380, 100)
-layout_mode = 2
-
-[node name="Character2Panel" type="PanelContainer" parent="UI/PartyPanel"]
-custom_minimum_size = Vector2(380, 100)
-layout_mode = 2
-
-[node name="Character3Panel" type="PanelContainer" parent="UI/PartyPanel"]
-custom_minimum_size = Vector2(380, 100)
-layout_mode = 2
-
-[node name="Character4Panel" type="PanelContainer" parent="UI/PartyPanel"]
-custom_minimum_size = Vector2(380, 100)
-layout_mode = 2
+offset_right = -100.0
+offset_bottom = 850.0
+grow_horizontal = 0
 
 [node name="EnemyPanel" type="HBoxContainer" parent="UI"]
 custom_minimum_size = Vector2(800, 600)
-offset_left = 1000.0
+offset_left = 50.0
 offset_top = 100.0
-offset_right = 1040.0
-offset_bottom = 140.0
-theme_override_constants/separation = 20
-alignment = 1
+offset_right = 850.0
+offset_bottom = 700.0
 
 [node name="ActionMenu" type="PanelContainer" parent="UI"]
 custom_minimum_size = Vector2(400, 200)
@@ -58,205 +52,7 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 50.0
-offset_top = -280.0
+offset_top = -230.0
 offset_right = 450.0
-offset_bottom = -64.0
+offset_bottom = -30.0
 grow_vertical = 0
-
-[node name="MenuBackground" type="ColorRect" parent="UI/ActionMenu"]
-layout_mode = 2
-color = Color(0, 0, 0, 0.7882353)
-
-[node name="MenuButtons" type="VBoxContainer" parent="UI/ActionMenu"]
-layout_mode = 2
-
-[node name="AttackButton" type="Button" parent="UI/ActionMenu/MenuButtons"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-text = "Attack"
-
-[node name="SkillsButton" type="Button" parent="UI/ActionMenu/MenuButtons"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-text = "Skills"
-
-[node name="ItemsButton" type="Button" parent="UI/ActionMenu/MenuButtons"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-text = "Items"
-
-[node name="GuardButton" type="Button" parent="UI/ActionMenu/MenuButtons"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-text = "Guard"
-
-[node name="Escape" type="Button" parent="UI/ActionMenu/MenuButtons"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-text = "Escape"
-
-[node name="SkillMenu" type="PanelContainer" parent="UI"]
-custom_minimum_size = Vector2(900, 600)
-offset_left = 500.0
-offset_top = 200.0
-offset_right = 540.0
-offset_bottom = 240.0
-
-[node name="MarginContainer" type="MarginContainer" parent="UI/SkillMenu"]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
-
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/SkillMenu/MarginContainer"]
-layout_mode = 2
-theme_override_constants/separation = 30
-
-[node name="LeftPanel" type="VBoxContainer" parent="UI/SkillMenu/MarginContainer/HBoxContainer"]
-custom_minimum_size = Vector2(500, 0)
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="SkillTabs" type="TabBar" parent="UI/SkillMenu/MarginContainer/HBoxContainer/LeftPanel"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-
-[node name="ScrollContainer" type="ScrollContainer" parent="UI/SkillMenu/MarginContainer/HBoxContainer/LeftPanel"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="SkillList" type="VBoxContainer" parent="UI/SkillMenu/MarginContainer/HBoxContainer/LeftPanel/ScrollContainer"]
-layout_mode = 2
-
-[node name="SkillInfo" type="VBoxContainer" parent="UI/SkillMenu/MarginContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 15
-
-[node name="TargetSelector" type="Control" parent="UI"]
-visible = false
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Cursor" type="Sprite2D" parent="UI/TargetSelector"]
-position = Vector2(960, 400)
-scale = Vector2(2, 2)
-
-[node name="Notifications" type="Control" parent="UI"]
-layout_mode = 3
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -20.0
-offset_top = 100.0
-offset_right = 20.0
-offset_bottom = 140.0
-grow_horizontal = 2
-
-[node name="OneMoreLabel" type="Label" parent="UI/Notifications"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -49.5
-offset_right = 20.0
-offset_bottom = 49.5
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 72
-
-[node name="TechnicalLabel" type="Label" parent="UI/Notifications"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -49.5
-offset_right = 20.0
-offset_bottom = 49.5
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 72
-
-[node name="WeaknessLabel" type="Label" parent="UI/Notifications"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -49.5
-offset_right = 20.0
-offset_bottom = 49.5
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 72
-
-[node name="BatonPassPanel" type="PanelContainer" parent="UI/Notifications"]
-visible = false
-custom_minimum_size = Vector2(300, 100)
-layout_mode = 0
-offset_top = 200.0
-offset_right = 40.0
-offset_bottom = 240.0
-
-[node name="AllOutAttackPrompt" type="CenterContainer" parent="UI"]
-visible = false
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="PromptPanel" type="PanelContainer" parent="UI/AllOutAttackPrompt"]
-custom_minimum_size = Vector2(600, 300)
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/AllOutAttackPrompt/PromptPanel"]
-layout_mode = 2
-theme_override_constants/separation = 30
-alignment = 1
-
-[node name="TitleLabel" type="Label" parent="UI/AllOutAttackPrompt/PromptPanel/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "All-Out Attack?"
-horizontal_alignment = 1
-
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/AllOutAttackPrompt/PromptPanel/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 50
-alignment = 1
-
-[node name="YesButton" type="Button" parent="UI/AllOutAttackPrompt/PromptPanel/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(200, 60)
-layout_mode = 2
-text = "YES!"
-
-[node name="NoButton" type="Button" parent="UI/AllOutAttackPrompt/PromptPanel/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(200, 60)
-layout_mode = 2
-text = "NO"
-
-[node name="DamageNumbers" type="Control" parent="UI"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="BattleUIController" type="Node" parent="UI"]
-script = ExtResource("2_hip74")

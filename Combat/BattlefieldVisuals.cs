@@ -31,17 +31,17 @@ namespace EchoesAcrossTime.Combat
 
         #region Default Formations
         private readonly Vector2[] DefaultPartyPositions = {
-            new Vector2(1600, 300),
-            new Vector2(1600, 450),
-            new Vector2(1600, 600),
-            new Vector2(1600, 750)
+            new Vector2(1400, 400),  // Character 1 - front right
+            new Vector2(1450, 500),  // Character 2 - back right
+            new Vector2(1350, 500),  // Character 3 - back left  
+            new Vector2(1400, 600)   // Character 4 - far back
         };
 
         private readonly Vector2[] DefaultEnemyPositions = {
-            new Vector2(400, 350),
-            new Vector2(600, 450),
-            new Vector2(500, 600),
-            new Vector2(700, 500)
+            new Vector2(400, 300),   // Enemy 1 - front
+            new Vector2(500, 400),   // Enemy 2 - middle
+            new Vector2(400, 500),   // Enemy 3 - back
+            new Vector2(300, 400)    // Enemy 4 - side
         };
         #endregion
 
@@ -100,7 +100,7 @@ namespace EchoesAcrossTime.Combat
                 spriteHomePositions[sprite] = positions[i];
                 
                 // Flip enemies to face party
-                sprite.FlipH = true;
+                sprite.FlipH = false;
             }
         }
 
