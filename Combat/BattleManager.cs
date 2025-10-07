@@ -140,6 +140,10 @@ namespace EchoesAcrossTime.Combat
                 }
             }
             
+            var battlefieldVisuals = GetNode<BattlefieldVisuals>("../BattleField");
+            battlefieldVisuals.SetupPartySprites(playerParty);
+            battlefieldVisuals.SetupEnemySprites(enemyParty);
+            
             // Calculate turn order
             CalculateTurnOrder();
             

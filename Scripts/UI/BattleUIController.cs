@@ -88,6 +88,7 @@ public partial class BattleUIController : Node
     private AnimationPlayer showtimeAnimationPlayer;
     private Control showtimeOverlay;
     
+    private BattlefieldVisuals battlefieldVisuals;
     #endregion
     
     #region Initialization
@@ -108,6 +109,8 @@ public partial class BattleUIController : Node
         
         // Hide menus initially
         HideAllMenus();
+        
+        battlefieldVisuals = GetNode<BattlefieldVisuals>("../BattleField");
     }
     
     private void CacheUIReferences()
@@ -233,9 +236,10 @@ public partial class BattleUIController : Node
         // Show damage number
         if (damageDealt > 0)
         {
+            // FIXED: Call with correct parameters (3 params: damage, isCritical, isWeakness)
             ShowDamageNumber(damageDealt, wasCritical, hitWeakness);
         }
-        
+    
         UpdatePartyDisplay();
         UpdateEnemyDisplay();
     }
@@ -750,7 +754,7 @@ public partial class BattleUIController : Node
         var label = new Label();
         label.Text = damage.ToString();
         label.Position = targetCursor.Position + new Vector2(0, -50);
-        
+    
         if (isCritical)
         {
             label.AddThemeColorOverride("font_color", Colors.Red);
@@ -766,9 +770,9 @@ public partial class BattleUIController : Node
             label.AddThemeColorOverride("font_color", Colors.White);
             label.AddThemeFontSizeOverride("font_size", 24);
         }
-        
+    
         damageNumbersContainer.AddChild(label);
-        
+    
         // Animate damage number
         var tween = CreateTween();
         tween.SetParallel(true);
