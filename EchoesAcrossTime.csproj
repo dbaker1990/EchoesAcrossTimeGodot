@@ -17,6 +17,7 @@
   <ItemGroup>
     <Folder Include="Audio\BGM\" />
     <Folder Include="Audio\SFX\" />
+    <Folder Include="Database\Summons\" />
     <Folder Include="Data\Lore\Characters\" />
     <Folder Include="Data\Lore\Events\" />
     <Folder Include="Data\Lore\Locations\" />

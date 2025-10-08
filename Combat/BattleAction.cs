@@ -15,7 +15,9 @@ namespace EchoesAcrossTime.Combat
         Escape,
         AllOutAttack,
         LimitBreak,
-        Pass
+        Pass,
+        DUOLimit,
+        Summon
     }
     
     /// <summary>
@@ -132,5 +134,7 @@ namespace EchoesAcrossTime.Combat
             
             return $"{Actor.Stats.CharacterName} -> {action} -> {targetNames}";
         }
+        
+        
     }
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using EchoesAcrossTime.Combat;
 using EchoesAcrossTime.Database;
 using EchoesAcrossTime.Items;
+using EchoesAcrossTime.Managers;
 using RPG.Items;
 
 namespace EchoesAcrossTime.Combat
@@ -401,6 +402,8 @@ namespace EchoesAcrossTime.Combat
                     StartNextTurn();
                 }
             }
+            
+            
         }
         
         /// <summary>
