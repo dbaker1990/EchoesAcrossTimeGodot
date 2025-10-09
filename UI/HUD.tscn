@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://dbwx84trnlnlc"]
+
+[ext_resource type="Script" uid="uid://b5pmiasjc385d" path="res://UI/HUDManager.cs" id="1_ijstf"]
+[ext_resource type="Script" uid="uid://cc7kl5u6svhhc" path="res://UI/MinimapTextures.cs" id="2_4n7mi"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_ijstf")
+
+[node name="Minimap" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("2_4n7mi")

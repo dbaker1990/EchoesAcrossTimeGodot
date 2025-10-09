@@ -3,6 +3,7 @@
 using EchoesAcrossTime.Combat;
 using Godot;
 using EchoesAcrossTime.Database;
+using EchoesAcrossTime.Managers;
 
 namespace EchoesAcrossTime
 {
@@ -35,6 +36,8 @@ namespace EchoesAcrossTime
             }
 
             Instance = this;
+            
+            ConnectMinimapEvents();
 
             // Load database if not assigned
             if (Database == null)
@@ -135,6 +138,8 @@ namespace EchoesAcrossTime
 
             // Load battle scene
             GetTree().ChangeSceneToFile("res://Scenes/BattleScene.tscn");
+            
+            CallDeferred(MethodName.RefreshMinimap);
 
             // You'll need to pass party/enemy data to the battle scene
             // This can be done through the GameManager or a dedicated BattleData class
@@ -164,6 +169,88 @@ namespace EchoesAcrossTime
             GetTree().Paused = false;
             GetTree().ChangeSceneToFile("res://Scenes/TitleScreen.tscn");
         }
+        
+        #region Minimap Integration - NEW CODE ONLY
+        
+        /// <summary>
+        /// Call this in your _Ready() method: ConnectMinimapEvents();
+        /// Or call manually when needed
+        /// </summary>
+        public void ConnectMinimapEvents()
+        {
+            GetTree().NodeAdded += OnNodeAddedForMinimap;
+        }
+
+        /// <summary>
+        /// Automatically setup minimap when player/tilemap loads
+        /// </summary>
+        private void OnNodeAddedForMinimap(Node node)
+        {
+            // Detect player
+            if (node.IsInGroup("player") && node is Node2D player2D)
+            {
+                if (HUDManager.Instance != null)
+                {
+                    HUDManager.Instance.SetPlayer(player2D);
+                }
+            }
+            
+            // Detect tilemap
+            if (node is TileMapLayer tileMapLayer)
+            {
+                if (HUDManager.Instance != null)
+                {
+                    HUDManager.Instance.SetTileMap(tileMapLayer);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Call this after changing scenes to refresh minimap
+        /// Add to your existing scene transition code
+        /// </summary>
+        public void RefreshMinimap()
+        {
+            if (HUDManager.Instance != null)
+            {
+                HUDManager.Instance.OnMapChanged();
+            }
+        }
+
+        /// <summary>
+        /// Call this before battle starts - Add to your existing StartBattle method
+        /// </summary>
+        public void HideMinimapForBattle()
+        {
+            if (HUDManager.Instance != null)
+            {
+                HUDManager.Instance.Visible = false;
+            }
+        }
+
+        /// <summary>
+        /// Call this after battle ends - Add to your existing ReturnToOverworld method
+        /// </summary>
+        public void ShowMinimapAfterBattle()
+        {
+            if (HUDManager.Instance != null)
+            {
+                HUDManager.Instance.Visible = true;
+            }
+        }
+
+        /// <summary>
+        /// Toggle minimap on/off
+        /// </summary>
+        public void ToggleMinimap(bool visible)
+        {
+            if (HUDManager.Instance != null)
+            {
+                HUDManager.Instance.SetMinimapVisible(visible);
+            }
+        }
+
+        #endregion
 
     }
 }
