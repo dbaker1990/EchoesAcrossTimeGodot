@@ -33,6 +33,8 @@ namespace EchoesAcrossTime.Database
         [ExportGroup("Events")]
         [Export] public Array<EventPage> CommonEvents { get; set; }
         [Export] public Dictionary DialogueTables { get; set; }
+        [ExportGroup("Battle Troops")]
+        [Export] public Array<EventCommandExecutor.TroopData> Troops { get; set; }
         
         public GameDatabase()
         {
@@ -45,6 +47,7 @@ namespace EchoesAcrossTime.Database
             Equipment = new Array<EquipmentData>();
             CommonEvents = new Array<EventPage>();
             DialogueTables = new Dictionary();
+            Troops = new Array<EventCommandExecutor.TroopData>();
         }
         
         #region Character Lookup
@@ -139,5 +142,49 @@ namespace EchoesAcrossTime.Database
         {
             return GetCharacter(id) != null;
         }
+        
+        
+        // Add this method to your GameDatabase class
+        #region Troop Lookup
+        
+        /// <summary>
+        /// Get a troop formation by ID
+        /// </summary>
+        public EventCommandExecutor.TroopData GetTroop(string troopId)
+        {
+            if (Troops == null) return null;
+            
+            foreach (var troop in Troops)
+            {
+                if (troop != null && troop.TroopId == troopId)
+                {
+                    return troop;
+                }
+            }
+            
+            GD.Print($"[GameDatabase] Troop '{troopId}' not found in database");
+            return null;
+        }
+        
+        /// <summary>
+        /// Get all troops
+        /// </summary>
+        public System.Collections.Generic.List<EventCommandExecutor.TroopData> GetAllTroops()
+        {
+            var list = new System.Collections.Generic.List<EventCommandExecutor.TroopData>();
+            if (Troops != null)
+            {
+                foreach (var troop in Troops)
+                {
+                    if (troop != null)
+                    {
+                        list.Add(troop);
+                    }
+                }
+            }
+            return list;
+        }
+        
+        #endregion
     }
 }

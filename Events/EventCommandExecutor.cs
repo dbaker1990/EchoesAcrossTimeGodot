@@ -22,6 +22,9 @@ namespace EchoesAcrossTime.Events
         [Export] public PartyManager PartyManager { get; set; }
         [Export] public TileMapLayer NavigationLayer { get; set; }
         
+        private string preBattleScenePath;
+        private Vector2 preBattlePlayerPosition;
+        
         // Add these to the Properties & Fields region
         [Export] public PackedScene BalloonIconScene { get; set; }
         [Export] public PackedScene NameInputScreenScene { get; set; } // Assuming NameInputUI is a node in your scene
@@ -298,6 +301,7 @@ namespace EchoesAcrossTime.Events
         public void ChangeBattleBGM(AudioStream battleBGM)
         {
             currentBattleBGM = battleBGM;
+            GD.Print($"[EventCommandExecutor] Battle BGM changed");
         }
 
         /// <summary>
@@ -307,38 +311,44 @@ namespace EchoesAcrossTime.Events
         {
             if (string.IsNullOrEmpty(troopId))
             {
-                GD.PrintErr("Battle troop ID is empty");
+                GD.PrintErr("[EventCommandExecutor] Battle troop ID is empty");
                 return;
             }
+            
+            GD.Print($"[EventCommandExecutor] Initiating battle with troop: {troopId}");
             
             // Use provided BGM or fall back to current battle BGM
             var bgmToUse = battleBGM ?? currentBattleBGM;
             
-            // TODO: Implement battle system integration
-            // When you have a BattleManager, uncomment and modify this code:
-            /*
-            var tcs = new TaskCompletionSource<bool>();
-            var battleManager = GetNode<Node>("/root/BattleManager");
-            if (battleManager == null)
+            // Save current scene and player position for return
+            SavePreBattleState();
+            
+            // Fade out current music
+            await StopBGM(0.5f);
+            
+            // Play battle transition effect
+            if (ScreenEffects != null)
             {
-                GD.PrintErr("BattleManager not found");
+                await ScreenEffects.Flash(Colors.White, 0.3f);
+            }
+            
+            // Load the troop data from database
+            var troop = LoadTroopData(troopId);
+            if (troop == null)
+            {
+                GD.PrintErr($"[EventCommandExecutor] Troop '{troopId}' not found!");
                 return;
             }
             
-            void OnBattleEnd(bool victory)
-            {
-                tcs.TrySetResult(victory);
-            }
+            // Store battle parameters in GameManager for the battle scene to access
+            StoreBattleParameters(troop, canEscape, canLose, bgmToUse);
             
-            battleManager.Connect("BattleEnded", Callable.From<bool>(OnBattleEnd));
-            battleManager.Call("StartBattle", troopId, canEscape, canLose, bgmToUse);
+            // Transition to battle scene
+            GetTree().ChangeSceneToFile("res://Combat/BattleScene.tscn");
             
-            await tcs.Task;
+            // Battle scene will initialize itself using the stored parameters
+            // When battle ends, BattleManager will call SetBattleResult() and return to map
             
-            battleManager.Disconnect("BattleEnded", Callable.From<bool>(OnBattleEnd));
-            */
-            
-            GD.Print($"InitiateBattle called: TroopId={troopId}, CanEscape={canEscape}, CanLose={canLose}");
             await Task.CompletedTask;
         }
 
@@ -762,6 +772,222 @@ namespace EchoesAcrossTime.Events
         private long Vector2IToId(Vector2I vec)
         {
             return ((long)vec.X << 32) | (long)(uint)vec.Y;
+        }
+        
+        /// <summary>
+        /// Save current game state before battle
+        /// </summary>
+        private void SavePreBattleState()
+        {
+            // Store current scene path
+            preBattleScenePath = GetTree().CurrentScene.SceneFilePath;
+            
+            // Store player position if player exists
+            var player = GetTree().GetFirstNodeInGroup("player") as Node2D;
+            if (player != null)
+            {
+                preBattlePlayerPosition = player.GlobalPosition;
+                
+                // Also save to GameManager for battle to access
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.LastMapScene = preBattleScenePath;
+                    GameManager.Instance.LastPlayerPosition = preBattlePlayerPosition;
+                }
+            }
+            
+            GD.Print($"[EventCommandExecutor] Saved pre-battle state: {preBattleScenePath}");
+        }
+        
+        /// <summary>
+        /// Load troop data from database or create dynamically
+        /// </summary>
+        private TroopData LoadTroopData(string troopId)
+        {
+            // Try to load from database first
+            if (GameManager.Instance?.Database != null)
+            {
+                var troop = GameManager.Instance.Database.GetTroop(troopId);
+                if (troop != null) return troop;
+            }
+            
+            // If not found, try loading as a resource file
+            try
+            {
+                var troop = GD.Load<TroopData>($"res://Data/Troops/{troopId}.tres");
+                if (troop != null) return troop;
+            }
+            catch
+            {
+                // Ignore load errors
+            }
+            
+            // Create dynamic troop if it's in the format "enemy_id" or "enemy_id_count"
+            return CreateDynamicTroop(troopId);
+        }
+        
+        /// <summary>
+        /// Store battle parameters for BattleScene to access
+        /// </summary>
+        private void StoreBattleParameters(TroopData troop, bool canEscape, bool canLose, AudioStream battleBGM)
+        {
+            // Create a dictionary to pass to the battle scene
+            var battleParams = new Godot.Collections.Dictionary
+            {
+                { "TroopId", troop.TroopId },
+                { "EnemyIds", ConvertToGodotArray(troop.EnemyIds) },
+                { "IsBossBattle", troop.IsBossBattle },
+                { "CanEscape", canEscape },
+                { "CanLose", canLose },
+                { "BattleBGM", battleBGM?.ResourcePath ?? "" },
+                { "BattleBackground", troop.BattleBackground?.ResourcePath ?? "" },
+                { "ReturnScene", preBattleScenePath },
+                { "PlayerPosition", preBattlePlayerPosition }
+            };
+            
+            // Store in GameManager's metadata or a global singleton
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.SetMeta("PendingBattleData", battleParams);
+            }
+            
+            // Also store locally in case GameManager isn't available
+            SetMeta("PendingBattleData", battleParams);
+        }
+        
+        /// <summary>
+        /// Convert C# List to Godot Array
+        /// </summary>
+        private Godot.Collections.Array<string> ConvertToGodotArray(List<string> list)
+        {
+            var array = new Godot.Collections.Array<string>();
+            foreach (var item in list)
+            {
+                array.Add(item);
+            }
+            return array;
+        }
+        
+        /// <summary>
+        /// Return to overworld after battle
+        /// Called by BattleManager when battle ends
+        /// </summary>
+        public async Task ReturnFromBattle()
+        {
+            GD.Print("[EventCommandExecutor] Returning from battle");
+            
+            // Fade to black
+            if (ScreenEffects != null)
+            {
+                await ScreenEffects.FadeToBlack(0.5f);
+            }
+            
+            // Return to previous scene
+            if (!string.IsNullOrEmpty(preBattleScenePath))
+            {
+                GetTree().ChangeSceneToFile(preBattleScenePath);
+                
+                // Wait for scene to load
+                await ToSignal(GetTree(), SceneTree.SignalName.NodeAdded);
+                
+                // Restore player position
+                var player = GetTree().GetFirstNodeInGroup("player") as Node2D;
+                if (player != null)
+                {
+                    player.GlobalPosition = preBattlePlayerPosition;
+                }
+            }
+            
+            // Fade back in
+            if (ScreenEffects != null)
+            {
+                await ScreenEffects.FadeFromBlack(0.5f);
+            }
+            
+            // Resume previous BGM
+            await ResumeBGM(0.5f);
+        }
+        
+        /// <summary>
+        /// Create a dynamic troop from an enemy ID pattern
+        /// Patterns: "goblin", "goblin_3", "goblin+slime", etc.
+        /// </summary>
+        private TroopData CreateDynamicTroop(string troopId)
+        {
+            var troop = new TroopData();
+            troop.TroopId = troopId;
+            troop.TroopName = $"Dynamic Troop: {troopId}";
+    
+            // Parse patterns like "goblin_3" (3 goblins) or "goblin+slime" (mixed)
+            if (troopId.Contains("+"))
+            {
+                // Multiple enemy types: "goblin+slime+wolf"
+                var enemyIds = troopId.Split("+");
+                foreach (var enemyId in enemyIds)
+                {
+                    troop.EnemyIds.Add(enemyId.Trim());
+                }
+            }
+            else if (troopId.Contains("_"))
+            {
+                // Count pattern: "goblin_3" means 3 goblins
+                var parts = troopId.Split("_");
+                string enemyId = parts[0];
+                int count = 1;
+        
+                if (parts.Length > 1 && int.TryParse(parts[1], out int parsedCount))
+                {
+                    count = parsedCount;
+                }
+        
+                for (int i = 0; i < count; i++)
+                {
+                    troop.EnemyIds.Add(enemyId);
+                }
+            }
+            else
+            {
+                // Single enemy
+                troop.EnemyIds.Add(troopId);
+            }
+    
+            GD.Print($"[EventCommandExecutor] Created dynamic troop with {troop.EnemyIds.Count} enemies");
+            return troop;
+        }
+
+        /// <summary>
+        /// Resume BGM with fade in
+        /// </summary>
+        private async Task ResumeBGM(float fadeInDuration)
+        {
+            // This assumes AudioManager has a method to resume or you stored the previous BGM
+            // For now, you can just fade in any playing music
+            if (AudioManager.Instance != null)
+            {
+                // If you have a way to store/restore previous BGM, use it here
+                // For now, this is a placeholder
+                await Task.CompletedTask;
+            }
+        }
+        
+        /// <summary>
+        /// Troop data - represents an enemy formation
+        /// Create these as .tres resources in res://Data/Troops/
+        /// </summary>
+        [GlobalClass]
+        public partial class TroopData : Resource
+        {
+            [Export] public string TroopId { get; set; } = "troop_001";
+            [Export] public string TroopName { get; set; } = "Enemy Group";
+            [Export] public List<string> EnemyIds { get; set; } = new List<string>();
+            [Export] public bool IsBossBattle { get; set; } = false;
+            [Export] public Texture2D BattleBackground { get; set; }
+            [Export] public AudioStream BattleBGM { get; set; }
+        
+            public TroopData()
+            {
+                EnemyIds = new List<string>();
+            }
         }
 
         #endregion

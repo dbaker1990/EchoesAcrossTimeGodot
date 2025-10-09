@@ -1,11 +1,14 @@
 ﻿using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using EchoesAcrossTime.Managers;
 
 namespace EchoesAcrossTime.Shops
 {
     /// <summary>
     /// Shop UI - displays shop interface for buying/selling
+    /// Complete version with proper game system integration
     /// </summary>
     public partial class ShopUI : Control
     {
@@ -47,11 +50,14 @@ namespace EchoesAcrossTime.Shops
         public override void _Ready()
         {
             // Connect signals
-            ShopManager.Instance.ShopOpened += OnShopOpened;
-            ShopManager.Instance.ShopClosed += OnShopClosed;
-            ShopManager.Instance.ItemBought += OnItemBought;
-            ShopManager.Instance.ItemSold += OnItemSold;
-            ShopManager.Instance.TransactionFailed += OnTransactionFailed;
+            if (ShopManager.Instance != null)
+            {
+                ShopManager.Instance.ShopOpened += OnShopOpened;
+                ShopManager.Instance.ShopClosed += OnShopClosed;
+                ShopManager.Instance.ItemBought += OnItemBought;
+                ShopManager.Instance.ItemSold += OnItemSold;
+                ShopManager.Instance.TransactionFailed += OnTransactionFailed;
+            }
             
             // Connect UI signals
             buyTabButton?.Connect("pressed", Callable.From(() => SwitchToTab(true)));
@@ -169,16 +175,16 @@ namespace EchoesAcrossTime.Shops
             foreach (var shopItem in currentShop.ItemsForSale)
             {
                 // Check if item should be shown
-                bool isUnlocked = ShopManager.Instance.IsShopUnlocked(currentShop);
+                bool isUnlocked = shopItem.IsUnlocked;
                 if (!isUnlocked && !shopItem.ShowIfLocked)
                     continue;
                 
-                // Get item data (you'll integrate with your ItemData system)
+                // Get item data from GameDatabase
                 var itemData = GetItemData(shopItem.ItemId);
                 if (itemData == null) continue;
                 
                 // Build display text
-                string displayText = $"{itemData.ItemName}";
+                string displayText = $"{itemData.DisplayName}";
                 
                 if (!isUnlocked)
                 {
@@ -226,7 +232,7 @@ namespace EchoesAcrossTime.Shops
                 return;
             }
             
-            // Get player's inventory (integrate with your InventorySystem)
+            // Get player's inventory from InventorySystem
             var inventory = GetPlayerInventory();
             
             foreach (var item in inventory)
@@ -241,7 +247,7 @@ namespace EchoesAcrossTime.Shops
                 
                 int sellPrice = ShopManager.Instance.GetSellPrice(itemId);
                 
-                string displayText = $"{itemData.ItemName} ({quantity}) - {sellPrice}G each";
+                string displayText = $"{itemData.DisplayName} ({quantity}) - {sellPrice}G each";
                 
                 int index = sellItemList.AddItem(displayText, itemData.Icon);
                 sellItemList.SetItemMetadata(index, itemId);
@@ -270,7 +276,7 @@ namespace EchoesAcrossTime.Shops
             
             // Update details panel
             if (itemNameLabel != null)
-                itemNameLabel.Text = itemData.ItemName;
+                itemNameLabel.Text = itemData.DisplayName;
             
             if (itemDescriptionLabel != null)
                 itemDescriptionLabel.Text = itemData.Description;
@@ -365,7 +371,8 @@ namespace EchoesAcrossTime.Shops
             {
                 RefreshBuyList();
                 UpdateGoldDisplay();
-                ShowNotification($"Purchased {quantity}x item!");
+                var itemData = GetItemData(selectedItemId);
+                ShowNotification($"Purchased {quantity}x {itemData?.DisplayName ?? selectedItemId}!");
             }
         }
         
@@ -379,7 +386,8 @@ namespace EchoesAcrossTime.Shops
             {
                 RefreshSellList();
                 UpdateGoldDisplay();
-                ShowNotification($"Sold {quantity}x item!");
+                var itemData = GetItemData(selectedItemId);
+                ShowNotification($"Sold {quantity}x {itemData?.DisplayName ?? selectedItemId}!");
             }
         }
         
@@ -415,78 +423,128 @@ namespace EchoesAcrossTime.Shops
         private void ShowNotification(string message)
         {
             GD.Print($"[ShopUI] {message}");
-            // TODO: Show actual notification popup
+            
+            // Show notification via ShopNotification if available
+            var notification = GetNodeOrNull<ShopNotification>("/root/ShopUI/ShopNotification");
+            if (notification == null)
+            {
+                // Try finding it as a child
+                notification = GetNodeOrNull<ShopNotification>("ShopNotification");
+            }
+            
+            if (notification != null)
+            {
+                notification.ShowNotification(message);
+            }
         }
         
         #endregion
         
         #region Integration Points - Connect to your systems
         
-        private ItemData GetItemData(string itemId)
+        /// <summary>
+        /// Get item data from GameDatabase
+        /// </summary>
+        private Items.ItemData GetItemData(string itemId)
         {
-            // TODO: Get from your GameDatabase
-            // Placeholder for now
-            return new ItemData
+            // First try GameDatabase
+            if (GameManager.Instance?.Database != null)
             {
-                ItemName = itemId,
-                Description = "Item description here",
-                Icon = null
-            };
+                return GameManager.Instance.Database.GetItem(itemId);
+            }
+            
+            // Fallback: Try to load directly
+            try
+            {
+                var itemData = GD.Load<Items.ItemData>($"res://Data/Items/{itemId}.tres");
+                return itemData;
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr($"[ShopUI] Could not load item data for '{itemId}': {e.Message}");
+                return null;
+            }
         }
         
+        /// <summary>
+        /// Get player inventory from InventorySystem
+        /// </summary>
         private Dictionary<string, int> GetPlayerInventory()
         {
-            // TODO: Get from InventorySystem
-            return new Dictionary<string, int>();
+            var inventory = new Dictionary<string, int>();
+            
+            if (Items.InventorySystem.Instance != null)
+            {
+                // Get all items from inventory
+                var items = Items.InventorySystem.Instance.GetAllItems();
+                
+                foreach (var slot in items)
+                {
+                    if (slot != null && slot.Item != null)
+                    {
+                        string itemId = slot.Item.ItemId;
+                        if (inventory.ContainsKey(itemId))
+                            inventory[itemId] += slot.Quantity;
+                        else
+                            inventory[itemId] = slot.Quantity;
+                    }
+                }
+            }
+            
+            return inventory;
         }
         
+        /// <summary>
+        /// Get item count from InventorySystem
+        /// </summary>
         private int GetItemCount(string itemId)
         {
-            // TODO: Get from InventorySystem
-            var inventorySystem = GetNodeOrNull<Node>("/root/InventorySystem");
-            if (inventorySystem != null && inventorySystem.HasMethod("GetItemCount"))
+            if (Items.InventorySystem.Instance != null)
             {
-                return (int)inventorySystem.Call("GetItemCount", itemId);
+                return Items.InventorySystem.Instance.GetItemCount(itemId);
             }
+            
             return 0;
         }
         
+        /// <summary>
+        /// Get player gold
+        /// </summary>
         private int GetPlayerGold()
         {
-            var saveManager = GetNodeOrNull<Node>("/root/SaveManager");
-            if (saveManager != null && saveManager.HasMethod("GetGold"))
+            // Use InventorySystem
+            if (Items.InventorySystem.Instance != null)
             {
-                return (int)saveManager.Call("GetGold");
+                return Items.InventorySystem.Instance.GetGold();
             }
-            return 9999;
+            
+            // Fallback: Try SaveManager
+            if (GameManager.Instance?.CurrentSave?.Inventory != null)
+            {
+                return GameManager.Instance.CurrentSave.Inventory.Gold;
+            }
+            
+            return 0;
         }
         
+        /// <summary>
+        /// Play UI sounds
+        /// </summary>
         private void PlayCursorSound()
         {
-            var systemManager = GetNodeOrNull<Node>("/root/SystemManager");
-            systemManager?.Call("PlayCursorSE");
+            SystemManager.Instance?.PlayCursorSE();
         }
         
         private void PlayCancelSound()
         {
-            var systemManager = GetNodeOrNull<Node>("/root/SystemManager");
-            systemManager?.Call("PlayCancelSE");
+            SystemManager.Instance?.PlayCancelSE();
         }
         
         private void PlayErrorSound()
         {
-            var systemManager = GetNodeOrNull<Node>("/root/SystemManager");
-            systemManager?.Call("PlayErrorSE");
+            SystemManager.Instance?.PlayBuzzerSE();
         }
         
         #endregion
-    }
-    
-    // Placeholder class - remove when integrating with your actual ItemData
-    public class ItemData
-    {
-        public string ItemName { get; set; }
-        public string Description { get; set; }
-        public Texture2D Icon { get; set; }
     }
 }
