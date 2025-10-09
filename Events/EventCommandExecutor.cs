@@ -835,7 +835,8 @@ namespace EchoesAcrossTime.Events
             var battleParams = new Godot.Collections.Dictionary
             {
                 { "TroopId", troop.TroopId },
-                { "EnemyIds", ConvertToGodotArray(troop.EnemyIds) },
+                // FIX: Don't convert - troop.EnemyIds is already Godot.Collections.Array<string>
+                { "EnemyIds", troop.EnemyIds },  // FIXED - no conversion needed!
                 { "IsBossBattle", troop.IsBossBattle },
                 { "CanEscape", canEscape },
                 { "CanLose", canLose },
@@ -844,14 +845,14 @@ namespace EchoesAcrossTime.Events
                 { "ReturnScene", preBattleScenePath },
                 { "PlayerPosition", preBattlePlayerPosition }
             };
-            
-            // Store in GameManager's metadata or a global singleton
+    
+            // Store in GameManager's metadata
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.SetMeta("PendingBattleData", battleParams);
             }
-            
-            // Also store locally in case GameManager isn't available
+    
+            // Also store locally
             SetMeta("PendingBattleData", battleParams);
         }
         
@@ -917,7 +918,7 @@ namespace EchoesAcrossTime.Events
             var troop = new TroopData();
             troop.TroopId = troopId;
             troop.TroopName = $"Dynamic Troop: {troopId}";
-    
+
             // Parse patterns like "goblin_3" (3 goblins) or "goblin+slime" (mixed)
             if (troopId.Contains("+"))
             {
@@ -934,12 +935,12 @@ namespace EchoesAcrossTime.Events
                 var parts = troopId.Split("_");
                 string enemyId = parts[0];
                 int count = 1;
-        
+    
                 if (parts.Length > 1 && int.TryParse(parts[1], out int parsedCount))
                 {
                     count = parsedCount;
                 }
-        
+    
                 for (int i = 0; i < count; i++)
                 {
                     troop.EnemyIds.Add(enemyId);
@@ -950,7 +951,7 @@ namespace EchoesAcrossTime.Events
                 // Single enemy
                 troop.EnemyIds.Add(troopId);
             }
-    
+
             GD.Print($"[EventCommandExecutor] Created dynamic troop with {troop.EnemyIds.Count} enemies");
             return troop;
         }
@@ -979,14 +980,17 @@ namespace EchoesAcrossTime.Events
         {
             [Export] public string TroopId { get; set; } = "troop_001";
             [Export] public string TroopName { get; set; } = "Enemy Group";
-            [Export] public List<string> EnemyIds { get; set; } = new List<string>();
+    
+            // FIX: Use Godot.Collections.Array instead of List for Export compatibility
+            [Export] public Godot.Collections.Array<string> EnemyIds { get; set; }
+    
             [Export] public bool IsBossBattle { get; set; } = false;
             [Export] public Texture2D BattleBackground { get; set; }
             [Export] public AudioStream BattleBGM { get; set; }
-        
+
             public TroopData()
             {
-                EnemyIds = new List<string>();
+                EnemyIds = new Godot.Collections.Array<string>();
             }
         }
 

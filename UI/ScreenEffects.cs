@@ -180,6 +180,22 @@ namespace EchoesAcrossTime.UI
         }
         
         /// <summary>
+        /// Fade to black (convenience method)
+        /// </summary>
+        public async Task FadeToBlack(float duration)
+        {
+            await Fade(fadeOut: true, duration: duration, fadeColor: Colors.Black);
+        }
+
+        /// <summary>
+        /// Fade from black (convenience method)
+        /// </summary>
+        public async Task FadeFromBlack(float duration)
+        {
+            await Fade(fadeOut: false, duration: duration, fadeColor: Colors.Black);
+        }
+        
+        /// <summary>
         /// Stop shake immediately
         /// </summary>
         public void StopShake()

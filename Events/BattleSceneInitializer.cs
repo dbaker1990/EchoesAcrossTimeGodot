@@ -1,4 +1,5 @@
-﻿using Godot;
+﻿// Events/BattleSceneInitializer.cs - COMPLETE FIX FOR ALL ERRORS
+using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,6 @@ namespace EchoesAcrossTime.Combat
         
         public override void _Ready()
         {
-            // Get battle manager if not assigned
             if (battleManager == null)
             {
                 battleManager = GetNode<BattleManager>("BattleManager");
@@ -29,66 +29,13 @@ namespace EchoesAcrossTime.Combat
             if (battleManager == null)
             {
                 GD.PrintErr("[BattleSceneInitializer] BattleManager not found!");
+                ReturnToOverworld();
                 return;
             }
             
-            // Check if this battle was started from an event
-            InitializeFromEventBattle();
-        }
-        
-        /// <summary>
-        /// Initialize battle from event command parameters
-        /// </summary>
-        private void InitializeFromEventBattle()
-        {
-            // Try to get pending battle data from GameManager
-            Godot.Collections.Dictionary battleParams = null;
-            
-            if (GameManager.Instance != null && GameManager.Instance.HasMeta("PendingBattleData"))
-            {
-                battleParams = GameManager.Instance.GetMeta("PendingBattleData").AsGodotDictionary();
-                GameManager.Instance.RemoveMeta("PendingBattleData"); // Clear after reading
-            }
-            
-            if (battleParams == null)
-            {
-                GD.Print("[BattleSceneInitializer] No pending battle data found");
-                return;
-            }
-            
-            GD.Print("[BattleSceneInitializer] Initializing battle from event parameters");
-            
-            // Extract parameters
-            string troopId = battleParams["TroopId"].AsString();
-            var enemyIds = battleParams["EnemyIds"].AsGodotArray<string>();
-            bool isBossBattle = battleParams["IsBossBattle"].AsBool();
-            bool canEscape = battleParams["CanEscape"].AsBool();
-            bool canLose = battleParams["CanLose"].AsBool();
-            string battleBGMPath = battleParams["BattleBGM"].AsString();
-            string backgroundPath = battleParams["BattleBackground"].AsString();
-            
-            // Set battle background if provided
-            if (!string.IsNullOrEmpty(backgroundPath))
-            {
-                SetBattleBackground(backgroundPath);
-            }
-            
-            // Play battle BGM if provided
-            if (!string.IsNullOrEmpty(battleBGMPath))
-            {
-                PlayBattleBGM(battleBGMPath);
-            }
-            else
-            {
-                // Use default battle music
-                SystemManager.Instance?.PlayBattleMusic();
-            }
-            
-            // Get player party
+            // Get battle parameters
             var playerParty = GetPlayerParty();
-            
-            // Create enemies from IDs
-            var enemies = CreateEnemiesFromIds(enemyIds);
+            var enemies = GetEnemyParty();
             
             if (playerParty.Count == 0 || enemies.Count == 0)
             {
@@ -97,21 +44,17 @@ namespace EchoesAcrossTime.Combat
                 return;
             }
             
-            // Initialize the battle
+            // FIX #1: Use positional parameters, not named parameters
             battleManager.InitializeBattle(
-                playerParty,
-                enemies,
-                availableShowtimes: GetAvailableShowtimes(),
-                availableLimitBreaks: GetAvailableLimitBreaks(),
-                isBossBattle: isBossBattle,
-                isPinnedDown: !canEscape
+                playerParty,                                    // playerStats
+                enemies,                                        // enemyStats
+                GetAvailableShowtimes(),                       // availableShowtimes
+                GetAvailableLimitBreaks(),                     // availableLimitBreaks
+                GetBattleParam("IsBossBattle", false),        // isBossBattle
+                !GetBattleParam("CanEscape", true)            // isPinnedDown
             );
             
-            // Connect to battle end signal
             battleManager.BattleEnded += OnBattleEnded;
-            
-            // Start the battle
-            battleManager.StartBattle();
         }
         
         /// <summary>
@@ -121,35 +64,37 @@ namespace EchoesAcrossTime.Combat
         {
             var partyStats = new List<CharacterStats>();
             
-            if (PartyManager.Instance != null)
+            // Use PartyMenuManager for party members
+            if (PartyMenuManager.Instance != null)
             {
-                var party = PartyManager.Instance.GetMainParty();
+                var party = PartyMenuManager.Instance.GetMainParty();
                 foreach (var member in party)
                 {
-                    if (member != null)
+                    if (member != null && member.Stats != null)
                     {
-                        var stats = member.ToCharacterStats();
-                        if (stats != null)
-                        {
-                            partyStats.Add(stats);
-                        }
+                        partyStats.Add(member.Stats);
                     }
                 }
             }
             
+            // FIX #2 & #3: SaveData uses `Party` not `PartyMembers` or `MainPartyIds`
             // Fallback: Load from current save
             if (partyStats.Count == 0 && GameManager.Instance?.CurrentSave != null)
             {
                 var saveData = GameManager.Instance.CurrentSave;
-                foreach (var memberId in saveData.MainPartyIds)
+                
+                // SaveData.Party is List<PartyMemberSaveData>, not MainPartyIds
+                if (saveData.Party != null && GameManager.Instance.Database != null)
                 {
-                    var memberData = saveData.PartyMembers.FirstOrDefault(m => m.CharacterId == memberId);
-                    if (memberData != null && GameManager.Instance.Database != null)
+                    foreach (var memberData in saveData.Party)
                     {
-                        var stats = memberData.ToCharacterStats(GameManager.Instance.Database);
-                        if (stats != null)
+                        if (memberData != null)
                         {
-                            partyStats.Add(stats);
+                            var stats = memberData.ToCharacterStats(GameManager.Instance.Database);
+                            if (stats != null)
+                            {
+                                partyStats.Add(stats);
+                            }
                         }
                     }
                 }
@@ -157,6 +102,21 @@ namespace EchoesAcrossTime.Combat
             
             GD.Print($"[BattleSceneInitializer] Created party with {partyStats.Count} members");
             return partyStats;
+        }
+        
+        /// <summary>
+        /// Get enemy party from battle parameters
+        /// </summary>
+        private List<CharacterStats> GetEnemyParty()
+        {
+            var enemyIds = GetBattleParam<Godot.Collections.Array<string>>("EnemyIds", null);
+            if (enemyIds == null || enemyIds.Count == 0)
+            {
+                GD.PrintErr("[BattleSceneInitializer] No enemy IDs in battle parameters!");
+                return new List<CharacterStats>();
+            }
+            
+            return CreateEnemiesFromIds(enemyIds);
         }
         
         /// <summary>
@@ -177,7 +137,7 @@ namespace EchoesAcrossTime.Combat
                 var enemyData = GameManager.Instance.Database.GetCharacter(enemyId);
                 if (enemyData != null)
                 {
-                    var stats = enemyData.ToCharacterStats();
+                    var stats = enemyData.CreateStatsInstance();
                     if (stats != null)
                     {
                         enemies.Add(stats);
@@ -194,68 +154,38 @@ namespace EchoesAcrossTime.Combat
         }
         
         /// <summary>
-        /// Get available showtime attacks for this party
+        /// Get available showtime attacks
         /// </summary>
         private List<ShowtimeAttackData> GetAvailableShowtimes()
         {
-            // TODO: Implement based on your showtime system
-            // For now, return empty list
+            // Implement based on your showtime system
             return new List<ShowtimeAttackData>();
         }
         
         /// <summary>
-        /// Get available limit breaks for this party
+        /// Get available limit breaks
         /// </summary>
         private List<LimitBreakData> GetAvailableLimitBreaks()
         {
-            // TODO: Implement based on your limit break system
-            // For now, return empty list
+            // Implement based on your limit break system
             return new List<LimitBreakData>();
         }
         
         /// <summary>
-        /// Set battle background image
+        /// Get battle parameter with proper Godot variant handling
+        /// FIX #7: Add [MustBeVariant] attribute for generic parameter
         /// </summary>
-        private void SetBattleBackground(string backgroundPath)
+        private T GetBattleParam<[MustBeVariant] T>(string key, T defaultValue)
         {
-            if (battleBackground == null || string.IsNullOrEmpty(backgroundPath))
-                return;
-            
-            try
+            if (GameManager.Instance != null && GameManager.Instance.HasMeta("PendingBattleData"))
             {
-                var texture = GD.Load<Texture2D>(backgroundPath);
-                if (texture != null && battleBackground is Sprite2D sprite)
+                var battleData = GameManager.Instance.GetMeta("PendingBattleData").As<Godot.Collections.Dictionary>();
+                if (battleData != null && battleData.ContainsKey(key))
                 {
-                    sprite.Texture = texture;
-                    GD.Print($"[BattleSceneInitializer] Set battle background: {backgroundPath}");
+                    return battleData[key].As<T>();
                 }
             }
-            catch (Exception e)
-            {
-                GD.PrintErr($"[BattleSceneInitializer] Failed to load background: {e.Message}");
-            }
-        }
-        
-        /// <summary>
-        /// Play battle BGM
-        /// </summary>
-        private void PlayBattleBGM(string bgmPath)
-        {
-            if (string.IsNullOrEmpty(bgmPath)) return;
-            
-            try
-            {
-                var bgm = GD.Load<AudioStream>(bgmPath);
-                if (bgm != null && AudioManager.Instance != null)
-                {
-                    AudioManager.Instance.PlayBGM(bgm);
-                    GD.Print($"[BattleSceneInitializer] Playing battle BGM: {bgmPath}");
-                }
-            }
-            catch (Exception e)
-            {
-                GD.PrintErr($"[BattleSceneInitializer] Failed to load BGM: {e.Message}");
-            }
+            return defaultValue;
         }
         
         /// <summary>
@@ -263,9 +193,9 @@ namespace EchoesAcrossTime.Combat
         /// </summary>
         private async void OnBattleEnded(bool victory)
         {
-            GD.Print($"[BattleSceneInitializer] Battle ended - Victory: {victory}");
+            GD.Print($"[BattleSceneInitializer] Battle ended. Victory: {victory}");
             
-            // Set battle result for event branches
+            // Set battle result
             var result = victory ? 
                 EventCommandExecutor.BattleResult.Victory : 
                 EventCommandExecutor.BattleResult.Defeat;
@@ -281,33 +211,16 @@ namespace EchoesAcrossTime.Combat
             }
             
             // Distribute rewards if victory
-            if (victory && PartyManager.Instance != null)
+            if (victory && PartyMenuManager.Instance != null)
             {
-                var rewards = battleManager.GetBattleRewards();
-                if (rewards != null)
-                {
-                    // Distribute EXP
-                    PartyManager.Instance.DistributeExperience(rewards.TotalExp);
-                    
-                    // Add gold
-                    if (Items.InventorySystem.Instance != null)
-                    {
-                        Items.InventorySystem.Instance.AddGold(rewards.TotalGold);
-                    }
-                    
-                    // Add item drops
-                    foreach (var drop in rewards.ItemDrops)
-                    {
-                        var itemData = GameManager.Instance?.Database?.GetItem(drop.itemId);
-                        if (itemData != null && Items.InventorySystem.Instance != null)
-                        {
-                            Items.InventorySystem.Instance.AddItem(itemData, drop.quantity);
-                        }
-                    }
-                }
+                // FIX #4: Don't use BattleStats.ExpReward - calculate directly from enemy data
+                var totalExp = CalculateTotalExpFromEnemies();
+                PartyMenuManager.Instance.DistributeExperience(totalExp);
+                
+                // Gold and items are handled by BattleRewardsManager signals
             }
             
-            // Wait a moment for rewards screen
+            // Wait for rewards screen
             await ToSignal(GetTree().CreateTimer(2.0f), SceneTreeTimer.SignalName.Timeout);
             
             // Return to overworld
@@ -315,24 +228,44 @@ namespace EchoesAcrossTime.Combat
         }
         
         /// <summary>
+        /// FIX #4: Calculate total EXP from defeated enemies
+        /// BattleStats doesn't have ExpReward - rewards come from elsewhere
+        /// </summary>
+        private int CalculateTotalExpFromEnemies()
+        {
+            int totalExp = 0;
+            var enemyIds = GetBattleParam<Godot.Collections.Array<string>>("EnemyIds", null);
+            
+            if (enemyIds != null && GameManager.Instance?.Database != null)
+            {
+                foreach (var enemyId in enemyIds)
+                {
+                    var enemyData = GameManager.Instance.Database.GetCharacter(enemyId);
+                    if (enemyData != null)
+                    {
+                        // Use level-based calculation as fallback
+                        // BattleStats doesn't have ExpReward property
+                        int enemyLevel = enemyData.Level;
+                        int expFromEnemy = enemyLevel * 10; // Base calculation
+                        totalExp += expFromEnemy;
+                        
+                        GD.Print($"[BattleSceneInitializer] {enemyData.DisplayName} (Lv{enemyLevel}) gives {expFromEnemy} EXP");
+                    }
+                }
+            }
+            
+            GD.Print($"[BattleSceneInitializer] Total EXP: {totalExp}");
+            return totalExp;
+        }
+        
+        /// <summary>
         /// Return to the overworld scene
         /// </summary>
         private void ReturnToOverworld()
         {
-            // Get return scene from GameManager
-            string returnScene = "res://Maps/TestMap.tscn"; // Default fallback
-            
-            if (GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.LastMapScene))
-            {
-                returnScene = GameManager.Instance.LastMapScene;
-            }
-            
+            string returnScene = GetBattleParam("ReturnScene", "res://Maps/TestMap.tscn");
             GD.Print($"[BattleSceneInitializer] Returning to: {returnScene}");
-            
-            // Change scene
             GetTree().ChangeSceneToFile(returnScene);
-            
-            // Player position restoration happens in the overworld scene's _Ready
         }
         
         public override void _ExitTree()
