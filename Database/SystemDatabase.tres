@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SystemDatabase" load_steps=10 format=3 uid="uid://ct1til02gm2cw"]
+[gd_resource type="Resource" script_class="SystemDatabase" load_steps=11 format=3 uid="uid://ct1til02gm2cw"]
 
 [ext_resource type="Script" uid="uid://bs2bw6qjoj0w0" path="res://Database/SystemDatabase.cs" id="1_g2q08"]
 [ext_resource type="AudioStream" uid="uid://cbvja8tn75hvr" path="res://Audio/BGM/Ashes in Motion(Battle 1 Theme).mp3" id="1_g308u"]
@@ -9,11 +9,13 @@
 [ext_resource type="AudioStream" uid="uid://0l3wwdg4a3yo" path="res://Audio/SFX/confirm.mp3" id="6_nu0sl"]
 [ext_resource type="AudioStream" uid="uid://xv583q3ushno" path="res://Audio/SFX/save.mp3" id="7_jtgin"]
 [ext_resource type="AudioStream" uid="uid://b8ovyhusi4i24" path="res://Audio/BGM/CROOKED HEAVEN (SAY NOTHING).mp3" id="8_t55o4"]
+[ext_resource type="Texture2D" uid="uid://baf4agafp2sms" path="res://Images/TitleScreen/Title Screen.png" id="9_janac"]
 
 [resource]
 script = ExtResource("1_g2q08")
+TitleScreenImage = ExtResource("9_janac")
 UseGlobalFormulaOverride = true
-GlobalDamageFormula = 4
+GlobalDamageFormula = 2
 TitleMusic = ExtResource("8_t55o4")
 BattleMusic = ExtResource("1_g308u")
 CursorSE = ExtResource("4_liid0")
