@@ -7,9 +7,34 @@ using System.Threading.Tasks;
 using EchoesAcrossTime.Combat;
 using EchoesAcrossTime.Events;
 using EchoesAcrossTime.Managers;
+using EchoesAcrossTime.Items;
 
 namespace EchoesAcrossTime.Combat
 {
+    /// <summary>
+    /// Helper class to store battle reward data
+    /// </summary>
+    public class BattleRewardData
+    {
+        public int TotalGold { get; set; }
+        public List<ItemDrop> DroppedItems { get; set; }
+        
+        public BattleRewardData()
+        {
+            TotalGold = 0;
+            DroppedItems = new List<ItemDrop>();
+        }
+    }
+    
+    /// <summary>
+    /// Helper class to store individual item drop
+    /// </summary>
+    public class ItemDrop
+    {
+        public string ItemId { get; set; }
+        public int Quantity { get; set; }
+    }
+    
     /// <summary>
     /// Attach this to your BattleScene root node
     /// It will automatically initialize the battle from event battle parameters
@@ -434,6 +459,101 @@ namespace EchoesAcrossTime.Combat
             
             GD.Print($"[BattleSceneInitializer] Total EXP: {totalExp}");
             return totalExp;
+        }
+        
+        /// <summary>
+        /// Calculate gold and item drops from defeated enemies
+        /// </summary>
+        private BattleRewardData CalculateGoldAndDrops()
+        {
+            var rewards = new BattleRewardData();
+            var rng = new RandomNumberGenerator();
+            rng.Randomize();
+            
+            var enemyIds = GetBattleParam<Godot.Collections.Array<string>>("EnemyIds", null);
+            if (enemyIds != null && GameManager.Instance?.Database != null)
+            {
+                foreach (var enemyId in enemyIds)
+                {
+                    var enemyData = GameManager.Instance.Database.GetCharacter(enemyId);
+                    if (enemyData?.Rewards != null)
+                    {
+                        var enemyRewards = enemyData.Rewards;
+                        
+                        // Calculate gold with variance
+                        int baseGold = enemyRewards.BaseGoldReward;
+                        float variance = enemyRewards.GoldVariance;
+                        float multiplier = 1f + (rng.Randf() * variance * 2f - variance);
+                        int goldEarned = Mathf.RoundToInt(baseGold * multiplier);
+                        
+                        // Apply boss multiplier if applicable
+                        if (enemyRewards.IsBoss)
+                        {
+                            goldEarned = Mathf.RoundToInt(goldEarned * enemyRewards.BossGoldMultiplier);
+                        }
+                        
+                        rewards.TotalGold += goldEarned;
+                        GD.Print($"[BattleSceneInitializer] {enemyData.DisplayName} drops {goldEarned} gold");
+                        
+                        // Process guaranteed drop
+                        if (enemyRewards.GuaranteedDrop != null)
+                        {
+                            ProcessDrop(enemyRewards.GuaranteedDrop, rng, rewards);
+                        }
+                        
+                        // Process common drops
+                        if (enemyRewards.CommonDrops != null)
+                        {
+                            foreach (var drop in enemyRewards.CommonDrops)
+                            {
+                                ProcessDrop(drop, rng, rewards);
+                            }
+                        }
+                        
+                        // Process rare drops
+                        if (enemyRewards.RareDrops != null)
+                        {
+                            foreach (var drop in enemyRewards.RareDrops)
+                            {
+                                ProcessDrop(drop, rng, rewards);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            GD.Print($"[BattleSceneInitializer] Total Gold: {rewards.TotalGold}, Total Items: {rewards.DroppedItems.Count}");
+            return rewards;
+        }
+        
+        /// <summary>
+        /// Process a single drop item with chance calculation
+        /// </summary>
+        private void ProcessDrop(DropItem drop, RandomNumberGenerator rng, BattleRewardData rewards)
+        {
+            if (drop == null || string.IsNullOrEmpty(drop.ItemId))
+                return;
+            
+            // Check drop chance
+            float roll = rng.Randf() * 100f;
+            if (roll <= drop.DropChance)
+            {
+                // Calculate quantity
+                int quantity = drop.MinQuantity;
+                if (drop.MaxQuantity > drop.MinQuantity)
+                {
+                    quantity = rng.RandiRange(drop.MinQuantity, drop.MaxQuantity);
+                }
+                
+                // Add to rewards
+                rewards.DroppedItems.Add(new ItemDrop
+                {
+                    ItemId = drop.ItemId,
+                    Quantity = quantity
+                });
+                
+                GD.Print($"[BattleSceneInitializer] Dropped {quantity}x {drop.ItemId}");
+            }
         }
         
         /// <summary>
