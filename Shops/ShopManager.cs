@@ -1,6 +1,7 @@
 ﻿using Godot;
 using System;
 using System.Collections.Generic;
+using EchoesAcrossTime.Items;
 
 namespace EchoesAcrossTime.Shops
 {
@@ -40,6 +41,8 @@ namespace EchoesAcrossTime.Shops
         {
             GD.Print("[ShopManager] Ready!");
         }
+        
+        
         
         #region Shop Registration
         
@@ -369,94 +372,190 @@ namespace EchoesAcrossTime.Shops
         
         private int GetPlayerGold()
         {
-            // TODO: Integrate with your save system
-            var saveManager = GetNodeOrNull<Node>("/root/SaveManager");
-            if (saveManager != null && saveManager.HasMethod("GetGold"))
+            // Primary: Use InventorySystem (most common pattern)
+            if (InventorySystem.Instance != null)
             {
-                return (int)saveManager.Call("GetGold");
+                return InventorySystem.Instance.GetGold();
             }
             
-            // Fallback - you can implement this differently
-            return 9999;
+            // Fallback: Try SaveManager
+            if (GameManager.Instance?.CurrentSave != null)
+            {
+                if (GameManager.Instance.CurrentSave.Inventory != null)
+                {
+                    return GameManager.Instance.CurrentSave.Inventory.Gold;
+                }
+            }
+            
+            GD.PrintErr("[ShopManager] Could not access gold - no InventorySystem or SaveManager!");
+            return 0;
         }
         
         private bool SpendGold(int amount)
         {
-            var saveManager = GetNodeOrNull<Node>("/root/SaveManager");
-            if (saveManager != null && saveManager.HasMethod("SpendGold"))
+            if (amount <= 0) return true;
+            
+            // Primary: Use InventorySystem
+            if (InventorySystem.Instance != null)
             {
-                return (bool)saveManager.Call("SpendGold", amount);
+                return InventorySystem.Instance.RemoveGold(amount);
             }
-            return true;
+            
+            // Fallback: Try SaveManager
+            if (GameManager.Instance?.CurrentSave?.Inventory != null)
+            {
+                int currentGold = GameManager.Instance.CurrentSave.Inventory.Gold;
+                if (currentGold >= amount)
+                {
+                    GameManager.Instance.CurrentSave.Inventory.Gold -= amount;
+                    return true;
+                }
+                return false;
+            }
+            
+            GD.PrintErr("[ShopManager] Could not spend gold - no system available!");
+            return false;
         }
         
         private void AddGold(int amount)
         {
-            var saveManager = GetNodeOrNull<Node>("/root/SaveManager");
-            if (saveManager != null && saveManager.HasMethod("AddGold"))
+            if (amount <= 0) return;
+            
+            // Primary: Use InventorySystem
+            if (InventorySystem.Instance != null)
             {
-                saveManager.Call("AddGold", amount);
+                InventorySystem.Instance.AddGold(amount);
+                return;
             }
+            
+            // Fallback: Try SaveManager
+            if (GameManager.Instance?.CurrentSave?.Inventory != null)
+            {
+                GameManager.Instance.CurrentSave.Inventory.Gold += amount;
+                return;
+            }
+            
+            GD.PrintErr("[ShopManager] Could not add gold - no system available!");
         }
         
         private bool AddItemToInventory(string itemId, int quantity)
         {
-            var inventorySystem = GetNodeOrNull<Node>("/root/InventorySystem");
-            if (inventorySystem != null && inventorySystem.HasMethod("AddItem"))
+            if (InventorySystem.Instance == null)
             {
-                return (bool)inventorySystem.Call("AddItem", itemId, quantity);
+                GD.PrintErr("[ShopManager] InventorySystem not found!");
+                return false;
             }
-            return true;
+    
+            // FIXED: Use fully qualified type name
+            EchoesAcrossTime.Items.ItemData itemData = null;
+    
+            if (GameManager.Instance?.Database != null)
+            {
+                itemData = GameManager.Instance.Database.GetItem(itemId);
+            }
+    
+            if (itemData == null)
+            {
+                // Try to load directly as fallback
+                try
+                {
+                    // FIXED: Use fully qualified type name
+                    itemData = GD.Load<EchoesAcrossTime.Items.ItemData>($"res://Data/Items/{itemId}.tres");
+                }
+                catch
+                {
+                    GD.PrintErr($"[ShopManager] Could not find ItemData for '{itemId}'!");
+                    return false;
+                }
+            }
+    
+            if (itemData == null)
+            {
+                GD.PrintErr($"[ShopManager] ItemData is null for '{itemId}'!");
+                return false;
+            }
+    
+            // Add to inventory
+            return InventorySystem.Instance.AddItem(itemData, quantity);
         }
+
         
         private bool RemoveItemFromInventory(string itemId, int quantity)
         {
-            var inventorySystem = GetNodeOrNull<Node>("/root/InventorySystem");
-            if (inventorySystem != null && inventorySystem.HasMethod("RemoveItem"))
+            if (InventorySystem.Instance == null)
             {
-                return (bool)inventorySystem.Call("RemoveItem", itemId, quantity);
+                GD.PrintErr("[ShopManager] InventorySystem not found!");
+                return false;
             }
-            return true;
+            
+            return InventorySystem.Instance.RemoveItem(itemId, quantity);
         }
         
         private bool HasItemInInventory(string itemId, int quantity)
         {
-            var inventorySystem = GetNodeOrNull<Node>("/root/InventorySystem");
-            if (inventorySystem != null && inventorySystem.HasMethod("GetItemCount"))
+            if (InventorySystem.Instance != null)
             {
-                int count = (int)inventorySystem.Call("GetItemCount", itemId);
+                int count = InventorySystem.Instance.GetItemCount(itemId);
                 return count >= quantity;
             }
+            
+            GD.PrintErr("[ShopManager] Could not check inventory - InventorySystem not found!");
             return false;
         }
         
+        /// <summary>
+        /// Get item value from database (FIXED - was returning hardcoded 100)
+        /// </summary>
         private int GetItemValue(string itemId)
         {
-            // TODO: Get from your ItemData
-            // This is a placeholder - integrate with your Database system
-            var database = GetNodeOrNull<Node>("/root/GameDatabase");
-            if (database != null && database.HasMethod("GetItemValue"))
+            // Try to get from GameManager/Database
+            if (GameManager.Instance?.Database != null)
             {
-                return (int)database.Call("GetItemValue", itemId);
+                var itemData = GameManager.Instance.Database.GetItem(itemId);
+                if (itemData != null)
+                {
+                    // FIXED: ItemData has "Price" property
+                    return itemData.Price;
+                }
+                else
+                {
+                    GD.PrintErr($"[ShopManager] Item '{itemId}' not found in database!");
+                    return 0;
+                }
             }
-            return 100; // Default value
+    
+            // Fallback - try to load directly if GameManager isn't set up
+            try
+            {
+                // FIXED: Use fully qualified type name
+                var itemData = GD.Load<EchoesAcrossTime.Items.ItemData>($"res://Data/Items/{itemId}.tres");
+                if (itemData != null)
+                {
+                    return itemData.Price;
+                }
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr($"[ShopManager] Could not load item data for '{itemId}': {e.Message}");
+            }
+    
+            GD.PrintErr($"[ShopManager] Failed to get value for item '{itemId}' - returning 0");
+            return 0;
         }
         
         private void PlayPurchaseSound()
         {
-            var systemManager = GetNodeOrNull<Node>("/root/SystemManager");
-            if (systemManager != null && systemManager.HasMethod("PlayOkSE"))
+            if (Managers.SystemManager.Instance != null)
             {
-                systemManager.Call("PlayOkSE");
+                Managers.SystemManager.Instance.PlayOkSE();
             }
         }
         
         private void PlaySellSound()
         {
-            var systemManager = GetNodeOrNull<Node>("/root/SystemManager");
-            if (systemManager != null && systemManager.HasMethod("PlayOkSE"))
+            if (Managers.SystemManager.Instance != null)
             {
-                systemManager.Call("PlayOkSE");
+                Managers.SystemManager.Instance.PlayOkSE();
             }
         }
         

@@ -53,7 +53,7 @@ namespace EchoesAcrossTime.Combat
             public BattleActionResult Result { get; set; }
         }
         
-        private PendingAction pendingSkillAction;
+        //private PendingAction pendingSkillAction;
         private PendingAction pendingAttackAction;
         
         #endregion
