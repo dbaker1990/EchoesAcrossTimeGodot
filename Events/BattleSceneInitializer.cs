@@ -409,7 +409,7 @@ namespace EchoesAcrossTime.Combat
         {
             // Calculate total EXP from enemies
             int totalExp = CalculateExpReward();
-            
+    
             // Award EXP to party
             if (PartyMenuManager.Instance != null && totalExp > 0)
             {
@@ -425,10 +425,35 @@ namespace EchoesAcrossTime.Combat
                     }
                 }
             }
-            
-            // TODO: Award gold and items based on enemy drops
-            // This would require enemy reward data to be passed or calculated
-            
+    
+            // Award gold and items based on enemy drops
+            var rewards = CalculateGoldAndDrops();
+    
+            // Award gold
+            if (InventorySystem.Instance != null && rewards.TotalGold > 0)
+            {
+                InventorySystem.Instance.AddGold(rewards.TotalGold);
+                GD.Print($"[BattleSceneInitializer] Awarded {rewards.TotalGold} gold");
+            }
+    
+            // Award items
+            if (InventorySystem.Instance != null && GameManager.Instance?.Database != null)
+            {
+                foreach (var drop in rewards.DroppedItems)
+                {
+                    var itemData = GameManager.Instance.Database.GetItem(drop.ItemId);
+                    if (itemData != null)
+                    {
+                        InventorySystem.Instance.AddItem(itemData, drop.Quantity);
+                        GD.Print($"[BattleSceneInitializer] Awarded {drop.Quantity}x {drop.ItemId}");
+                    }
+                    else
+                    {
+                        GD.PrintErr($"[BattleSceneInitializer] Item {drop.ItemId} not found in database!");
+                    }
+                }
+            }
+    
             await Task.CompletedTask;
         }
         
