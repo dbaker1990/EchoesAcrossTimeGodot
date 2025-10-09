@@ -1,0 +1,74 @@
+[gd_scene load_steps=4 format=3 uid="uid://co700pofi1cap"]
+
+[ext_resource type="Script" uid="uid://bu1557hmgk1uc" path="res://UI/HPMPBarDisplay.cs" id="1_ywedy"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qmtyw"]
+bg_color = Color(0, 1, 0, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_suvhr"]
+bg_color = Color(0, 0, 0.9063318, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="Control" type="Control" node_paths=PackedStringArray("hpProgressBar", "hpValueLabel", "mpProgressBar", "mpValueLabel")]
+custom_minimum_size = Vector2(270, 110)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_ywedy")
+hpProgressBar = NodePath("VBoxContainer/HPSection/HPBar/HPProgressBar")
+hpValueLabel = NodePath("VBoxContainer/HPSection/HPBar/HPValueLabel")
+mpProgressBar = NodePath("VBoxContainer/MPSection/MPBar/MPProgressBar")
+mpValueLabel = NodePath("VBoxContainer/MPSection/MPBar/MPValueLabel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="HPSection" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="HPLabel" type="Label" parent="VBoxContainer/HPSection"]
+layout_mode = 2
+text = "HP"
+
+[node name="HPBar" type="HBoxContainer" parent="VBoxContainer/HPSection"]
+layout_mode = 2
+
+[node name="HPProgressBar" type="ProgressBar" parent="VBoxContainer/HPSection/HPBar"]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/background = SubResource("StyleBoxFlat_qmtyw")
+show_percentage = false
+
+[node name="HPValueLabel" type="Label" parent="VBoxContainer/HPSection/HPBar"]
+layout_mode = 2
+text = "100/100"
+
+[node name="MPSection" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="MPLabel" type="Label" parent="VBoxContainer/MPSection"]
+layout_mode = 2
+text = "MP"
+
+[node name="MPBar" type="HBoxContainer" parent="VBoxContainer/MPSection"]
+layout_mode = 2
+
+[node name="MPProgressBar" type="ProgressBar" parent="VBoxContainer/MPSection/MPBar"]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/background = SubResource("StyleBoxFlat_suvhr")
+show_percentage = false
+
+[node name="MPValueLabel" type="Label" parent="VBoxContainer/MPSection/MPBar"]
+layout_mode = 2
+text = "100/100"

@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://cjlth5qe7gg7j"]
+[gd_scene load_steps=5 format=3 uid="uid://cjlth5qe7gg7j"]
 
 [ext_resource type="Script" uid="uid://rgkk87qmgnn3" path="res://Combat/BattleSceneController.cs" id="1_hip74"]
 [ext_resource type="Script" uid="uid://brn5x78cj0tqp" path="res://Combat/BattleManager.cs" id="2_b2eky"]
 [ext_resource type="Script" uid="uid://deabmgrtyoymn" path="res://Combat/UI/TurnOrderDisplay.cs" id="3_b2eky"]
+[ext_resource type="Script" uid="uid://n6cte5s14tji" path="res://Combat/UI/BattleActionMenu.cs" id="4_ahap6"]
 
 [node name="BattleScene" type="Node2D"]
 script = ExtResource("1_hip74")
@@ -64,3 +65,6 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("3_b2eky")
+
+[node name="BattleActionMenu" type="CanvasLayer" parent="."]
+script = ExtResource("4_ahap6")
