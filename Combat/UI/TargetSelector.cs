@@ -8,27 +8,21 @@ namespace EchoesAcrossTime.Combat.UI
     {
         private BattleMember selectedTarget;
         private bool selectionMade;
+        private List<BattleMember> availableTargets;
+        private int selectedIndex = 0;
+        private List<Panel> targetIndicators = new List<Panel>();
+        private Label instructionLabel;
+        private Sprite2D cursorArrow;
+        private SkillData currentSkill; // NEW!
         
-        public BattleMember GetSelectedTarget()
-        {
-            return selectedTarget;
-        }
-        
-        public bool WasSelectionMade()
-        {
-            return selectionMade;
-        }
+        public BattleMember GetSelectedTarget() => selectedTarget;
+        public bool WasSelectionMade() => selectionMade;
         
         public void ClearSelection()
         {
             selectedTarget = null;
             selectionMade = false;
         }
-        
-        private List<BattleMember> availableTargets;
-        private int selectedIndex = 0;
-        private List<Panel> targetIndicators = new List<Panel>();
-        private Label instructionLabel;
         
         public override void _Ready()
         {
@@ -38,12 +32,18 @@ namespace EchoesAcrossTime.Combat.UI
             instructionLabel.Modulate = Colors.Yellow;
             AddChild(instructionLabel);
             
+            cursorArrow = new Sprite2D();
+            cursorArrow.Modulate = Colors.Yellow;
+            AddChild(cursorArrow);
+            
             Hide();
         }
         
-        public void ShowSelection(List<BattleMember> targets)
+        // MODIFIED: Added skill parameter
+        public void ShowSelection(List<BattleMember> targets, SkillData skill = null)
         {
             availableTargets = targets;
+            currentSkill = skill; // NEW!
             selectedIndex = 0;
             selectionMade = false;
             selectedTarget = null;
@@ -55,6 +55,7 @@ namespace EchoesAcrossTime.Combat.UI
             Show();
         }
         
+        // MODIFIED: Added affinity checking
         private void CreateTargetIndicators()
         {
             foreach (var indicator in targetIndicators)
@@ -66,21 +67,70 @@ namespace EchoesAcrossTime.Combat.UI
             int index = 0;
             foreach (var target in availableTargets)
             {
-                var indicator = new Panel();
-                indicator.CustomMinimumSize = new Vector2(180, 80);
+                var container = new VBoxContainer();
+                container.AddThemeConstantOverride("separation", 5);
                 
-                Vector2 position;
                 if (target.IsPlayerControlled)
                 {
-                    position = new Vector2(50, 150 + (index * 120));
+                    container.Position = new Vector2(50, 150 + (index * 120));
                 }
                 else
                 {
-                    position = new Vector2(600 + (index * 200), 180);
+                    container.Position = new Vector2(600 + (index * 200), 180);
                 }
-                indicator.Position = position;
                 
-                AddChild(indicator);
+                // Name and HP with affinity check
+                var infoLabel = new Label();
+                string infoText = $"{target.Stats.CharacterName}\nHP: {target.Stats.CurrentHP}/{target.Stats.MaxHP}";
+                
+                // NEW: Check elemental affinity
+                if (currentSkill != null && currentSkill.Element != ElementType.None && target.SourceData.ElementAffinities != null)
+                {
+                    var affinity = target.SourceData.ElementAffinities.GetAffinity(currentSkill.Element);
+                    
+                    switch (affinity)
+                    {
+                        case ElementAffinity.Weak:
+                            infoText += "\n⚡ WEAK!";
+                            infoLabel.Modulate = Colors.Yellow;
+                            break;
+                            
+                        case ElementAffinity.Resist:
+                            infoText += "\n🛡 RESIST";
+                            infoLabel.Modulate = Colors.Gray;
+                            break;
+                            
+                        case ElementAffinity.Immune:
+                            infoText += "\n🚫 IMMUNE";
+                            infoLabel.Modulate = Colors.DarkGray;
+                            break;
+                            
+                        case ElementAffinity.Absorb:
+                            infoText += "\n💚 ABSORB";
+                            infoLabel.Modulate = Colors.LightGreen;
+                            break;
+                            
+                        default:
+                            infoLabel.Modulate = Colors.White;
+                            break;
+                    }
+                }
+                else
+                {
+                    infoLabel.Modulate = Colors.White;
+                }
+                
+                infoLabel.Text = infoText;
+                infoLabel.HorizontalAlignment = HorizontalAlignment.Center;
+                infoLabel.AddThemeFontSizeOverride("font_size", 12);
+                container.AddChild(infoLabel);
+                
+                // Indicator panel
+                var indicator = new Panel();
+                indicator.CustomMinimumSize = new Vector2(180, 80);
+                container.AddChild(indicator);
+                
+                AddChild(container);
                 targetIndicators.Add(indicator);
                 index++;
             }
@@ -90,9 +140,32 @@ namespace EchoesAcrossTime.Combat.UI
         {
             for (int i = 0; i < targetIndicators.Count; i++)
             {
-                targetIndicators[i].Modulate = i == selectedIndex ? 
-                    Colors.Yellow : new Color(1, 1, 1, 0.3f);
+                if (i == selectedIndex)
+                {
+                    targetIndicators[i].Modulate = Colors.Yellow;
+                    AnimateIndicator(targetIndicators[i]);
+                }
+                else
+                {
+                    targetIndicators[i].Modulate = new Color(1, 1, 1, 0.3f);
+                }
             }
+            
+            if (selectedIndex >= 0 && selectedIndex < targetIndicators.Count)
+            {
+                var targetPos = targetIndicators[selectedIndex].GlobalPosition;
+                cursorArrow.Position = targetPos + new Vector2(0, -40);
+            }
+        }
+        
+        private void AnimateIndicator(Panel indicator)
+        {
+            var tween = CreateTween();
+            tween.TweenProperty(indicator, "scale", new Vector2(1.1f, 1.1f), 0.3f)
+                .SetEase(Tween.EaseType.InOut);
+            tween.TweenProperty(indicator, "scale", Vector2.One, 0.3f)
+                .SetEase(Tween.EaseType.InOut);
+            tween.SetLoops();
         }
         
         public override void _Input(InputEvent @event)
@@ -103,6 +176,7 @@ namespace EchoesAcrossTime.Combat.UI
             {
                 selectedIndex = (selectedIndex + 1) % availableTargets.Count;
                 UpdateSelection();
+                Managers.SystemManager.Instance?.PlayCursorSE();
                 GetViewport().SetInputAsHandled();
             }
             else if (@event.IsActionPressed("ui_left"))
@@ -110,12 +184,14 @@ namespace EchoesAcrossTime.Combat.UI
                 selectedIndex--;
                 if (selectedIndex < 0) selectedIndex = availableTargets.Count - 1;
                 UpdateSelection();
+                Managers.SystemManager.Instance?.PlayCursorSE();
                 GetViewport().SetInputAsHandled();
             }
             else if (@event.IsActionPressed("ui_accept"))
             {
                 selectedTarget = availableTargets[selectedIndex];
                 selectionMade = true;
+                Managers.SystemManager.Instance?.PlayOkSE();
                 Hide();
                 GetViewport().SetInputAsHandled();
             }
@@ -123,6 +199,7 @@ namespace EchoesAcrossTime.Combat.UI
             {
                 selectedTarget = null;
                 selectionMade = false;
+                Managers.SystemManager.Instance?.PlayCancelSE();
                 Hide();
                 GetViewport().SetInputAsHandled();
             }

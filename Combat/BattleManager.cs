@@ -702,6 +702,13 @@ namespace EchoesAcrossTime.Combat
             return Mathf.Max(1, Mathf.RoundToInt(baseDamage));
         }
         
+        public List<BattleMember> GetTurnOrder()
+        {
+            return new List<BattleMember>(turnOrder);
+        }
+        
+        
+        
         #endregion
         
         #region Advanced Mechanics
