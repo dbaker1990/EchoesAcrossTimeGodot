@@ -56,6 +56,7 @@ namespace EchoesAcrossTime.Combat
         public LimitBreakData LimitBreak { get; set; }
         public BattleMember DuoPartner { get; set; } // For duo limit breaks
         public object ItemData { get; set; } // For item usage
+        public SummonData SummonData { get; set; }
         
         public BattleAction(BattleMember actor, BattleActionType actionType)
         {
@@ -85,6 +86,13 @@ namespace EchoesAcrossTime.Combat
             return this;
         }
         
+        public BattleAction WithSummon(SummonData summonData)
+        {
+            SummonData = summonData;
+            ActionType = BattleActionType.Summon;
+            return this;
+        }
+        
         public bool IsValid()
         {
             if (Actor == null || !Actor.Stats.IsAlive) return false;
@@ -110,6 +118,9 @@ namespace EchoesAcrossTime.Combat
                     
                 case BattleActionType.AllOutAttack:
                     return Actor.CanAllOutAttack;
+                
+                case BattleActionType.Summon:
+                    return SummonData != null && SummonData.CanSummon(Actor.Stats);
                     
                 default:
                     return false;

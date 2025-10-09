@@ -44,6 +44,8 @@ namespace EchoesAcrossTime.Combat
         private BattleItemSystem itemSystem;
         private EscapeSystem escapeSystem;
         private BattleRewardsManager rewardsManager;
+        private SummonManager summonManager;
+        [Export] public SummonManager SummonManager { get; set; }
         
         private class PendingAction
         {
@@ -113,6 +115,12 @@ namespace EchoesAcrossTime.Combat
             else
             {
                 GD.PrintErr("BattlefieldVisuals node not found! Add it to the scene.");
+            }
+            
+            if (SummonManager == null)
+            {
+                SummonManager = new SummonManager();
+                AddChild(SummonManager);
             }
             
             // Initialize rewards manager
@@ -226,6 +234,11 @@ namespace EchoesAcrossTime.Combat
         /// </summary>
         public void StartNextTurn()
         {
+            if (SummonManager != null)
+            {
+                SummonManager.ProcessTurnStart(this);
+            }
+            
             // Process guard HP/MP regeneration at start of turn
             foreach (var member in playerParty.Concat(enemyParty))
             {
@@ -342,6 +355,7 @@ namespace EchoesAcrossTime.Combat
                 BattleActionType.Escape => ExecuteEscape(action),
                 BattleActionType.AllOutAttack => ExecuteAllOutAttack(action),
                 BattleActionType.LimitBreak => ExecuteLimitBreak(action),
+                BattleActionType.Summon => ExecuteSummonAction(action),
                 _ => new BattleActionResult { Success = false, Message = "Not implemented" }
             };
             
@@ -428,6 +442,7 @@ namespace EchoesAcrossTime.Combat
             
             return result;
         }
+        
         
         /// <summary>
         /// Execute a skill
@@ -637,6 +652,54 @@ namespace EchoesAcrossTime.Combat
             return result;
         }
         
+        private BattleActionResult ExecuteSummonAction(BattleAction action)
+        {
+            if (action.SummonData == null)
+            {
+                GD.PrintErr("Summon action has no SummonData");
+                return new BattleActionResult 
+                { 
+                    Success = false, 
+                    Message = "No summon data provided" 
+                };
+            }
+    
+            if (summonManager == null)
+            {
+                GD.PrintErr("SummonManager not initialized");
+                return new BattleActionResult 
+                { 
+                    Success = false, 
+                    Message = "Summon system not available" 
+                };
+            }
+    
+            GD.Print($"\n🔮 {action.Actor.Stats.CharacterName} attempts to summon {action.SummonData.DisplayName}!");
+    
+            // Execute the summon
+            BattleActionResult result = summonManager.ExecuteSummon(action.Actor, action.SummonData, this);
+    
+            if (result.Success)
+            {
+                GD.Print($"✨ Summon successful!");
+        
+                // Emit signal for UI (if you have this signal)
+                EmitSignal(SignalName.ActionExecuted, 
+                    action.Actor.Stats.CharacterName, 
+                    $"Summon: {action.SummonData.DisplayName}", 
+                    result.DamageDealt, 
+                    false, 
+                    false);
+            }
+            else
+            {
+                GD.Print($"❌ Summon failed: {result.Message}");
+            }
+    
+            // Return the result instead of calling StartNextTurn
+            return result;
+        }
+        
         /// <summary>
         /// Execute Limit Break
         /// </summary>
@@ -707,6 +770,20 @@ namespace EchoesAcrossTime.Combat
             return new List<BattleMember>(turnOrder);
         }
         
+        public void RebuildTurnOrder()
+        {
+            if (turnOrder == null) return;
+        
+            // Rebuild the turn order list based on speed
+            turnOrder.Clear();
+            turnOrder.AddRange(playerParty.Where(p => p.Stats.IsAlive));
+            turnOrder.AddRange(enemyParty.Where(e => e.Stats.IsAlive));
+        
+            // Sort by speed (descending)
+            turnOrder.Sort((a, b) => b.Stats.Speed.CompareTo(a.Stats.Speed));
+        
+            GD.Print("Turn order rebuilt");
+        }
         
         
         #endregion
@@ -1374,12 +1451,44 @@ namespace EchoesAcrossTime.Combat
             }
         }
         
+        private void OnMemberDefeated(BattleMember member)
+        {
+            // Check if this member had summons
+            if (SummonManager != null)
+            {
+                // If it was a summon that died
+                if (IsSummon(member))
+                {
+                    SummonManager.OnSummonDefeated(member, this);
+                }
+                else
+                {
+                    // If it was a summoner that died, dismiss their summons
+                    SummonManager.OnSummonerDefeated(member.Stats.CharacterName, this);
+                }
+            }
+        }
+        
+        private bool IsSummon(BattleMember member)
+        {
+            // Check if this member is an active summon
+            var activeSummons = SummonManager?.GetActiveSummons();
+            if (activeSummons == null) return false;
+        
+            return activeSummons.Any(s => s.SummonMember == member);
+        }
+        
         /// <summary>
         /// Called when battle ends with victory
         /// </summary>
         private void OnBattleVictory()
         {
             GD.Print("=== BATTLE VICTORY ===");
+            
+            if (SummonManager != null)
+            {
+                SummonManager.ClearAllSummons();
+            }
             
             if (battlefieldVisuals != null)
             {
