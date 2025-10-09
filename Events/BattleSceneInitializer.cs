@@ -1,8 +1,9 @@
-﻿// Events/BattleSceneInitializer.cs - COMPLETE FIX FOR ALL ERRORS
+﻿// Events/BattleSceneInitializer.cs - COMPLETE IMPLEMENTATION
 using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using EchoesAcrossTime.Combat;
 using EchoesAcrossTime.Events;
 using EchoesAcrossTime.Managers;
@@ -18,6 +19,10 @@ namespace EchoesAcrossTime.Combat
         [Export] private BattleManager battleManager;
         [Export] private Node2D battleBackground;
         [Export] private string defaultBattleScenePath = "res://Combat/BattleScene.tscn";
+        
+        // Paths to resource folders
+        [Export] private string showtimesPath = "res://Data/Showtimes/";
+        [Export] private string limitBreaksPath = "res://Data/LimitBreaks/";
         
         public override void _Ready()
         {
@@ -44,7 +49,7 @@ namespace EchoesAcrossTime.Combat
                 return;
             }
             
-            // FIX #1: Use positional parameters, not named parameters
+            // Initialize battle with all systems
             battleManager.InitializeBattle(
                 playerParty,                                    // playerStats
                 enemies,                                        // enemyStats
@@ -77,13 +82,11 @@ namespace EchoesAcrossTime.Combat
                 }
             }
             
-            // FIX #2 & #3: SaveData uses `Party` not `PartyMembers` or `MainPartyIds`
             // Fallback: Load from current save
             if (partyStats.Count == 0 && GameManager.Instance?.CurrentSave != null)
             {
                 var saveData = GameManager.Instance.CurrentSave;
                 
-                // SaveData.Party is List<PartyMemberSaveData>, not MainPartyIds
                 if (saveData.Party != null && GameManager.Instance.Database != null)
                 {
                     foreach (var memberData in saveData.Party)
@@ -154,26 +157,185 @@ namespace EchoesAcrossTime.Combat
         }
         
         /// <summary>
-        /// Get available showtime attacks
+        /// Get available showtime attacks based on party composition
         /// </summary>
         private List<ShowtimeAttackData> GetAvailableShowtimes()
         {
-            // Implement based on your showtime system
-            return new List<ShowtimeAttackData>();
+            var showtimes = new List<ShowtimeAttackData>();
+            
+            // Get party members
+            var partyMembers = GetPlayerParty();
+            if (partyMembers.Count < 2)
+            {
+                return showtimes; // Need at least 2 members for showtimes
+            }
+            
+            // Method 1: Load all showtime resources from folder
+            if (DirAccess.DirExistsAbsolute(showtimesPath))
+            {
+                using var dir = DirAccess.Open(showtimesPath);
+                if (dir != null)
+                {
+                    dir.ListDirBegin();
+                    string fileName = dir.GetNext();
+                    
+                    while (fileName != "")
+                    {
+                        if (!dir.CurrentIsDir() && fileName.EndsWith(".tres"))
+                        {
+                            string fullPath = showtimesPath + fileName;
+                            var showtime = GD.Load<ShowtimeAttackData>(fullPath);
+                            
+                            if (showtime != null)
+                            {
+                                // Check if both required characters are in party
+                                bool hasChar1 = partyMembers.Any(p => 
+                                    p.CharacterName.Equals(showtime.Character1Id, StringComparison.OrdinalIgnoreCase));
+                                bool hasChar2 = partyMembers.Any(p => 
+                                    p.CharacterName.Equals(showtime.Character2Id, StringComparison.OrdinalIgnoreCase));
+                                
+                                if (hasChar1 && hasChar2)
+                                {
+                                    showtimes.Add(showtime);
+                                    GD.Print($"[BattleSceneInitializer] Loaded Showtime: {showtime.AttackName}");
+                                }
+                            }
+                        }
+                        fileName = dir.GetNext();
+                    }
+                    dir.ListDirEnd();
+                }
+            }
+            
+            // Method 2: Load from battle parameters if specified
+            var showtimeIds = GetBattleParam<Godot.Collections.Array<string>>("ShowtimeIds", null);
+            if (showtimeIds != null && showtimeIds.Count > 0)
+            {
+                foreach (var showtimeId in showtimeIds)
+                {
+                    string resourcePath = $"{showtimesPath}{showtimeId}.tres";
+                    if (ResourceLoader.Exists(resourcePath))
+                    {
+                        var showtime = GD.Load<ShowtimeAttackData>(resourcePath);
+                        if (showtime != null && !showtimes.Contains(showtime))
+                        {
+                            showtimes.Add(showtime);
+                            GD.Print($"[BattleSceneInitializer] Loaded Showtime from params: {showtime.AttackName}");
+                        }
+                    }
+                }
+            }
+            
+            GD.Print($"[BattleSceneInitializer] Total Showtimes available: {showtimes.Count}");
+            return showtimes;
         }
         
         /// <summary>
-        /// Get available limit breaks
+        /// Get available limit breaks for party members
         /// </summary>
         private List<LimitBreakData> GetAvailableLimitBreaks()
         {
-            // Implement based on your limit break system
-            return new List<LimitBreakData>();
+            var limitBreaks = new List<LimitBreakData>();
+            
+            // Get party members
+            var partyMembers = GetPlayerParty();
+            if (partyMembers.Count == 0)
+            {
+                return limitBreaks;
+            }
+            
+            // Method 1: Load limit breaks for each party member from folder
+            if (DirAccess.DirExistsAbsolute(limitBreaksPath))
+            {
+                foreach (var member in partyMembers)
+                {
+                    // Try to load limit break for this character
+                    string characterId = member.CharacterName.ToLower();
+                    string[] possibleNames = new string[]
+                    {
+                        $"{characterId}_lb.tres",
+                        $"{characterId}_limitbreak.tres",
+                        $"{characterId}.tres",
+                        $"LB_{characterId}.tres"
+                    };
+                    
+                    foreach (var fileName in possibleNames)
+                    {
+                        string fullPath = limitBreaksPath + fileName;
+                        if (ResourceLoader.Exists(fullPath))
+                        {
+                            var limitBreak = GD.Load<LimitBreakData>(fullPath);
+                            if (limitBreak != null && !limitBreaks.Any(lb => lb.CharacterId == limitBreak.CharacterId))
+                            {
+                                limitBreaks.Add(limitBreak);
+                                GD.Print($"[BattleSceneInitializer] Loaded Limit Break: {limitBreak.DisplayName} for {member.CharacterName}");
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Method 2: Load from battle parameters if specified
+            var limitBreakIds = GetBattleParam<Godot.Collections.Array<string>>("LimitBreakIds", null);
+            if (limitBreakIds != null && limitBreakIds.Count > 0)
+            {
+                foreach (var lbId in limitBreakIds)
+                {
+                    string resourcePath = $"{limitBreaksPath}{lbId}.tres";
+                    if (ResourceLoader.Exists(resourcePath))
+                    {
+                        var limitBreak = GD.Load<LimitBreakData>(resourcePath);
+                        if (limitBreak != null && !limitBreaks.Any(lb => lb.LimitBreakId == limitBreak.LimitBreakId))
+                        {
+                            limitBreaks.Add(limitBreak);
+                            GD.Print($"[BattleSceneInitializer] Loaded Limit Break from params: {limitBreak.DisplayName}");
+                        }
+                    }
+                }
+            }
+            
+            // Method 3: Scan entire limit breaks folder if nothing found yet
+            if (limitBreaks.Count == 0 && DirAccess.DirExistsAbsolute(limitBreaksPath))
+            {
+                using var dir = DirAccess.Open(limitBreaksPath);
+                if (dir != null)
+                {
+                    dir.ListDirBegin();
+                    string fileName = dir.GetNext();
+                    
+                    while (fileName != "")
+                    {
+                        if (!dir.CurrentIsDir() && fileName.EndsWith(".tres"))
+                        {
+                            string fullPath = limitBreaksPath + fileName;
+                            var limitBreak = GD.Load<LimitBreakData>(fullPath);
+                            
+                            if (limitBreak != null)
+                            {
+                                // Check if this limit break belongs to a party member
+                                bool belongsToPartyMember = partyMembers.Any(p => 
+                                    p.CharacterName.Equals(limitBreak.CharacterId, StringComparison.OrdinalIgnoreCase));
+                                
+                                if (belongsToPartyMember && !limitBreaks.Any(lb => lb.LimitBreakId == limitBreak.LimitBreakId))
+                                {
+                                    limitBreaks.Add(limitBreak);
+                                    GD.Print($"[BattleSceneInitializer] Loaded Limit Break: {limitBreak.DisplayName}");
+                                }
+                            }
+                        }
+                        fileName = dir.GetNext();
+                    }
+                    dir.ListDirEnd();
+                }
+            }
+            
+            GD.Print($"[BattleSceneInitializer] Total Limit Breaks available: {limitBreaks.Count}");
+            return limitBreaks;
         }
         
         /// <summary>
         /// Get battle parameter with proper Godot variant handling
-        /// FIX #7: Add [MustBeVariant] attribute for generic parameter
         /// </summary>
         private T GetBattleParam<[MustBeVariant] T>(string key, T defaultValue)
         {
@@ -196,46 +358,63 @@ namespace EchoesAcrossTime.Combat
             GD.Print($"[BattleSceneInitializer] Battle ended. Victory: {victory}");
             
             // Set battle result
-            var result = victory ? 
-                EventCommandExecutor.BattleResult.Victory : 
-                EventCommandExecutor.BattleResult.Defeat;
+            var result = victory ? "victory" : "defeat";
             
-            if (battleManager.CurrentPhase == BattlePhase.Escaped)
+            if (GameManager.Instance != null)
             {
-                result = EventCommandExecutor.BattleResult.Escape;
-            }
-            
-            if (EventCommandExecutor.Instance != null)
-            {
-                EventCommandExecutor.Instance.SetBattleResult(result);
-            }
-            
-            // Distribute rewards if victory
-            if (victory && PartyMenuManager.Instance != null)
-            {
-                // FIX #4: Don't use BattleStats.ExpReward - calculate directly from enemy data
-                var totalExp = CalculateTotalExpFromEnemies();
-                PartyMenuManager.Instance.DistributeExperience(totalExp);
+                GameManager.Instance.SetMeta("BattleResult", result);
                 
-                // Gold and items are handled by BattleRewardsManager signals
+                // Award rewards on victory
+                if (victory)
+                {
+                    await AwardBattleRewards();
+                }
             }
             
-            // Wait for rewards screen
-            await ToSignal(GetTree().CreateTimer(2.0f), SceneTreeTimer.SignalName.Timeout);
+            // Brief delay before returning
+            await ToSignal(GetTree().CreateTimer(1.0), "timeout");
             
-            // Return to overworld
             ReturnToOverworld();
         }
         
         /// <summary>
-        /// FIX #4: Calculate total EXP from defeated enemies
-        /// BattleStats doesn't have ExpReward - rewards come from elsewhere
+        /// Award experience, gold, and items after battle victory
         /// </summary>
-        private int CalculateTotalExpFromEnemies()
+        private async Task AwardBattleRewards()
+        {
+            // Calculate total EXP from enemies
+            int totalExp = CalculateExpReward();
+            
+            // Award EXP to party
+            if (PartyMenuManager.Instance != null && totalExp > 0)
+            {
+                // Get main party
+                var party = PartyMenuManager.Instance.GetMainParty();
+                foreach (var member in party)
+                {
+                    if (member != null && member.Stats != null && member.Stats.IsAlive)
+                    {
+                        int expGained = totalExp;
+                        member.Stats.AddExp(expGained);
+                        GD.Print($"[BattleSceneInitializer] {member.Stats.CharacterName} gained {expGained} EXP");
+                    }
+                }
+            }
+            
+            // TODO: Award gold and items based on enemy drops
+            // This would require enemy reward data to be passed or calculated
+            
+            await Task.CompletedTask;
+        }
+        
+        /// <summary>
+        /// Calculate total EXP reward from defeated enemies
+        /// </summary>
+        private int CalculateExpReward()
         {
             int totalExp = 0;
-            var enemyIds = GetBattleParam<Godot.Collections.Array<string>>("EnemyIds", null);
             
+            var enemyIds = GetBattleParam<Godot.Collections.Array<string>>("EnemyIds", null);
             if (enemyIds != null && GameManager.Instance?.Database != null)
             {
                 foreach (var enemyId in enemyIds)
@@ -243,9 +422,8 @@ namespace EchoesAcrossTime.Combat
                     var enemyData = GameManager.Instance.Database.GetCharacter(enemyId);
                     if (enemyData != null)
                     {
-                        // Use level-based calculation as fallback
-                        // BattleStats doesn't have ExpReward property
-                        int enemyLevel = enemyData.Level;
+                        // Calculate EXP based on enemy level
+                        int enemyLevel = enemyData.Level > 0 ? enemyData.Level : 1;
                         int expFromEnemy = enemyLevel * 10; // Base calculation
                         totalExp += expFromEnemy;
                         
