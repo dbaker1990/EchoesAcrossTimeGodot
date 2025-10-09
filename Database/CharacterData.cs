@@ -1,7 +1,10 @@
 // Database/CharacterData.cs
 using Godot;
 using System;
+using System.Collections.Generic;
 using EchoesAcrossTime.Combat;
+using EchoesAcrossTime.Combat.Advanced;
+using EchoesAcrossTime.Examples;
 using EchoesAcrossTime.Items;
 
 namespace EchoesAcrossTime.Database
@@ -12,6 +15,24 @@ namespace EchoesAcrossTime.Database
         Enemy,
         NPC,
         Boss
+    }
+    
+    /// <summary>
+    /// Advanced AI Preset Selection
+    /// Choose from pre-configured AI patterns!
+    /// </summary>
+    public enum AdvancedAIPreset
+    {
+        None,                    // Use basic AI only
+        MasterStrategist,        // Plans 3 turns ahead, predicts moves
+        AdaptiveChampion,        // Learns patterns, adjusts difficulty
+        TeamCommander,           // Coordinates allies, protects backline
+        RecklessGambler,         // High-risk high-reward
+        ReactiveCounter,         // 85% prediction accuracy, counters
+        ResourceHoarder,         // Conserves MP strategically
+        FormationTactician,      // Flanking, positioning
+        UltimateBoss,            // ALL 8 systems enabled!
+        Custom                   // Configure manually
     }
     
     [GlobalClass]
@@ -73,12 +94,21 @@ namespace EchoesAcrossTime.Database
         [Export] public ElementAffinityData ElementAffinities { get; set; }
         [Export] public ExperienceCurve ExpCurve { get; set; }
         [Export] public BattleStats BattleStats { get; set; }
+        public AIPattern AIPattern { get; set; }
         
         [ExportGroup("Battle Animations")]
         [Export] public BattleAnimationData BattleAnimations { get; set; }
 
         [ExportGroup("AI Behavior")]
-        [Export] public AIPattern AIBehavior { get; set; }
+        [Export] public AIPattern AIBehavior { get; set; }  // Your existing basic AI
+
+        // NEW: Advanced AI Selection
+        [ExportSubgroup("Advanced AI (Optional)")]
+        [Export] public bool UseAdvancedAI { get; set; } = false;  // Enable/disable toggle
+        [Export] public AdvancedAIPreset AdvancedAIPreset { get; set; } = AdvancedAIPreset.None;
+
+        // Optional: Custom Advanced AI if you want manual control
+        [Export] public AdvancedAIPattern CustomAdvancedAI { get; set; }
         
         [ExportGroup("Enemy Rewards")]
         [Export] public EnemyRewards Rewards { get; set; }
@@ -159,6 +189,47 @@ namespace EchoesAcrossTime.Database
             
             GD.Print($"Created overworld instance for {DisplayName}");
             return character;
+        }
+        
+        /// <summary>
+        /// Get the AI pattern (basic or advanced) for this character
+        /// Call this when creating enemy stats!
+        /// </summary>
+        public AIPattern GetAIPattern()
+        {
+            // If not using advanced AI, return basic AI
+            if (!UseAdvancedAI || AdvancedAIPreset == AdvancedAIPreset.None)
+            {
+                return AIBehavior;
+            }
+    
+            // If custom advanced AI is configured, use it
+            if (AdvancedAIPreset == AdvancedAIPreset.Custom && CustomAdvancedAI != null)
+            {
+                return CustomAdvancedAI;
+            }
+    
+            // Otherwise, create the selected preset
+            return CreateAdvancedAIFromPreset(AdvancedAIPreset);
+        }
+        
+        /// <summary>
+        /// Creates an AdvancedAIPattern from the selected preset
+        /// </summary>
+        private AdvancedAIPattern CreateAdvancedAIFromPreset(AdvancedAIPreset preset)
+        {
+            return preset switch
+            {
+                AdvancedAIPreset.MasterStrategist => AdvancedAIExamples.CreateMasterStrategist(),
+                AdvancedAIPreset.AdaptiveChampion => AdvancedAIExamples.CreateAdaptiveChampion(),
+                AdvancedAIPreset.TeamCommander => AdvancedAIExamples.CreateTeamCommander(),
+                AdvancedAIPreset.RecklessGambler => AdvancedAIExamples.CreateRecklessGambler(),
+                AdvancedAIPreset.ReactiveCounter => AdvancedAIExamples.CreateReactiveCounter(),
+                AdvancedAIPreset.ResourceHoarder => AdvancedAIExamples.CreateResourceHoarder(),
+                AdvancedAIPreset.FormationTactician => AdvancedAIExamples.CreateFormationTactician(),
+                AdvancedAIPreset.UltimateBoss => AdvancedAIExamples.CreateUltimateBoss(),
+                _ => null  // Fallback to basic AI
+            };
         }
         
         /// <summary>
@@ -294,6 +365,8 @@ namespace EchoesAcrossTime.Database
                 stats.BattleStats = new BattleStats();
             }
             
+            stats.AIPattern = this.AIBehavior;
+            
             // Initialize skills
             stats.Skills = new CharacterSkills(this.CharacterId);
             
@@ -308,6 +381,7 @@ namespace EchoesAcrossTime.Database
                     }
                 }
             }
+            stats.AIPattern = GetAIPattern();
             
             return stats;
         }

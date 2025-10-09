@@ -73,6 +73,8 @@ namespace EchoesAcrossTime.Combat
         
         [Signal]
         public delegate void ExpGainedEventHandler(int expGained, int currentExp, int expToNext);
+
+        public AIPattern AIPattern { get; set; }
         
         public List<ActiveStatusEffect> ActiveStatuses { get; set; } = new List<ActiveStatusEffect>();
         
@@ -81,6 +83,7 @@ namespace EchoesAcrossTime.Combat
             ElementAffinities = new ElementAffinityData();
             ExperienceCurve = ExperienceCurve.CreateQuadraticCurve();
             BattleStats = new BattleStats();
+            AIPattern = new AIPattern();
             Skills = new CharacterSkills("");
             ActiveStatuses = new List<ActiveStatusEffect>();
         }
