@@ -409,7 +409,7 @@ namespace EchoesAcrossTime.Combat
                     CurrentPhase = BattlePhase.AllOutAttackPrompt;
                     AllOutAttackAvailable = true;
                     EmitSignal(SignalName.AllOutAttackReady);
-                    GD.Print("*** ALL-OUT ATTACK AVAILABLE! ***");
+                    GD.Print("*** CONVERGENCE AVAILABLE! ***");
                 }
                 else
                 {
@@ -623,7 +623,7 @@ namespace EchoesAcrossTime.Combat
             var result = new BattleActionResult();
             
             GD.Print("\n╔═══════════════════════════════════════╗");
-            GD.Print("║       ★ ALL-OUT ATTACK! ★          ║");
+            GD.Print("║       ★ CONVERGENCE STRIKE! ★          ║");
             GD.Print("╚═══════════════════════════════════════╝\n");
             
             rewardsManager.RecordEvent("all_out_attack");
@@ -647,7 +647,7 @@ namespace EchoesAcrossTime.Combat
             
             AllOutAttackAvailable = false;
             result.Success = true;
-            result.Message = "All-Out Attack finished!";
+            result.Message = "Convergence Strike finished!";
             
             return result;
         }
@@ -799,7 +799,7 @@ namespace EchoesAcrossTime.Combat
             {
                 actor.HasExtraTurn = true;
                 EmitSignal(SignalName.OneMoreTriggered, actor.Stats.CharacterName);
-                GD.Print($"\n*** {actor.Stats.CharacterName} gets ONE MORE! ***\n");
+                GD.Print($"\n*** {actor.Stats.CharacterName} achieves RESONANCE! ***\n");
             }
         }
         

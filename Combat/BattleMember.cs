@@ -86,7 +86,7 @@ namespace EchoesAcrossTime.Combat
             HasExtraTurn = true;
             CanAllOutAttack = true;
             
-            GD.Print($"{Stats.CharacterName} was knocked down!");
+            GD.Print($"{Stats.CharacterName} was disrupted!");
         }
         
         /// <summary>
@@ -154,8 +154,8 @@ namespace EchoesAcrossTime.Combat
         public string GetStateDisplay()
         {
             if (!Stats.IsAlive) return "DOWNED";
-            if (IsKnockedDown) return "KNOCKED DOWN";
-            if (HasExtraTurn) return "ONE MORE!";
+            if (IsKnockedDown) return "DISRUPTED";
+            if (HasExtraTurn) return "RESONANCE!";
             if (HasActedThisTurn) return "ACTED";
             return "READY";
         }

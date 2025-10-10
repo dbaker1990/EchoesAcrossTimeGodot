@@ -123,7 +123,7 @@ namespace EchoesAcrossTime.Combat
             string key = GetPairKey(showtime.Character1Id, showtime.Character2Id);
             showtimeStates[key] = new ShowtimeState(showtime);
             
-            GD.Print($"Registered Showtime: {showtime.AttackName} ({showtime.Character1Id} + {showtime.Character2Id})");
+            GD.Print($"Registered Synchrony: {showtime.AttackName} ({showtime.Character1Id} + {showtime.Character2Id})");
         }
         
         /// <summary>
@@ -153,7 +153,7 @@ namespace EchoesAcrossTime.Combat
                         // Roll for trigger
                         if (rng.Randf() * 100 < state.AttackData.TriggerChance)
                         {
-                            GD.Print($"\n★★★ SHOWTIME READY! ★★★");
+                            GD.Print($"\n★★★ SYNCHRONY READY! ★★★");
                             GD.Print($"{state.AttackData.AttackName}");
                             return state.AttackData;
                         }
@@ -207,7 +207,7 @@ namespace EchoesAcrossTime.Combat
             {
                 Success = true,
                 Message = $"\n╔══════════════════════════════════════╗\n" +
-                         $"║  ★★★ SHOWTIME: {showtime.AttackName} ★★★  \n" +
+                         $"║  ★★★ SYNCHRONY: {showtime.AttackName} ★★★  \n" +
                          $"╚══════════════════════════════════════╝\n"
             };
             
@@ -290,7 +290,7 @@ namespace EchoesAcrossTime.Combat
                 state.UseShowtime();
             }
             
-            GD.Print($"\nShowtime complete! Total damage: {result.DamageDealt}");
+            GD.Print($"\nSynchrony complete! Total damage: {result.DamageDealt}");
             
             return result;
         }
@@ -340,7 +340,7 @@ namespace EchoesAcrossTime.Combat
             if (showtimeStates.TryGetValue(key, out var state))
             {
                 state.UseShowtime();
-                GD.Print($"Showtime '{showtime.AttackName}' put on cooldown for {showtime.CooldownTurns} turns");
+                GD.Print($"Synchrony '{showtime.AttackName}' put on cooldown for {showtime.CooldownTurns} turns");
             }
         }
         

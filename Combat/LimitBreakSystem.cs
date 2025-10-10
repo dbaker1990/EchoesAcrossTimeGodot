@@ -180,7 +180,7 @@ namespace EchoesAcrossTime.Combat
             if (limitBreak.GrantsExtraTurn)
             {
                 user.HasExtraTurn = true;
-                GD.Print($"  → {user.Stats.CharacterName} gains an extra turn!");
+                GD.Print($"  → {user.Stats.CharacterName} achieves resonance!");
             }
             
             if (limitBreak.StopsTime)

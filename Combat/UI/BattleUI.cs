@@ -213,7 +213,7 @@ namespace EchoesAcrossTime.Combat.UI
             vbox.AddChild(limitBreakButton);
             
             batonPassButton = new Button();
-            batonPassButton.Text = "Baton Pass";
+            batonPassButton.Text = "Sync Pass";
             batonPassButton.CustomMinimumSize = new Vector2(250, 35);
             batonPassButton.Pressed += OnBatonPassPressed;
             batonPassButton.Disabled = true;
@@ -356,7 +356,7 @@ namespace EchoesAcrossTime.Combat.UI
             showtimePanel.AddChild(vbox);
             
             var titleLabel = new Label();
-            titleLabel.Text = "★ SHOWTIME ATTACK ★";
+            titleLabel.Text = "★ SYNCHRONY ATTACK ★";
             titleLabel.AddThemeFontSizeOverride("font_size", 36);
             titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
             titleLabel.Modulate = Colors.Orange;
@@ -381,7 +381,7 @@ namespace EchoesAcrossTime.Combat.UI
             vbox.AddChild(buttonHBox);
             
             useShowtimeButton = new Button();
-            useShowtimeButton.Text = "Use Showtime!";
+            useShowtimeButton.Text = "Use Synchrony!";
             useShowtimeButton.CustomMinimumSize = new Vector2(270, 50);
             useShowtimeButton.Pressed += OnUseShowtimePressed;
             buttonHBox.AddChild(useShowtimeButton);
@@ -472,7 +472,7 @@ namespace EchoesAcrossTime.Combat.UI
         private void ShowOneMoreBanner()
         {
             var banner = new Label();
-            banner.Text = "⭐ ONE MORE! ⭐";
+            banner.Text = "⭐ RESONANCE! ⭐";
             banner.AddThemeFontSizeOverride("font_size", 64);
             banner.Modulate = Colors.Yellow;
             banner.Position = new Vector2(400, 250);
@@ -545,7 +545,7 @@ namespace EchoesAcrossTime.Combat.UI
         {
             if (!battleManager.CanBatonPass())
             {
-                GD.Print("Cannot Baton Pass right now!");
+                GD.Print("Cannot Sync Pass right now!");
                 return;
             }
             
@@ -555,7 +555,7 @@ namespace EchoesAcrossTime.Combat.UI
             
             if (validTargets.Count == 0)
             {
-                GD.Print("No valid Baton Pass targets!");
+                GD.Print("No valid Sync Pass targets!");
                 actionMenuPanel.Show();
                 return;
             }
@@ -955,7 +955,7 @@ namespace EchoesAcrossTime.Combat.UI
             if (showtimes.Count == 0)
             {
                 var noShowtimeLabel = new Label();
-                noShowtimeLabel.Text = "No Showtimes available!";
+                noShowtimeLabel.Text = "No Synchrony available!";
                 noShowtimeLabel.HorizontalAlignment = HorizontalAlignment.Center;
                 showtimeList.AddChild(noShowtimeLabel);
                 
@@ -1075,7 +1075,7 @@ namespace EchoesAcrossTime.Combat.UI
         
         private void OnAllOutAttackReady()
         {
-            GD.Print("All-Out Attack is ready!");
+            GD.Print("Convergence Strike is ready!");
             ShakeScreen(8.0f, 0.4f);
         }
         
@@ -1106,7 +1106,7 @@ namespace EchoesAcrossTime.Combat.UI
         private void OnShowtimeTriggered(string showtimeName, string char1, string char2)
         {
             var showtimeLabel = new Label();
-            showtimeLabel.Text = $"★ SHOWTIME! ★\n{showtimeName}";
+            showtimeLabel.Text = $"★ SYNCHRONY! ★\n{showtimeName}";
             showtimeLabel.AddThemeFontSizeOverride("font_size", 52);
             showtimeLabel.Modulate = Colors.Orange;
             showtimeLabel.Position = new Vector2(400, 280);
@@ -1408,11 +1408,11 @@ namespace EchoesAcrossTime.Combat.UI
             
             if (success)
             {
-                GD.Print($"Baton Pass executed to {target.Stats.CharacterName}!");
+                GD.Print($"Sync Pass executed to {target.Stats.CharacterName}!");
             }
             else
             {
-                GD.Print("Baton Pass failed!");
+                GD.Print("Sync Pass failed!");
                 actionMenuPanel.Show();
             }
         }

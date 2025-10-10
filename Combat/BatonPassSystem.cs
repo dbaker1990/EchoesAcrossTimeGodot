@@ -56,7 +56,7 @@ namespace EchoesAcrossTime.Combat
             HealingMultiplier = 1.0f + (BASE_HEALING_BONUS * PassCount);
             CriticalBonus = BASE_CRIT_BONUS * PassCount;
             
-            GD.Print($"Baton Pass Level {PassCount}!");
+            GD.Print($"Sync Pass Level {PassCount}!");
             GD.Print($"  Damage: x{DamageMultiplier:F1}");
             GD.Print($"  Healing: x{HealingMultiplier:F1}");
             GD.Print($"  Critical: +{CriticalBonus}%");
@@ -69,7 +69,7 @@ namespace EchoesAcrossTime.Combat
         {
             if (!IsActive) return "";
             
-            return $"Baton Pass x{PassCount} (DMG +{(DamageMultiplier - 1f) * 100:F0}%, CRIT +{CriticalBonus}%)";
+            return $"Sync Pass x{PassCount} (DMG +{(DamageMultiplier - 1f) * 100:F0}%, CRIT +{CriticalBonus}%)";
         }
     }
     
@@ -125,7 +125,7 @@ namespace EchoesAcrossTime.Combat
             
             currentPassHolder = target;
             
-            GD.Print($"\n★ BATON PASS! ★");
+            GD.Print($"\n★ SYNC PASS! ★");
             GD.Print($"{actor.Stats.CharacterName} → {target.Stats.CharacterName}");
             
             return true;

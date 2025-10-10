@@ -46,14 +46,14 @@ namespace EchoesAcrossTime.Combat.UI
             panel.AddChild(vbox);
             
             var titleLabel = new Label();
-            titleLabel.Text = "⚔️ ALL-OUT ATTACK? ⚔️";
+            titleLabel.Text = "⚔️ CONVERGENCE STRIKE? ⚔️";
             titleLabel.AddThemeFontSizeOverride("font_size", 42);
             titleLabel.Modulate = Colors.Red;
             titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
             vbox.AddChild(titleLabel);
             
             var description = new Label();
-            description.Text = "All enemies are knocked down!\nFinish them!";
+            description.Text = "All enemies are disrupted!\nFinish them!";
             description.AddThemeFontSizeOverride("font_size", 18);
             description.HorizontalAlignment = HorizontalAlignment.Center;
             vbox.AddChild(description);
