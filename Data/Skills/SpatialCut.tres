@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://bjtgg8e8onwey"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_5wx2n"]
+
+[resource]
+script = ExtResource("1_5wx2n")
+SkillId = "spatial_cut"
+DisplayName = "Spatial Cut"
+Description = "Cut through space to strike a foe with shadowy precision."
+MPCost = 12
+DamageFormula = 1
+Element = 8
+BasePower = 90
+CriticalBonus = 15
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

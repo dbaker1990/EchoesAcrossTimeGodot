@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=10 format=3 uid="uid://dk6nnk8jigg5d"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=12 format=3 uid="uid://dk6nnk8jigg5d"]
 
 [ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="1_q528u"]
 [ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="2_s4kmk"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="4_0mmqd"]
 [ext_resource type="Texture2D" uid="uid://bhxam0svfgsmi" path="res://Images/FacePics/aldricface.png" id="4_p3nha"]
 [ext_resource type="Texture2D" uid="uid://be6sv3vg61s10" path="res://Images/MenuPortraits/aldricmenu.png" id="5_0mmqd"]
+[ext_resource type="Resource" uid="uid://cvi2ohtd1nsf6" path="res://Data/Skills/Mend.tres" id="6_meqy6"]
+[ext_resource type="Resource" uid="uid://bfk0y7ncto0ad" path="res://Data/Skills/Somnus.tres" id="7_yny53"]
 
 [sub_resource type="Resource" id="Resource_meqy6"]
 script = ExtResource("1_q528u")
@@ -44,6 +46,6 @@ LuckGrowthRate = 0.06
 ElementAffinities = SubResource("Resource_yny53")
 ExpCurve = SubResource("Resource_l1lmy")
 BattleStats = SubResource("Resource_meqy6")
-StartingSkills = null
+StartingSkills = Array[Object]([ExtResource("6_meqy6"), ExtResource("7_yny53")])
 SkillsLearnedAtLevel = null
 metadata/_custom_type_script = "uid://uxwpgs5c4g7l"

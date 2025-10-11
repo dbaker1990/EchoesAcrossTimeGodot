@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=10 format=3 uid="uid://bf0ykbq17surk"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=13 format=3 uid="uid://bf0ykbq17surk"]
 
 [ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="1_ebtga"]
 [ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="2_pvpl8"]
@@ -6,6 +6,9 @@
 [ext_resource type="Texture2D" uid="uid://dnc2fqrpr5t7p" path="res://Images/FacePics/elena face.png" id="4_3sipx"]
 [ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="4_6m8ua"]
 [ext_resource type="Texture2D" uid="uid://bl2e8k4oe6g0q" path="res://Images/MenuPortraits/elenaMenu.png" id="5_6m8ua"]
+[ext_resource type="Resource" uid="uid://betkn2p4qc5he" path="res://Data/Skills/EmberStrike.tres" id="6_mqrcc"]
+[ext_resource type="Resource" uid="uid://box8buw6a0d00" path="res://Data/Skills/FrostShard.tres" id="7_s3kl0"]
+[ext_resource type="Resource" uid="uid://cb4aoir1wwlww" path="res://Data/Skills/ShockBolt.tres" id="8_qsf7g"]
 
 [sub_resource type="Resource" id="Resource_cs3b2"]
 script = ExtResource("1_ebtga")
@@ -45,6 +48,6 @@ LuckGrowthRate = 0.05
 ElementAffinities = SubResource("Resource_mqrcc")
 ExpCurve = SubResource("Resource_s3kl0")
 BattleStats = SubResource("Resource_cs3b2")
-StartingSkills = null
+StartingSkills = Array[Object]([ExtResource("6_mqrcc"), ExtResource("7_s3kl0"), ExtResource("8_qsf7g")])
 SkillsLearnedAtLevel = null
 metadata/_custom_type_script = "uid://uxwpgs5c4g7l"

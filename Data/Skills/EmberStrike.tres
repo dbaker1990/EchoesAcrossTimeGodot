@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://betkn2p4qc5he"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_yd2sw"]
+
+[resource]
+script = ExtResource("1_yd2sw")
+SkillId = "ember_strike"
+DisplayName = "Ember Strike"
+Description = "Hurl flames at a single foe."
+MPCost = 8
+DamageFormula = 1
+DamageType = 1
+Element = 1
+BasePower = 80
+Accuracy = 95
+CriticalBonus = 5
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

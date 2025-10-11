@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://cb4aoir1wwlww"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_paoxe"]
+
+[resource]
+script = ExtResource("1_paoxe")
+SkillId = "shock_bolt"
+DisplayName = "Shock Bolt"
+Description = "Strike with lightning. May shock the target."
+MPCost = 8
+DamageFormula = 1
+DamageType = 1
+Element = 3
+BasePower = 80
+CriticalBonus = 5
+InflictsStatuses = Array[int]([10])
+StatusChances = Array[int]([15])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://bfk0y7ncto0ad"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_62je2"]
+
+[resource]
+script = ExtResource("1_62je2")
+SkillId = "somnus"
+DisplayName = "Somnus"
+Description = "A calming light that lulls foes to sleep."
+MPCost = 12
+DamageType = 1
+BasePower = 0
+Accuracy = 85
+InflictsStatuses = Array[int]([2])
+StatusChances = Array[int]([75])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

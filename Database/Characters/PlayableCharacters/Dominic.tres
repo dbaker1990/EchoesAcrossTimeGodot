@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=16 format=3 uid="uid://cyu0ebqc2yodg"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=17 format=3 uid="uid://cyu0ebqc2yodg"]
 
 [ext_resource type="Script" uid="uid://p16fiucorrw4" path="res://Combat/AIPattern.cs" id="1_26tk0"]
 [ext_resource type="Script" uid="uid://cqhok56saxuo3" path="res://Combat/BattleAnimationData.cs" id="2_cvyen"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="6_yd8s2"]
 [ext_resource type="Texture2D" uid="uid://c6l21qj52e47e" path="res://Images/FacePics/Dominic facepic.png" id="6_yqr70"]
 [ext_resource type="Texture2D" uid="uid://cgx37a8vpyvgo" path="res://Images/MenuPortraits/Dominic portrait.png" id="7_ftvjt"]
+[ext_resource type="Resource" uid="uid://bjtgg8e8onwey" path="res://Data/Skills/SpatialCut.tres" id="9_3imhm"]
 
 [sub_resource type="Resource" id="Resource_q872v"]
 script = ExtResource("1_26tk0")
@@ -74,6 +75,6 @@ BattleStats = SubResource("Resource_4nevw")
 BattleAnimations = SubResource("Resource_4pc82")
 AIBehavior = SubResource("Resource_q872v")
 CustomAdvancedAI = SubResource("Resource_yd8s2")
-StartingSkills = Array[Object]([])
+StartingSkills = Array[Object]([ExtResource("9_3imhm")])
 SkillsLearnedAtLevel = {}
 metadata/_custom_type_script = "uid://uxwpgs5c4g7l"
