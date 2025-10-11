@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=10 format=3 uid="uid://bpenj1mwtka4s"]
+
+[ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="1_1w2y4"]
+[ext_resource type="Script" uid="uid://cqhok56saxuo3" path="res://Combat/BattleAnimationData.cs" id="1_2rinl"]
+[ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="2_kplvt"]
+[ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="3_pxcsg"]
+[ext_resource type="Script" uid="uid://cg2tuivyyfkte" path="res://Combat/ExperienceCurve.cs" id="4_cmyfo"]
+
+[sub_resource type="Resource" id="Resource_5jycc"]
+script = ExtResource("1_2rinl")
+metadata/_custom_type_script = "uid://cqhok56saxuo3"
+
+[sub_resource type="Resource" id="Resource_nxnan"]
+script = ExtResource("2_kplvt")
+metadata/_custom_type_script = "uid://cii0v4krf5lb8"
+
+[sub_resource type="Resource" id="Resource_yq1tr"]
+script = ExtResource("3_pxcsg")
+metadata/_custom_type_script = "uid://cr283ljrg7q0d"
+
+[sub_resource type="Resource" id="Resource_1l3h4"]
+script = ExtResource("4_cmyfo")
+metadata/_custom_type_script = "uid://cg2tuivyyfkte"
+
+[resource]
+script = ExtResource("1_1w2y4")
+CharacterId = "ilyana"
+DisplayName = "Ilyana"
+Description = "A former Aether Knight who walked away after watching the White Annex whitewash soul-rig experiments behind clean reports. She learned to puncture counterfeit Edicts during the Helios Gate cover-up, turning audits into weapons. Now she cuts through lies with an arming sword in one hand and the truth in the other—disarming what was never meant to be questioned."
+Class = 13
+MaxMP = 70
+Attack = 11
+Defense = 11
+MagicAttack = 13
+Speed = 13
+HPGrowthRate = 0.07
+MPGrowthRate = 0.07
+AttackGrowthRate = 0.1
+DefenseGrowthRate = 0.1
+MagicAttackGrowthRate = 0.1
+MagicDefenseGrowthRate = 0.09
+SpeedGrowthRate = 0.1
+LuckGrowthRate = 0.06
+ElementAffinities = SubResource("Resource_yq1tr")
+ExpCurve = SubResource("Resource_1l3h4")
+BattleStats = SubResource("Resource_nxnan")
+BattleAnimations = SubResource("Resource_5jycc")
+StartingSkills = null
+SkillsLearnedAtLevel = null
+metadata/_custom_type_script = "uid://uxwpgs5c4g7l"

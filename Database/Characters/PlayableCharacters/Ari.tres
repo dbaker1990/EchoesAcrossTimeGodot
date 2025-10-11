@@ -1,0 +1,51 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=10 format=3 uid="uid://b6ah4vkrrg0fo"]
+
+[ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="1_bsqga"]
+[ext_resource type="Script" uid="uid://cqhok56saxuo3" path="res://Combat/BattleAnimationData.cs" id="1_nrlwl"]
+[ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="2_dxovy"]
+[ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="3_1sxlg"]
+[ext_resource type="Script" uid="uid://cg2tuivyyfkte" path="res://Combat/ExperienceCurve.cs" id="4_qwbfo"]
+
+[sub_resource type="Resource" id="Resource_xv7j3"]
+script = ExtResource("1_nrlwl")
+metadata/_custom_type_script = "uid://cqhok56saxuo3"
+
+[sub_resource type="Resource" id="Resource_o0oax"]
+script = ExtResource("2_dxovy")
+metadata/_custom_type_script = "uid://cii0v4krf5lb8"
+
+[sub_resource type="Resource" id="Resource_8n47r"]
+script = ExtResource("3_1sxlg")
+metadata/_custom_type_script = "uid://cr283ljrg7q0d"
+
+[sub_resource type="Resource" id="Resource_meocs"]
+script = ExtResource("4_qwbfo")
+metadata/_custom_type_script = "uid://cg2tuivyyfkte"
+
+[resource]
+script = ExtResource("1_bsqga")
+CharacterId = "ari"
+DisplayName = "Ari"
+Description = "A quiet Applied Mysterian from Tenebrae who accepts the Astrals are real—and insists technology should be ethical anyway. Ari stabilizes what others break: drift corridors, failing relays, and teams on the edge of catastrophe. When hostile rigs turn against their owners, it's usually because Ari left a Prism Spoof where it would do the most good."
+Class = 14
+MaxHP = 80
+MaxMP = 90
+Attack = 5
+Defense = 8
+MagicAttack = 11
+MagicDefense = 16
+Speed = 12
+Luck = 12
+MPGrowthRate = 0.11
+DefenseGrowthRate = 0.07
+MagicAttackGrowthRate = 0.09
+MagicDefenseGrowthRate = 0.13
+SpeedGrowthRate = 0.09
+LuckGrowthRate = 0.07
+ElementAffinities = SubResource("Resource_8n47r")
+ExpCurve = SubResource("Resource_meocs")
+BattleStats = SubResource("Resource_o0oax")
+BattleAnimations = SubResource("Resource_xv7j3")
+StartingSkills = null
+SkillsLearnedAtLevel = null
+metadata/_custom_type_script = "uid://uxwpgs5c4g7l"

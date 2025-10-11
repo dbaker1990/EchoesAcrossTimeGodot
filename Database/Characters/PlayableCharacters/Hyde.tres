@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=10 format=3 uid="uid://d0man8404riam"]
+
+[ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="1_0evd4"]
+[ext_resource type="Script" uid="uid://cqhok56saxuo3" path="res://Combat/BattleAnimationData.cs" id="1_ty023"]
+[ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="2_pfnoi"]
+[ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="3_gjmc1"]
+[ext_resource type="Script" uid="uid://cg2tuivyyfkte" path="res://Combat/ExperienceCurve.cs" id="4_lue8r"]
+
+[sub_resource type="Resource" id="Resource_iyorw"]
+script = ExtResource("1_ty023")
+metadata/_custom_type_script = "uid://cqhok56saxuo3"
+
+[sub_resource type="Resource" id="Resource_63107"]
+script = ExtResource("2_pfnoi")
+metadata/_custom_type_script = "uid://cii0v4krf5lb8"
+
+[sub_resource type="Resource" id="Resource_ykors"]
+script = ExtResource("3_gjmc1")
+metadata/_custom_type_script = "uid://cr283ljrg7q0d"
+
+[sub_resource type="Resource" id="Resource_kpo0s"]
+script = ExtResource("4_lue8r")
+metadata/_custom_type_script = "uid://cg2tuivyyfkte"
+
+[resource]
+script = ExtResource("1_0evd4")
+CharacterId = "hyde"
+DisplayName = "Hyde"
+Description = "A privateer-navigator from Brinespire's sky-dock who runs clean for the Clean Wake Initiative while hunting black-hull raiders on the side. Hyde knows every insurer loophole at Ledger Tower and uses his anchor-grapnel to out-route pirates and customs alike—threading shortcuts where others see only storm and stone."
+Class = 15
+MaxHP = 95
+MaxMP = 55
+Attack = 14
+Defense = 8
+MagicAttack = 6
+MagicDefense = 9
+Speed = 16
+Luck = 15
+HPGrowthRate = 0.07
+MPGrowthRate = 0.04
+AttackGrowthRate = 0.13
+DefenseGrowthRate = 0.06
+MagicDefenseGrowthRate = 0.07
+SpeedGrowthRate = 0.12
+LuckGrowthRate = 0.1
+ElementAffinities = SubResource("Resource_ykors")
+ExpCurve = SubResource("Resource_kpo0s")
+BattleStats = SubResource("Resource_63107")
+BattleAnimations = SubResource("Resource_iyorw")
+StartingSkills = null
+SkillsLearnedAtLevel = null
+metadata/_custom_type_script = "uid://uxwpgs5c4g7l"

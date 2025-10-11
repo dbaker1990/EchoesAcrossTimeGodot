@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=10 format=3 uid="uid://bn1iawe1744b3"]
+
+[ext_resource type="Script" uid="uid://cqhok56saxuo3" path="res://Combat/BattleAnimationData.cs" id="1_e46w2"]
+[ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="1_jy3o4"]
+[ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="2_yp4w6"]
+[ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="3_beai2"]
+[ext_resource type="Script" uid="uid://cg2tuivyyfkte" path="res://Combat/ExperienceCurve.cs" id="4_s3sdu"]
+
+[sub_resource type="Resource" id="Resource_x43y3"]
+script = ExtResource("1_e46w2")
+metadata/_custom_type_script = "uid://cqhok56saxuo3"
+
+[sub_resource type="Resource" id="Resource_7gqdi"]
+script = ExtResource("2_yp4w6")
+metadata/_custom_type_script = "uid://cii0v4krf5lb8"
+
+[sub_resource type="Resource" id="Resource_ns85a"]
+script = ExtResource("3_beai2")
+metadata/_custom_type_script = "uid://cr283ljrg7q0d"
+
+[sub_resource type="Resource" id="Resource_kmdb0"]
+script = ExtResource("4_s3sdu")
+metadata/_custom_type_script = "uid://cg2tuivyyfkte"
+
+[resource]
+script = ExtResource("1_jy3o4")
+CharacterId = "scribe"
+DisplayName = "Scribe"
+Description = "A young Weigher trained under Thanemire's Raven Protocols, Tal turns chaos into patterns and endless testimony into solvable puzzles. His first field case—breaking a Bone Choir loop—taught him that even the dead follow rules. Now he serves at the Silent Court, unraveling boss mechanics and making inevitability look like a choice."
+Class = 17
+MaxHP = 75
+MaxMP = 95
+Attack = 6
+Defense = 7
+MagicAttack = 15
+MagicDefense = 14
+Luck = 16
+HPGrowthRate = 0.04
+MPGrowthRate = 0.12
+AttackGrowthRate = 0.04
+DefenseGrowthRate = 0.06
+MagicAttackGrowthRate = 0.12
+MagicDefenseGrowthRate = 0.1
+SpeedGrowthRate = 0.07
+LuckGrowthRate = 0.09
+ElementAffinities = SubResource("Resource_ns85a")
+ExpCurve = SubResource("Resource_kmdb0")
+BattleStats = SubResource("Resource_7gqdi")
+BattleAnimations = SubResource("Resource_x43y3")
+StartingSkills = null
+SkillsLearnedAtLevel = null
+metadata/_custom_type_script = "uid://uxwpgs5c4g7l"

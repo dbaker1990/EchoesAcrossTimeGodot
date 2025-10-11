@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=10 format=3 uid="uid://cjx7j7evedp8y"]
+
+[ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="1_6ee2g"]
+[ext_resource type="Script" uid="uid://cqhok56saxuo3" path="res://Combat/BattleAnimationData.cs" id="1_qd6rc"]
+[ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="2_xbora"]
+[ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="3_7htup"]
+[ext_resource type="Script" uid="uid://cg2tuivyyfkte" path="res://Combat/ExperienceCurve.cs" id="4_el2fd"]
+
+[sub_resource type="Resource" id="Resource_2ynl8"]
+script = ExtResource("1_qd6rc")
+metadata/_custom_type_script = "uid://cqhok56saxuo3"
+
+[sub_resource type="Resource" id="Resource_korxg"]
+script = ExtResource("2_xbora")
+metadata/_custom_type_script = "uid://cii0v4krf5lb8"
+
+[sub_resource type="Resource" id="Resource_4btem"]
+script = ExtResource("3_7htup")
+metadata/_custom_type_script = "uid://cr283ljrg7q0d"
+
+[sub_resource type="Resource" id="Resource_5ojbv"]
+script = ExtResource("4_el2fd")
+metadata/_custom_type_script = "uid://cg2tuivyyfkte"
+
+[resource]
+script = ExtResource("1_6ee2g")
+CharacterId = "kaia"
+DisplayName = "Kaia"
+Description = "A ritual singer from Maelcour who turns oceanic wards into chorus spirits—foam sprites to cleanse, riptide eels to drag, and storm gulls to delay. She became known after leading choir evacuations during an Under-Brine Vault breach, proving that even the tide answers to those who know its hymns."
+Class = 16
+MaxHP = 70
+MaxMP = 100
+Attack = 5
+Defense = 7
+MagicAttack = 13
+MagicDefense = 13
+Speed = 8
+Luck = 11
+HPGrowthRate = 0.04
+MPGrowthRate = 0.13
+DefenseGrowthRate = 0.05
+MagicAttackGrowthRate = 0.1
+MagicDefenseGrowthRate = 0.1
+SpeedGrowthRate = 0.06
+LuckGrowthRate = 0.07
+ElementAffinities = SubResource("Resource_4btem")
+ExpCurve = SubResource("Resource_5ojbv")
+BattleStats = SubResource("Resource_korxg")
+BattleAnimations = SubResource("Resource_2ynl8")
+StartingSkills = null
+SkillsLearnedAtLevel = null
+metadata/_custom_type_script = "uid://uxwpgs5c4g7l"
