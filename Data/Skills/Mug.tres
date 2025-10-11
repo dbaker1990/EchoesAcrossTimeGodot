@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://b6eepqcvt4yn7"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_xueeb"]
+
+[resource]
+script = ExtResource("1_xueeb")
+SkillId = "mug"
+DisplayName = "Mug"
+Description = "Attack and steal in one action."
+MPCost = 15
+DamageFormula = 2
+BasePower = 120
+PowerMultiplier = 1.2
+Accuracy = 95
+CriticalBonus = 10
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+RequiredLevel = 15
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

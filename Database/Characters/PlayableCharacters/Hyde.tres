@@ -1,10 +1,12 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=10 format=3 uid="uid://d0man8404riam"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=12 format=3 uid="uid://d0man8404riam"]
 
 [ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="1_0evd4"]
 [ext_resource type="Script" uid="uid://cqhok56saxuo3" path="res://Combat/BattleAnimationData.cs" id="1_ty023"]
 [ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="2_pfnoi"]
 [ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="3_gjmc1"]
 [ext_resource type="Script" uid="uid://cg2tuivyyfkte" path="res://Combat/ExperienceCurve.cs" id="4_lue8r"]
+[ext_resource type="Resource" uid="uid://b6eepqcvt4yn7" path="res://Data/Skills/Mug.tres" id="5_gjmc1"]
+[ext_resource type="Resource" uid="uid://dj6vgrbs78vf4" path="res://Data/Skills/Steal.tres" id="5_pfnoi"]
 
 [sub_resource type="Resource" id="Resource_iyorw"]
 script = ExtResource("1_ty023")
@@ -47,6 +49,8 @@ ElementAffinities = SubResource("Resource_ykors")
 ExpCurve = SubResource("Resource_kpo0s")
 BattleStats = SubResource("Resource_63107")
 BattleAnimations = SubResource("Resource_iyorw")
-StartingSkills = null
-SkillsLearnedAtLevel = null
+StartingSkills = Array[Object]([ExtResource("5_pfnoi")])
+SkillsLearnedAtLevel = Dictionary[int, Object]({
+15: ExtResource("5_gjmc1")
+})
 metadata/_custom_type_script = "uid://uxwpgs5c4g7l"

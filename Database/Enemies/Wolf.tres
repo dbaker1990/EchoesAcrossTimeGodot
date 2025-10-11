@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=4 format=3 uid="uid://ce6bbl26nxpta"]
+
+[ext_resource type="Script" uid="uid://crj0onon0xmy0" path="res://Combat/EnemyRewards.cs" id="1_hdmx3"]
+[ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="1_v8ycx"]
+
+[sub_resource type="Resource" id="Resource_w2nma"]
+script = ExtResource("1_hdmx3")
+BaseExpReward = 3
+CommonDrops = null
+UncommonDrops = null
+RareDrops = null
+StealableItems = Array[Object]([null])
+BaseStealChance = 40
+metadata/_custom_type_script = "uid://crj0onon0xmy0"
+
+[resource]
+script = ExtResource("1_v8ycx")
+CharacterId = "wolf"
+DisplayName = "Wolf"
+Type = 1
+MaxHP = 60
+MaxMP = 30
+Attack = 18
+Defense = 12
+MagicAttack = 5
+MagicDefense = 6
+Speed = 8
+Luck = 12
+Rewards = SubResource("Resource_w2nma")
+StartingSkills = null
+SkillsLearnedAtLevel = null
+metadata/_custom_type_script = "uid://uxwpgs5c4g7l"

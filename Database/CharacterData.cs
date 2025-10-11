@@ -115,7 +115,7 @@ namespace EchoesAcrossTime.Database
         
         [ExportGroup("Skills")]
         [Export] public Godot.Collections.Array<SkillData> StartingSkills { get; set; }
-        [Export] public Godot.Collections.Dictionary SkillsLearnedAtLevel { get; set; }
+        [Export] public Godot.Collections.Dictionary<int, SkillData> SkillsLearnedAtLevel { get; set; }
         
         [ExportGroup("Character Scenes (Optional)")]
         [Export] public PackedScene CustomOverworldScene { get; set; }
@@ -138,7 +138,7 @@ namespace EchoesAcrossTime.Database
             }
             
             StartingSkills = new Godot.Collections.Array<SkillData>();
-            SkillsLearnedAtLevel = new Godot.Collections.Dictionary();
+            SkillsLearnedAtLevel = new Godot.Collections.Dictionary<int, SkillData>();
         }
         
         /// <summary>

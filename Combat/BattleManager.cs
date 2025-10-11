@@ -45,6 +45,7 @@ namespace EchoesAcrossTime.Combat
         private EscapeSystem escapeSystem;
         private BattleRewardsManager rewardsManager;
         private SummonManager summonManager;
+        private StealMugSystem stealMugSystem;
         [Export] public SummonManager SummonManager { get; set; }
         
         private class PendingAction
@@ -130,6 +131,13 @@ namespace EchoesAcrossTime.Combat
             // Connect basic tracking
             ActionExecuted += TrackDamageForRewards;
             WeaknessHit += (a, t) => rewardsManager?.RecordEvent("weakness_hit");
+            
+            stealMugSystem = GetNode<StealMugSystem>("StealMugSystem");
+            if (stealMugSystem == null)
+            {
+                stealMugSystem = new StealMugSystem();
+                AddChild(stealMugSystem);
+            }
             
             // Connect to signals for reward tracking
             ConnectRewardSignals();
@@ -448,80 +456,76 @@ namespace EchoesAcrossTime.Combat
         /// Execute a skill
         /// </summary>
         private async Task<BattleActionResult> ExecuteSkill(BattleAction action)
+{
+    var result = new BattleActionResult();
+    var attacker = action.Actor;
+    var skill = action.Skill;
+    
+    // Check MP cost
+    if (attacker.Stats.CurrentMP < skill.MPCost)
+    {
+        result.Success = false;
+        result.Message = "Not enough MP!";
+        return result;
+    }
+    
+    // Deduct MP
+    attacker.Stats.CurrentMP -= skill.MPCost;
+    
+    GD.Print($">>> {attacker.Stats.CharacterName} uses {skill.DisplayName}! <<<");
+    
+    // ===== STEAL SKILL HANDLING =====
+    if (skill.SkillId.ToLower().Contains("steal") && !skill.SkillId.ToLower().Contains("mug"))
+    {
+        return await ExecuteStealSkill(attacker, action.Targets[0]);
+    }
+    
+    // ===== MUG SKILL HANDLING =====
+    if (skill.SkillId.ToLower().Contains("mug"))
+    {
+        return await ExecuteMugSkill(attacker, action.Targets[0], skill);
+    }
+    
+    // Play casting animation
+    if (battlefieldVisuals != null)
+    {
+        await battlefieldVisuals.PlayCastSequence(attacker);
+    }
+    
+    // Apply to all targets
+    foreach (var target in action.Targets)
+    {
+        if (skill.DamageType == DamageType.Recovery)
         {
-            var result = new BattleActionResult();
-            var attacker = action.Actor;
-            var skill = action.Skill;
+            // Healing skill
+            int healAmount = skill.BasePower;
             
-            // Check MP cost
-            if (attacker.Stats.CurrentMP < skill.MPCost)
+            // Apply baton pass bonus if active
+            if (attacker.BatonPassData.IsActive)
             {
-                result.Success = false;
-                result.Message = "Not enough MP!";
-                return result;
+                healAmount = batonPassManager.ApplyHealingBonus(attacker, healAmount);
             }
             
-            // Deduct MP
-            attacker.Stats.CurrentMP -= skill.MPCost;
+            int actualHeal = target.Stats.Heal(healAmount);
+            result.HealingDone += actualHeal;
             
-            GD.Print($">>> {attacker.Stats.CharacterName} casts {skill.DisplayName}! <<<");
+            GD.Print($"  {target.Stats.CharacterName} healed for {actualHeal} HP!");
             
-            // Play casting animation
             if (battlefieldVisuals != null)
             {
-                await battlefieldVisuals.PlayCastSequence(attacker);
+                await battlefieldVisuals.ShowHealEffect(target);
             }
-            
-            // Apply to all targets
-            foreach (var target in action.Targets)
-            {
-                if (skill.DamageType == DamageType.Recovery)
-                {
-                    // Healing skill
-                    int healAmount = skill.BasePower;
-                    
-                    // Apply baton pass bonus if active
-                    if (attacker.BatonPassData.IsActive)
-                    {
-                        healAmount = batonPassManager.ApplyHealingBonus(attacker, healAmount);
-                    }
-                    
-                    int actualHeal = target.Stats.Heal(healAmount);
-                    result.HealingDone += actualHeal;
-                    
-                    GD.Print($"  {target.Stats.CharacterName} healed for {actualHeal} HP!");
-                    
-                    // Show heal effect
-                    if (battlefieldVisuals != null)
-                    {
-                        await battlefieldVisuals.ShowHealEffect(target);
-                    }
-                }
-                else if (skill.BasePower > 0)
-                {
-                    // Damaging skill
-                    await ApplySkillDamage(attacker, target, skill, result);
-                }
-                else
-                {
-                    // Buff/Debuff skill
-                    ApplySkillEffects(attacker, target, skill, result);
-                    
-                    // Show buff/debuff effect
-                    if (battlefieldVisuals != null)
-                    {
-                        string skillName = skill.DisplayName.ToLower();
-                        if (skillName.Contains("debuff") || skillName.Contains("down") || skillName.Contains("curse"))
-                            battlefieldVisuals.ShowDebuffEffect(target);
-                        else if (skillName.Contains("buff") || skillName.Contains("up") || skillName.Contains("boost"))
-                            battlefieldVisuals.ShowBuffEffect(target);
-                    }
-                }
-            }
-            
-            result.Success = true;
-            return result;
         }
+        else
+        {
+            // Damage skill
+            await ApplySkillDamage(attacker, target, skill, result);
+        }
+    }
+    
+    result.Success = true;
+    return result;
+}
         
         /// <summary>
         /// Execute guard action
@@ -609,6 +613,7 @@ namespace EchoesAcrossTime.Combat
             if (escapeResult.Success)
             {
                 CurrentPhase = BattlePhase.Escaped;
+                stealMugSystem?.ResetStealTracking();
                 EmitSignal(SignalName.BattleEnded, false);
             }
             
@@ -1269,6 +1274,137 @@ namespace EchoesAcrossTime.Combat
                 }
             }
         }
+        
+        /// <summary>
+        /// Execute Steal skill
+        /// </summary>
+        private async Task<BattleActionResult> ExecuteStealSkill(BattleMember thief, BattleMember target)
+        {
+            var result = new BattleActionResult();
+    
+            GD.Print($">>> {thief.Stats.CharacterName} attempts to steal from {target.Stats.CharacterName}! <<<");
+    
+            // Play steal animation (could be a quick attack animation)
+            if (battlefieldVisuals != null)
+            {
+                await battlefieldVisuals.PlayAttackSequence(thief, target);
+            }
+    
+            // Attempt steal
+            var stealResult = stealMugSystem.AttemptSteal(thief, target);
+    
+            result.Success = stealResult.Success;
+            result.Message = stealResult.Message;
+    
+            // Display result
+            if (stealResult.Success)
+            {
+                if (stealResult.ItemStolen != null)
+                {
+                    ShowBattleMessage($"{thief.Stats.CharacterName} stole {stealResult.Quantity}x {stealResult.ItemStolen.DisplayName}!");
+                }
+                else if (stealResult.GoldStolen > 0)
+                {
+                    ShowBattleMessage($"{thief.Stats.CharacterName} stole {stealResult.GoldStolen} gold!");
+                }
+            }
+            else
+            {
+                ShowBattleMessage(stealResult.Message);
+            }
+    
+            // Small delay for message
+            await ToSignal(GetTree().CreateTimer(1.0), SceneTreeTimer.SignalName.Timeout);
+    
+            return result;
+        }
+        
+        /// <summary>
+        /// Execute Mug skill (Attack + Steal)
+        /// </summary>
+        private async Task<BattleActionResult> ExecuteMugSkill(BattleMember attacker, BattleMember target, SkillData skill)
+        {
+            var result = new BattleActionResult();
+            
+            GD.Print($">>> {attacker.Stats.CharacterName} mugs {target.Stats.CharacterName}! <<<");
+            
+            // Play attack animation
+            if (battlefieldVisuals != null)
+            {
+                await battlefieldVisuals.PlayAttackSequence(attacker, target);
+            }
+            
+            // Execute mug (attack + steal)
+            var mugResult = await stealMugSystem.ExecuteMug(
+                attacker, 
+                target, 
+                skill,
+                async (atk, tgt, skl) => {
+                    var tmpResult = new BattleActionResult();
+                    await ApplySkillDamage(atk, tgt, skl, tmpResult);
+                    return tmpResult;
+                }
+            );
+            
+            // Combine results
+            result.DamageDealt = mugResult.AttackResult.DamageDealt;
+            result.HitWeakness = mugResult.AttackResult.HitWeakness;
+            result.WasCritical = mugResult.AttackResult.WasCritical;
+            result.Success = true;
+            
+            // Display damage
+            ShowDamageNumber(target, result.DamageDealt, result.WasCritical);
+            
+            // Display steal result
+            if (mugResult.StealResult.Success)
+            {
+                if (mugResult.StealResult.ItemStolen != null)
+                {
+                    ShowBattleMessage($"Also stole {mugResult.StealResult.Quantity}x {mugResult.StealResult.ItemStolen.DisplayName}!");
+                }
+                else if (mugResult.StealResult.GoldStolen > 0)
+                {
+                    ShowBattleMessage($"Also stole {mugResult.StealResult.GoldStolen} gold!");
+                }
+            }
+            
+            // Check for knockdown from weakness
+            if (result.HitWeakness && target.Stats.IsAlive)
+            {
+                target.KnockDown();
+                EmitSignal(SignalName.Knockdown, target.Stats.CharacterName);
+                
+                // Grant One More turn
+                attacker.HasExtraTurn = true;
+                EmitSignal(SignalName.OneMoreTriggered, attacker.Stats.CharacterName);
+            }
+            
+            // Small delay for messages
+            await ToSignal(GetTree().CreateTimer(1.5), SceneTreeTimer.SignalName.Timeout);
+            
+            return result;
+        }
+
+        
+        /// <summary>
+        /// Helper method to display battle messages (add this if you don't have it)
+        /// </summary>
+        private void ShowBattleMessage(string message)
+        {
+            GD.Print($"[BATTLE MESSAGE] {message}");
+            // TODO: Display this in your battle UI
+            // Example: battleUI?.ShowMessage(message);
+        }
+        
+        /// <summary>
+        /// Helper method to show damage numbers (add this if you don't have it)
+        /// </summary>
+        private void ShowDamageNumber(BattleMember target, int damage, bool isCritical)
+        {
+            GD.Print($"[DAMAGE] {target.Stats.CharacterName} took {damage} damage{(isCritical ? " (CRITICAL!)" : "")}");
+            // TODO: Show floating damage number in your battle UI
+            // Example: battlefieldVisuals?.ShowDamageNumber(target, damage, isCritical);
+        }
 
         /// <summary>
         /// Recover knocked down members at round end
@@ -1527,6 +1663,7 @@ namespace EchoesAcrossTime.Combat
             }
         
             CurrentPhase = BattlePhase.Victory;
+            stealMugSystem?.ResetStealTracking();
             EmitSignal(SignalName.BattleEnded, true);
         }
         
@@ -1545,6 +1682,7 @@ namespace EchoesAcrossTime.Combat
             }
         
             CurrentPhase = BattlePhase.Escaped;
+            stealMugSystem?.ResetStealTracking();
             EmitSignal(SignalName.BattleEnded, false);
         }
         
@@ -1568,6 +1706,7 @@ namespace EchoesAcrossTime.Combat
             }
         
             CurrentPhase = BattlePhase.Defeat;
+            stealMugSystem?.ResetStealTracking();
             EmitSignal(SignalName.BattleEnded, false);
         }
         

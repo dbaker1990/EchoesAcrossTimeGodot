@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://dj6vgrbs78vf4"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_tuklm"]
+
+[resource]
+script = ExtResource("1_tuklm")
+SkillId = "steal"
+DisplayName = "Steal"
+Description = "Attempt to steal an item or gold from an enemy."
+DamageFormula = 4
+Element = 0
+BasePower = 0
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"
