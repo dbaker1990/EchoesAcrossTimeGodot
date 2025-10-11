@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_g21ju")
-HPRestorePercent = 60.0
+HPRestorePercent = 0.6
 CuresStatuses = null
 InflictsStatus = null
 ItemId = "hi_vita"

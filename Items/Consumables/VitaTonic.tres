@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_bdp4c")
-HPRestorePercent = 30.0
+HPRestorePercent = 0.3
 CuresStatuses = null
 InflictsStatus = null
 ItemId = "vita_tonic"

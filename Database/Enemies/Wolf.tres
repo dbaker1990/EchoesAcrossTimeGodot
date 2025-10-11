@@ -1,32 +1,46 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=4 format=3 uid="uid://ce6bbl26nxpta"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=13 format=3 uid="uid://ce6bbl26nxpta"]
 
-[ext_resource type="Script" uid="uid://crj0onon0xmy0" path="res://Combat/EnemyRewards.cs" id="1_hdmx3"]
+[ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="1_nl44l"]
 [ext_resource type="Script" uid="uid://uxwpgs5c4g7l" path="res://Database/CharacterData.cs" id="1_v8ycx"]
+[ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="2_hpeiq"]
+[ext_resource type="Script" uid="uid://cg2tuivyyfkte" path="res://Combat/ExperienceCurve.cs" id="3_vp2nl"]
+[ext_resource type="Resource" uid="uid://3drjc7pqx5yg" path="res://Items/Consumables/VitaTonic.tres" id="4_ao8vd"]
+[ext_resource type="Script" uid="uid://crr6kag2xpn66" path="res://Combat/DropItem.cs" id="5_m8b7u"]
+[ext_resource type="Script" uid="uid://crj0onon0xmy0" path="res://Combat/EnemyRewards.cs" id="6_go07f"]
 
-[sub_resource type="Resource" id="Resource_w2nma"]
-script = ExtResource("1_hdmx3")
-BaseExpReward = 3
-CommonDrops = null
+[sub_resource type="Resource" id="Resource_ycvst"]
+script = ExtResource("1_nl44l")
+metadata/_custom_type_script = "uid://cii0v4krf5lb8"
+
+[sub_resource type="Resource" id="Resource_yo08h"]
+script = ExtResource("2_hpeiq")
+metadata/_custom_type_script = "uid://cr283ljrg7q0d"
+
+[sub_resource type="Resource" id="Resource_yli3a"]
+script = ExtResource("3_vp2nl")
+metadata/_custom_type_script = "uid://cg2tuivyyfkte"
+
+[sub_resource type="Resource" id="Resource_qavu8"]
+script = ExtResource("5_m8b7u")
+Item = ExtResource("4_ao8vd")
+ItemId = "vitatonic"
+DropChance = 60
+metadata/_custom_type_script = "uid://crr6kag2xpn66"
+
+[sub_resource type="Resource" id="Resource_ex3gc"]
+script = ExtResource("6_go07f")
+CommonDrops = Array[Object]([SubResource("Resource_qavu8")])
 UncommonDrops = null
 RareDrops = null
-StealableItems = Array[Object]([null])
-BaseStealChance = 40
+StealableItems = null
 metadata/_custom_type_script = "uid://crj0onon0xmy0"
 
 [resource]
 script = ExtResource("1_v8ycx")
-CharacterId = "wolf"
-DisplayName = "Wolf"
-Type = 1
-MaxHP = 60
-MaxMP = 30
-Attack = 18
-Defense = 12
-MagicAttack = 5
-MagicDefense = 6
-Speed = 8
-Luck = 12
-Rewards = SubResource("Resource_w2nma")
+ElementAffinities = SubResource("Resource_yo08h")
+ExpCurve = SubResource("Resource_yli3a")
+BattleStats = SubResource("Resource_ycvst")
+Rewards = SubResource("Resource_ex3gc")
 StartingSkills = null
 SkillsLearnedAtLevel = null
 metadata/_custom_type_script = "uid://uxwpgs5c4g7l"
