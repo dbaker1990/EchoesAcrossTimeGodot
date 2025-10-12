@@ -1,180 +1,114 @@
-﻿// UI/TitleScreen.cs
-using Godot;
+﻿using Godot;
+using System;
 using EchoesAcrossTime.Managers;
 
 namespace EchoesAcrossTime.UI
 {
     /// <summary>
-    /// Title Screen controller
-    /// Handles main menu navigation and game initialization
+    /// Title screen with main menu navigation
     /// </summary>
     public partial class TitleScreen : Control
     {
         #region Node References
-        [ExportGroup("UI Elements")]
         [Export] private Button newGameButton;
         [Export] private Button loadGameButton;
         [Export] private Button optionsButton;
         [Export] private Button quitButton;
-        
-        [ExportGroup("Panels")]
-        [Export] private Control loadGamePanel;
-        [Export] private Control optionsPanel;
-        
-        [ExportGroup("Background")]
         [Export] private TextureRect titleBackground;
         [Export] private Label titleLabel;
+        
+        // Panels
+        [Export] private Control loadGamePanel;
+        [Export] private TitleScreenOptionsUI optionsPanel;
         #endregion
         
-        private int selectedButtonIndex = 0;
         private Button[] menuButtons;
+        private int selectedButtonIndex = 0;
         
         public override void _Ready()
         {
-            // Initialize button array for keyboard navigation
-            menuButtons = new[] { newGameButton, loadGameButton, optionsButton, quitButton };
+            // Store all menu buttons for keyboard navigation
+            menuButtons = new Button[]
+            {
+                newGameButton,
+                loadGameButton,
+                optionsButton,
+                quitButton
+            };
             
             // Connect button signals
-            ConnectButtonSignals();
+            newGameButton.Pressed += OnNewGamePressed;
+            loadGameButton.Pressed += OnLoadGamePressed;
+            optionsButton.Pressed += OnOptionsPressed;
+            quitButton.Pressed += OnQuitPressed;
             
-            // Ensure panels are hidden
-            if (loadGamePanel != null) loadGamePanel.Visible = false;
-            if (optionsPanel != null) optionsPanel.Visible = false;
+            // Focus on first button
+            newGameButton?.GrabFocus();
             
-            // Play title music
-            PlayTitleMusic();
+            // Start title music
+            SystemManager.Instance?.PlayTitleMusic();
             
-            // Focus first button
-            if (newGameButton != null)
-            {
-                newGameButton.GrabFocus();
-            }
-            
-            GD.Print("Title Screen Ready");
-        }
-        
-        private void ConnectButtonSignals()
-        {
-            if (newGameButton != null)
-            {
-                newGameButton.Pressed += OnNewGamePressed;
-                newGameButton.FocusEntered += () => OnButtonHovered(0);
-            }
-            
-            if (loadGameButton != null)
-            {
-                loadGameButton.Pressed += OnLoadGamePressed;
-                loadGameButton.FocusEntered += () => OnButtonHovered(1);
-            }
-            
-            if (optionsButton != null)
-            {
-                optionsButton.Pressed += OnOptionsPressed;
-                optionsButton.FocusEntered += () => OnButtonHovered(2);
-            }
-            
-            if (quitButton != null)
-            {
-                quitButton.Pressed += OnQuitPressed;
-                quitButton.FocusEntered += () => OnButtonHovered(3);
-            }
-        }
-        
-        private void OnButtonHovered(int index)
-        {
-            selectedButtonIndex = index;
-            // Play cursor sound
-            SystemManager.Instance?.PlayCursorSE();
+            GD.Print("Title Screen loaded");
         }
         
         private void OnNewGamePressed()
         {
-            GD.Print("New Game selected");
+            GD.Print("New Game pressed");
             SystemManager.Instance?.PlayOkSE();
             
-            // Start new game
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.StartNewGame();
-                
-                // Get starting map from SystemDatabase
-                string startMap = SystemManager.Instance?.SystemData?.StartingMapPath 
-                    ?? "res://Maps/Veridia/VeridiaCapital.tscn";
-                
-                // Change to starting map
-                GetTree().ChangeSceneToFile(startMap);
-            }
-            else
-            {
-                GD.PrintErr("TitleScreen: GameManager instance not found!");
-            }
+            // TODO: Implement new game logic
+            // For now, just load the first scene or show character creation
+            GetTree().ChangeSceneToFile("res://Scenes/TestMap.tscn");
         }
         
         private void OnLoadGamePressed()
         {
-            GD.Print("Load Game selected");
+            GD.Print("Load Game pressed");
             SystemManager.Instance?.PlayOkSE();
             
-            // Show load game panel
             if (loadGamePanel != null)
             {
                 loadGamePanel.Visible = true;
+                // TODO: Populate load game panel with save files
             }
             else
             {
-                // Fallback: Try to load most recent save
-                if (SaveSystem.Instance != null)
-                {
-                    // Try to load slot 0 (auto-save) or first available save
-                    if (SaveSystem.Instance.SaveExists(0))
-                    {
-                        SaveSystem.Instance.LoadGame(0);
-                    }
-                    else
-                    {
-                        SystemManager.Instance?.PlayBuzzerSE();
-                        GD.Print("No save file found");
-                    }
-                }
+                GD.Print("Load Game Panel not assigned!");
             }
         }
         
         private void OnOptionsPressed()
         {
-            GD.Print("Options selected");
+            GD.Print("Options pressed");
             SystemManager.Instance?.PlayOkSE();
             
-            // Show options panel
             if (optionsPanel != null)
             {
-                optionsPanel.Visible = true;
+                optionsPanel.OpenMenu();
             }
             else
             {
-                GD.Print("Options panel not configured");
+                GD.PrintErr("Options Panel not assigned!");
             }
         }
         
         private void OnQuitPressed()
         {
-            GD.Print("Quit to Desktop selected");
-            SystemManager.Instance?.PlayCancelSE();
+            GD.Print("Quit pressed");
+            SystemManager.Instance?.PlayOkSE();
             
-            // Quit the game
-            GetTree().Quit();
-        }
-        
-        private void PlayTitleMusic()
-        {
-            if (SystemManager.Instance != null)
+            // Show confirmation dialog
+            var dialog = new ConfirmationDialog();
+            dialog.DialogText = "Are you sure you want to quit?";
+            dialog.Title = "Quit Game";
+            dialog.Confirmed += () =>
             {
-                SystemManager.Instance.PlayTitleMusic();
-                GD.Print("Playing title music");
-            }
-            else
-            {
-                GD.PrintErr("TitleScreen: SystemManager instance not found!");
-            }
+                GD.Print("Quitting game...");
+                GetTree().Quit();
+            };
+            
+            AddChild(dialog);
+            dialog.PopupCentered();
         }
         
         public override void _Input(InputEvent @event)
@@ -228,7 +162,7 @@ namespace EchoesAcrossTime.UI
         public void ReturnToMainMenu()
         {
             if (loadGamePanel != null) loadGamePanel.Visible = false;
-            if (optionsPanel != null) optionsPanel.Visible = false;
+            if (optionsPanel != null) optionsPanel.CloseMenu();
             
             newGameButton?.GrabFocus();
             SystemManager.Instance?.PlayCancelSE();

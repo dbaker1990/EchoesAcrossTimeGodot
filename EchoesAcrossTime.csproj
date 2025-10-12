@@ -12,6 +12,7 @@
     <Content Include="Images\TitleScreen\Title Screen.png" />
     <Content Include="Skits\SkitUI.tscn" />
     <Content Include="UI\PartyMenuUI.tscn" />
+    <Content Include="UI\TitleScreenOptionsUI.tscn" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Audio\BGM\" />

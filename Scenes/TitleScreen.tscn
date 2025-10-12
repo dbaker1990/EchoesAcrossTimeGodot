@@ -1,9 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://b8k4hvurghe8k"]
+[gd_scene load_steps=4 format=3 uid="uid://b8k4hvurghe8k"]
 
 [ext_resource type="Script" uid="uid://bis4htr86mh3q" path="res://UI/TitleScreen.cs" id="1_vmg2h"]
 [ext_resource type="Texture2D" uid="uid://baf4agafp2sms" path="res://Images/TitleScreen/Title Screen.png" id="2_8l4an"]
+[ext_resource type="PackedScene" uid="uid://brq0qsl863qu8" path="res://UI/TitleScreenOptionsUI.tscn" id="3_8l4an"]
 
-[node name="TitleScreen" type="Control" node_paths=PackedStringArray("newGameButton", "loadGameButton", "optionsButton", "quitButton", "titleBackground", "titleLabel")]
+[node name="TitleScreen" type="Control" node_paths=PackedStringArray("newGameButton", "loadGameButton", "optionsButton", "quitButton", "titleBackground", "titleLabel", "loadGamePanel", "optionsPanel")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -17,6 +18,8 @@ optionsButton = NodePath("CenterContainer/MenuPanel/VBoxContainer/OptionsButton"
 quitButton = NodePath("CenterContainer/MenuPanel/VBoxContainer/QuitButton")
 titleBackground = NodePath("Background")
 titleLabel = NodePath("TitleLabel")
+loadGamePanel = NodePath("LoadGamePanel")
+optionsPanel = NodePath("TitleScreenOptionsUI")
 
 [node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
@@ -27,16 +30,13 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_8l4an")
 expand_mode = 1
-stretch_mode = 6
 
 [node name="TitleLabel" type="Label" parent="."]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -20.0
-offset_right = 20.0
-offset_bottom = 23.0
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 100.0
+offset_bottom = 123.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.7529412, 0.7529412, 0.7529412, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
@@ -50,14 +50,13 @@ vertical_alignment = 1
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
+anchors_preset = 9
 anchor_bottom = 1.0
 offset_left = 200.0
-offset_top = -430.0
-offset_right = 600.0005
-offset_bottom = -50.0
-grow_vertical = 0
+offset_top = 530.0
+offset_right = 600.0
+offset_bottom = -170.0
+grow_vertical = 2
 
 [node name="MenuPanel" type="PanelContainer" parent="CenterContainer"]
 custom_minimum_size = Vector2(400, 350)
@@ -106,13 +105,49 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -100.0
-offset_top = -42.0
-offset_right = -16.0
+offset_left = -40.0
+offset_top = -23.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 30
 text = "v1.0.0"
-horizontal_alignment = 2
 vertical_alignment = 1
+
+[node name="TitleScreenOptionsUI" parent="." instance=ExtResource("3_8l4an")]
+layout_mode = 1
+
+[node name="LoadGamePanel" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="LoadGamePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.8)
+
+[node name="Label" type="Label" parent="LoadGamePanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "Load Game Panel - Coming Soon!"
+horizontal_alignment = 1

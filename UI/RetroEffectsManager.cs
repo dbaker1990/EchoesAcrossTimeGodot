@@ -1,5 +1,4 @@
-﻿// UI/RetroEffectsManager.cs
-using Godot;
+﻿using Godot;
 using System;
 using System.Collections.Generic;
 
@@ -13,14 +12,15 @@ namespace EchoesAcrossTime.UI
         public enum RetroEffectType
         {
             None,
-            CRT,
+            // CRT removed - uses screen_texture which doesn't work in AutoLoad
             Pixelation,
             ColorPalette,
             VHS,
             Dithering,
             Gameboy,
             RGBGlitch,
-            ArcadeCRT
+            ArcadeCRT,
+            Scanlines  // NEW: Simple scanlines effect
         }
 
         [ExportGroup("Active Effects")]
@@ -35,27 +35,63 @@ namespace EchoesAcrossTime.UI
         private Dictionary<RetroEffectType, ColorRect> effectRects = new Dictionary<RetroEffectType, ColorRect>();
         private Dictionary<RetroEffectType, ShaderMaterial> shaderMaterials = new Dictionary<RetroEffectType, ShaderMaterial>();
 
-        // Shader paths
+        // Shader paths (CRT removed)
         private readonly Dictionary<RetroEffectType, string> shaderPaths = new Dictionary<RetroEffectType, string>
         {
-            { RetroEffectType.CRT, "res://UI/Materials/CRT.gdshader" },
+            // CRT removed - requires screen_texture sampling
             { RetroEffectType.Pixelation, "res://UI/Materials/RetroPixelation.gdshader" },
             { RetroEffectType.ColorPalette, "res://UI/Materials/RetroPalette.gdshader" },
             { RetroEffectType.VHS, "res://UI/Materials/RetroVHS.gdshader" },
             { RetroEffectType.Dithering, "res://UI/Materials/RetroDither.gdshader" },
             { RetroEffectType.Gameboy, "res://UI/Materials/RetroGameboy.gdshader" },
             { RetroEffectType.RGBGlitch, "res://UI/Materials/RetroGlitch.gdshader" },
-            { RetroEffectType.ArcadeCRT, "res://UI/Materials/RetroArcade.gdshader" }
+            { RetroEffectType.ArcadeCRT, "res://UI/Materials/RetroArcade.gdshader" },
+            { RetroEffectType.Scanlines, "res://UI/Materials/RetroScanlines.gdshader" }
         };
 
         public override void _Ready()
         {
+            GD.Print("=== RetroEffectsManager Initializing ===");
+            
+            // CRITICAL: Set CanvasLayer properties for AutoLoad
+            // Use a high but not too high layer - render AFTER content
+            Layer = 100; // High enough to be on top, not so high it renders too early
+            FollowViewportEnabled = true; // Follow the viewport (essential for AutoLoad)
+            
+            GD.Print($"Layer set to: {Layer}");
+            GD.Print($"FollowViewportEnabled: {FollowViewportEnabled}");
+            
             InitializeEffects();
             UpdateActiveEffects();
+            
+            // Connect to viewport size changed signal
+            GetViewport().SizeChanged += OnViewportSizeChanged;
+            
+            GD.Print("=== RetroEffectsManager Ready ===");
+        }
+        
+        private void OnViewportSizeChanged()
+        {
+            // Update all effect rects when viewport size changes
+            var newSize = GetViewport().GetVisibleRect().Size;
+            GD.Print($"Viewport resized to: {newSize.X}x{newSize.Y}");
+            
+            foreach (var rect in effectRects.Values)
+            {
+                rect.SetSize(newSize);
+            }
         }
 
         private void InitializeEffects()
         {
+            GD.Print("Initializing visual effects...");
+            int successCount = 0;
+            int failCount = 0;
+            
+            // Get viewport size for proper rect sizing
+            var viewportSize = GetViewport().GetVisibleRect().Size;
+            GD.Print($"Viewport size: {viewportSize.X}x{viewportSize.Y}");
+            
             foreach (var effectType in System.Enum.GetValues<RetroEffectType>())
             {
                 if (effectType == RetroEffectType.None) continue;
@@ -67,7 +103,19 @@ namespace EchoesAcrossTime.UI
                     Visible = false
                 };
                 AddChild(rect);
+                
+                // Set anchors to fill screen
                 rect.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+                
+                // CRITICAL: Manually set size for AutoLoad CanvasLayers
+                rect.SetSize(viewportSize);
+                rect.Position = Vector2.Zero;
+                
+                // Also set offsets to 0 to ensure full coverage
+                rect.OffsetLeft = 0;
+                rect.OffsetTop = 0;
+                rect.OffsetRight = 0;
+                rect.OffsetBottom = 0;
 
                 if (shaderPaths.ContainsKey(effectType))
                 {
@@ -77,15 +125,20 @@ namespace EchoesAcrossTime.UI
                         var material = new ShaderMaterial { Shader = shader };
                         rect.Material = material;
                         shaderMaterials[effectType] = material;
+                        successCount++;
+                        GD.Print($"  ✓ {effectType} shader loaded - Size: {rect.Size}");
                     }
                     else
                     {
-                        GD.PrintErr($"Failed to load shader for {effectType} at {shaderPaths[effectType]}");
+                        GD.PrintErr($"  ✗ Failed to load shader for {effectType} at {shaderPaths[effectType]}");
+                        failCount++;
                     }
                 }
 
                 effectRects[effectType] = rect;
             }
+            
+            GD.Print($"Effects initialized: {successCount} loaded, {failCount} failed");
         }
 
         public override void _Process(double delta)
@@ -131,9 +184,19 @@ namespace EchoesAcrossTime.UI
         /// </summary>
         public void SetEffect(RetroEffectType effect)
         {
+            GD.Print($"[RetroEffectsManager] Setting effect to: {effect}");
             PrimaryEffect = effect;
             EnableSecondaryEffect = false;
             UpdateActiveEffects();
+            
+            // Debug: Check if rect is visible
+            if (effect != RetroEffectType.None && effectRects.ContainsKey(effect))
+            {
+                var rect = effectRects[effect];
+                GD.Print($"  Effect rect visible: {rect.Visible}");
+                GD.Print($"  Effect rect has material: {rect.Material != null}");
+                GD.Print($"  Effect rect size: {rect.Size}");
+            }
         }
 
         /// <summary>
@@ -141,6 +204,7 @@ namespace EchoesAcrossTime.UI
         /// </summary>
         public void SetCombinedEffect(RetroEffectType primary, RetroEffectType secondary)
         {
+            GD.Print($"[RetroEffectsManager] Setting combined effect: {primary} + {secondary}");
             PrimaryEffect = primary;
             SecondaryEffect = secondary;
             EnableSecondaryEffect = true;
@@ -152,6 +216,7 @@ namespace EchoesAcrossTime.UI
         /// </summary>
         public void SetEnabled(bool enabled)
         {
+            GD.Print($"[RetroEffectsManager] Enabled set to: {enabled}");
             Enabled = enabled;
             UpdateActiveEffects();
         }
@@ -165,6 +230,7 @@ namespace EchoesAcrossTime.UI
         }
 
         // ===== EFFECT-SPECIFIC PARAMETER SETTERS =====
+        // CRT methods removed
 
         public void SetPixelationSize(int size)
         {
@@ -198,15 +264,27 @@ namespace EchoesAcrossTime.UI
             }
         }
 
-        public void SetCRTParameters(float scanlineStrength, float curvature)
+        public void SetScanlinesParameters(float strength, float count)
         {
-            var material = GetEffectMaterial(RetroEffectType.CRT);
+            var material = GetEffectMaterial(RetroEffectType.Scanlines);
             if (material != null)
             {
-                material.SetShaderParameter("scanline_strength", scanlineStrength);
-                material.SetShaderParameter("curvature", curvature);
+                material.SetShaderParameter("scanline_strength", strength);
+                material.SetShaderParameter("scanline_count", count);
             }
         }
+
+        public void SetDitheringParameters(float strength, int size)
+        {
+            var material = GetEffectMaterial(RetroEffectType.Dithering);
+            if (material != null)
+            {
+                material.SetShaderParameter("dither_strength", strength);
+                material.SetShaderParameter("dither_size", size);
+            }
+        }
+
+        // CRT methods removed - filter not supported in AutoLoad
 
         // ===== PRESETS =====
 
@@ -221,6 +299,17 @@ namespace EchoesAcrossTime.UI
 
                 case "gameboy":
                     SetEffect(RetroEffectType.Gameboy);
+                    break;
+                    
+                case "snes":
+                    SetEffect(RetroEffectType.Scanlines);
+                    SetScanlinesParameters(0.3f, 480.0f);
+                    break;
+                    
+                case "snes_dither":
+                    SetCombinedEffect(RetroEffectType.Dithering, RetroEffectType.Scanlines);
+                    SetDitheringParameters(0.5f, 2);
+                    SetScanlinesParameters(0.2f, 480.0f);
                     break;
 
                 case "vhs_horror":
@@ -242,13 +331,10 @@ namespace EchoesAcrossTime.UI
                 case "pixel_perfect":
                     SetCombinedEffect(RetroEffectType.Pixelation, RetroEffectType.ColorPalette);
                     SetPixelationSize(3);
-                    SetColorDepth(32);
+                    SetColorDepth(256);
                     break;
 
-                case "crt_classic":
-                    SetEffect(RetroEffectType.CRT);
-                    SetCRTParameters(0.3f, 0.05f);
-                    break;
+                // CRT presets removed
 
                 default:
                     SetEffect(RetroEffectType.None);
