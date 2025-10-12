@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using EchoesAcrossTime.UI;
 using EchoesAcrossTime.Items;
 using EchoesAcrossTime.Combat;
+using EchoesAcrossTime.Managers;
 
 namespace EchoesAcrossTime.Events
 {
@@ -54,6 +55,8 @@ namespace EchoesAcrossTime.Events
             
             SetupPathfinding();
         }
+        
+        
 
         public override void _Input(InputEvent @event)
         {
@@ -61,6 +64,231 @@ namespace EchoesAcrossTime.Events
             {
                 inputReceived = true;
             }
+        }
+        
+        /// <summary>
+        /// Change weather with optional transition
+        /// Usage: ChangeWeather("Rain", instant: false)
+        /// </summary>
+        public void ChangeWeather(string weatherType, bool instant = false)
+        {
+            if (Enum.TryParse<WeatherManager.WeatherType>(weatherType, true, out var weather))
+            {
+                WeatherManager.Instance?.ChangeWeather(weather, instant);
+                GD.Print($"[Event] Weather changed to: {weather}");
+            }
+            else
+            {
+                GD.PrintErr($"[Event] Invalid weather type: {weatherType}");
+            }
+        }
+        
+        /// <summary>
+        /// Set story weather (disables auto-weather changes)
+        /// Usage: SetStoryWeather("Storm")
+        /// </summary>
+        public void SetStoryWeather(string weatherType)
+        {
+            if (Enum.TryParse<WeatherManager.WeatherType>(weatherType, true, out var weather))
+            {
+                WeatherManager.Instance?.SetStoryWeather(weather);
+                GD.Print($"[Event] Story weather set to: {weather}");
+            }
+        }
+        
+        /// <summary>
+        /// Resume automatic weather changes
+        /// Usage: ResumeAutoWeather()
+        /// </summary>
+        public void ResumeAutoWeather()
+        {
+            WeatherManager.Instance?.ResumeAutoWeather();
+            GD.Print("[Event] Auto-weather resumed");
+        }
+        
+        /// <summary>
+        /// Wait for weather transition to complete
+        /// Usage: await WaitForWeatherTransition()
+        /// </summary>
+        public async Task WaitForWeatherTransition()
+        {
+            if (WeatherManager.Instance == null) return;
+            
+            float duration = WeatherManager.Instance.TransitionDuration;
+            await ToSignal(GetTree().CreateTimer(duration), "timeout");
+        }
+        
+        /// <summary>
+        /// Set the time of day
+        /// Usage: SetTime(20, 30) for 8:30 PM
+        /// </summary>
+        public void SetTime(int hour, int minute)
+        {
+            TimeManager.Instance?.SetTime(hour, minute);
+            GD.Print($"[Event] Time set to {hour:D2}:{minute:D2}");
+        }
+        
+        /// <summary>
+        /// Advance time by specified minutes
+        /// Usage: AdvanceTime(120) for 2 hours
+        /// </summary>
+        public void AdvanceTime(int minutes)
+        {
+            TimeManager.Instance?.AdvanceTime(minutes);
+            GD.Print($"[Event] Advanced time by {minutes} minutes");
+        }
+        
+        /// <summary>
+        /// Set time to a specific time of day
+        /// Usage: SetTimeOfDay("Evening")
+        /// </summary>
+        public void SetTimeOfDay(string timeOfDay)
+        {
+            if (TimeManager.Instance == null) return;
+            
+            int hour = timeOfDay.ToLower() switch
+            {
+                "dawn" => 6,
+                "morning" => 9,
+                "afternoon" => 14,
+                "evening" => 19,
+                "night" => 22,
+                _ => 12
+            };
+            
+            TimeManager.Instance.SetTime(hour, 0);
+            GD.Print($"[Event] Time set to {timeOfDay}");
+        }
+        
+        /// <summary>
+        /// Toggle time progression
+        /// Usage: SetTimeEnabled(false) to pause time
+        /// </summary>
+        public void SetTimeEnabled(bool enabled)
+        {
+            if (TimeManager.Instance != null)
+            {
+                TimeManager.Instance.TimeEnabled = enabled;
+                GD.Print($"[Event] Time progression: {(enabled ? "ENABLED" : "DISABLED")}");
+            }
+        }
+        
+        /// <summary>
+        /// Fast forward time with fade effect
+        /// Usage: await FastForwardTime(240) for 4 hours
+        /// </summary>
+        public async Task FastForwardTime(int minutes, bool showFade = true)
+        {
+            if (TimeManager.Instance == null) return;
+            
+            if (showFade)
+            {
+                // Fade out
+                await FadeScreen(true, 0.5f, Colors.Black);
+            }
+            
+            // Advance time
+            TimeManager.Instance.AdvanceTime(minutes);
+            
+            if (showFade)
+            {
+                // Small delay
+                await ToSignal(GetTree().CreateTimer(0.3f), "timeout");
+                
+                // Fade in
+                await FadeScreen(false, 0.5f, Colors.Black);
+            }
+            
+            GD.Print($"[Event] Fast-forwarded {minutes} minutes");
+        }
+        
+        /// <summary>
+        /// Create a dramatic scene with weather and time
+        /// Usage: await SetSceneAmbience("Storm", "Evening")
+        /// </summary>
+        public async Task SetSceneAmbience(string weatherType, string timeOfDay)
+        {
+            // Set time first
+            SetTimeOfDay(timeOfDay);
+            
+            // Then set weather
+            ChangeWeather(weatherType, false);
+            
+            // Wait for transition
+            await WaitForWeatherTransition();
+        }
+        
+        /// <summary>
+        /// Wait until a specific time of day
+        /// Usage: await WaitUntilTimeOfDay("Night")
+        /// </summary>
+        public async Task WaitUntilTimeOfDay(string targetTimeOfDay)
+        {
+            if (TimeManager.Instance == null) return;
+            
+            if (!Enum.TryParse<TimeManager.TimeOfDay>(targetTimeOfDay, true, out var target))
+            {
+                GD.PrintErr($"[Event] Invalid time of day: {targetTimeOfDay}");
+                return;
+            }
+            
+            // Wait until target time of day is reached
+            while (TimeManager.Instance.CurrentTimeOfDay != target)
+            {
+                await ToSignal(GetTree(), "process_frame");
+            }
+            
+            GD.Print($"[Event] Reached {target}");
+        }
+        
+        /// <summary>
+        /// Check if it's currently a specific time of day
+        /// Usage: if (IsTimeOfDay("Night")) { ... }
+        /// </summary>
+        public bool IsTimeOfDay(string timeOfDay)
+        {
+            if (TimeManager.Instance == null) return false;
+            
+            if (Enum.TryParse<TimeManager.TimeOfDay>(timeOfDay, true, out var target))
+            {
+                return TimeManager.Instance.CurrentTimeOfDay == target;
+            }
+            
+            return false;
+        }
+        
+        /// <summary>
+        /// Check if weather is a specific type
+        /// Usage: if (IsWeather("Rain")) { ... }
+        /// </summary>
+        public bool IsWeather(string weatherType)
+        {
+            if (WeatherManager.Instance == null) return false;
+            
+            if (Enum.TryParse<WeatherManager.WeatherType>(weatherType, true, out var target))
+            {
+                return WeatherManager.Instance.CurrentWeather == target;
+            }
+            
+            return false;
+        }
+        
+        /// <summary>
+        /// Check if it's currently stormy
+        /// Usage: if (IsStormy()) { ... }
+        /// </summary>
+        public bool IsStormy()
+        {
+            return WeatherManager.Instance?.IsStormy() ?? false;
+        }
+        
+        /// <summary>
+        /// Check if it's nighttime
+        /// Usage: if (IsNight()) { ... }
+        /// </summary>
+        public bool IsNight()
+        {
+            return TimeManager.Instance?.IsNight() ?? false;
         }
 
         #endregion
@@ -244,6 +472,8 @@ namespace EchoesAcrossTime.Events
             GD.PrintErr($"Cannot compare incompatible types: {var1.VariantType} and {valueToCompare.VariantType}");
             return false;
         }
+        
+        
         
         #endregion
         
