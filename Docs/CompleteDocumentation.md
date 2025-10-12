@@ -1,4 +1,4 @@
-﻿# Echoes Across Time - Complete Project Documentation
+﻿# Echoes Across Time - Complete System Documentation
 
 ## 📋 Table of Contents
 1. [Project Overview](#project-overview)
@@ -6,13 +6,16 @@
 3. [Getting Started](#getting-started)
 4. [Core Systems](#core-systems)
 5. [Battle System](#battle-system)
-6. [UI & Menu Systems](#ui--menu-systems)
-7. [Game Systems](#game-systems)
-8. [Event & Dialogue System](#event--dialogue-system)
-9. [Overworld Systems](#overworld-systems)
-10. [Save System](#save-system)
-11. [API Reference](#api-reference)
-12. [Development Guide](#development-guide)
+6. [Advanced AI Systems](#advanced-ai-systems)
+7. [RPG Systems](#rpg-systems)
+8. [UI & Menu Systems](#ui--menu-systems)
+9. [Audio & Visual Systems](#audio--visual-systems)
+10. [Event & Dialogue System](#event--dialogue-system)
+11. [Overworld Systems](#overworld-systems)
+12. [Database System](#database-system)
+13. [Save System](#save-system)
+14. [API Reference](#api-reference)
+15. [Development Guide](#development-guide)
 
 ---
 
@@ -31,6 +34,7 @@
 - **Limit Break system** with solo and DUO ultimate attacks
 - **All-Out Attack** finisher when all enemies are knocked down
 - **Guard, Item, and Escape** mechanics
+- **Advanced AI systems** with pattern learning and adaptive behavior
 
 #### RPG Systems
 - 🏪 **Shop System** - Buy/sell with stock management
@@ -38,7 +42,7 @@
 - 📖 **Bestiary** - Progressive enemy discovery system
 - 🎭 **Skit System** - Tales-style character conversations
 - 📚 **Lore Codex** - World-building encyclopedia
-- 🔗 **Bond/Relationship System** - Character connections
+- 🔗 **Bond/Relationship System** - Character connections and romance
 - ⚡ **Encounter System** - Random battle encounters
 - 🎒 **Inventory & Equipment** - Complete item management
 - 🔨 **Crafting System** - Recipe-based item creation
@@ -50,6 +54,9 @@
 - 🎬 **Event/cutscene system** with command-based scripting
 - 🗺️ **Overworld character control** with state machine
 - 🏃 **Party management** with main/sub party system
+- 📊 **Database system** for all game data
+- 🎮 **HUD Manager** for on-screen display
+- 🎨 **Retro Effects** with shader-based visual filters
 
 ### Project Information
 - **Engine:** Godot 4.5+
@@ -69,16 +76,18 @@ The project uses several autoloaded manager scripts that provide global access:
 ```
 SystemManager          - Core system coordinator
 QuestManager           - Quest tracking and management
-PartyManager           - Party composition and stats
-SkitManager            - Character conversation system
-AudioManager           - Music and sound effects
-BestiaryManager        - Enemy encyclopedia tracking
+PartyManager           - Party composition and roster
+SkitManager            - Character skit conversations
+AudioManager           - BGM, SFX, and voice management
+BestiaryManager        - Enemy encyclopedia
 EncounterManager       - Random battle encounters
-BondManager            - Character bond levels
+BondManager            - Character bond progression
 RelationshipManager    - Character relationships
-ShopManager            - Shop system management
-LoreCodexManager       - Lore/worldbuilding entries
-HudManager             - HUD display management
+ShopManager            - Shop system coordination
+LoreCodexManager       - Lore encyclopedia management
+HudManager             - HUD display coordination
+RetroEffectsManager    - Visual shader effects
+FPSCounter             - Performance monitoring
 ```
 
 ### Project Structure
@@ -86,48 +95,51 @@ HudManager             - HUD display management
 ```
 EchoesAcrossTime/
 │
-├── Audio/                          # Audio management
-│   └── AudioManager.cs            # BGM, SFX, Voice
+├── Audio/                          # Audio system
+│   ├── AudioManager.cs             # (Autoload)
+│   ├── BGM/                        # Background music
+│   └── SFX/                        # Sound effects
 │
-├── Beastiary/                      # Enemy encyclopedia
+├── Beastiary/                      # Bestiary system
+│   ├── BestiaryManager.cs          # (Autoload)
 │   ├── BestiaryData.cs
-│   ├── BestiaryManager.cs         # (Autoload)
 │   ├── BestiaryUI.cs
-│   ├── BestiaryNotification.cs
-│   └── BestiaryIntegration.cs
+│   └── BestiaryNotification.tscn
 │
-├── Bonds/                          # Character relationships
-│   ├── BondManager.cs             # (Autoload)
-│   └── RelationshipManager.cs     # (Autoload)
+├── Bonds/                          # Bond/Relationship system
+│   ├── BondManager.cs              # (Autoload)
+│   ├── RelationshipManager.cs      # (Autoload)
+│   ├── BondData.cs
+│   └── BondConfig.tres
 │
 ├── Combat/                         # Battle system
-│   ├── BattleManager.cs           # Main battle controller
-│   ├── BattleMember.cs
-│   ├── BattleAction.cs
-│   ├── BatonPassSystem.cs
+│   ├── BattleManager.cs
+│   ├── CharacterStats.cs
+│   ├── SkillData.cs
 │   ├── TechnicalDamage.cs
 │   ├── ShowtimeAttacks.cs
 │   ├── LimitBreakSystem.cs
-│   ├── GuardSystem.cs
-│   ├── BattleItemSystem.cs
-│   ├── EscapeSystem.cs
-│   ├── ElementType.cs
-│   ├── CharacterStats.cs
-│   ├── SkillData.cs
-│   └── StatusEffectManager.cs
+│   ├── BatonPassManager.cs
+│   ├── AllOutAttackSystem.cs
+│   └── Advance/                    # Advanced AI
+│       ├── AdvancedAIPattern.cs
+│       ├── AdvancedAIDebugger.cs
+│       ├── AdvancedAIDirector.cs
+│       └── AdvancedAIAchievements.cs
 │
-├── Crafting/                       # Item crafting
+├── Crafting/                       # Crafting system
+│   ├── CraftingSystem.cs
 │   ├── CraftingRecipeData.cs
-│   ├── CraftingManager.cs
 │   └── CraftingUI.cs
 │
-├── Database/                       # Game data
-│   ├── CharacterData.cs
+├── Database/                       # Database system
 │   ├── GameDatabase.cs
-│   └── ItemData.cs
+│   ├── CharacterDatabase.cs
+│   └── CharacterDatabase.tres
 │
-├── Encounters/                     # Battle encounters
-│   └── EncounterManager.cs        # (Autoload)
+├── Encounters/                     # Encounter system
+│   ├── EncounterManager.cs         # (Autoload)
+│   └── EncounterZone.cs
 │
 ├── Events/                         # Cutscene system
 │   ├── EventCommand.cs
@@ -143,30 +155,38 @@ EchoesAcrossTime/
 │
 ├── LoreCodex/                      # Lore encyclopedia
 │   ├── LoreCodexData.cs
-│   ├── LoreCodexManager.cs        # (Autoload)
+│   ├── LoreCodexManager.cs         # (Autoload)
 │   └── LoreCodexUI.cs
 │
 ├── Managers/                       # Core managers
-│   ├── SystemManager.cs           # (Autoload)
+│   ├── SystemManager.cs            # (Autoload)
 │   ├── GameManager.cs
-│   └── PartyManager.cs            # (Autoload)
+│   └── PartyManager.cs             # (Autoload)
 │
 ├── Quests/                         # Quest system
 │   ├── QuestData.cs
-│   ├── QuestManager.cs            # (Autoload)
+│   ├── QuestManager.cs             # (Autoload)
 │   └── QuestUI.cs
+│
+├── SaveSystem/                     # Save/Load system
+│   ├── SaveManager.cs
+│   ├── SaveData.cs
+│   └── SaveData_Extensions.cs
 │
 ├── Shops/                          # Shop system
 │   ├── ShopData.cs
-│   ├── ShopManager.cs             # (Autoload)
+│   ├── ShopManager.cs              # (Autoload)
 │   └── ShopUI.cs
 │
 ├── Skits/                          # Character skits
 │   ├── SkitData.cs
-│   ├── SkitManager.cs             # (Autoload)
+│   ├── SkitManager.cs              # (Autoload)
 │   └── SkitUI.cs
 │
 ├── UI/                             # User interface
+│   ├── HUDManager.cs               # (Autoload)
+│   ├── RetroEffectsManager.cs      # (Autoload)
+│   ├── FPSCounter.cs               # (Autoload)
 │   ├── MainMenuUI.cs
 │   ├── ItemMenuUI.cs
 │   ├── SkillMenuUI.cs
@@ -174,20 +194,24 @@ EchoesAcrossTime/
 │   ├── StatusMenuUI.cs
 │   ├── OptionsMenuUI.cs
 │   ├── SaveMenuUI.cs
-│   └── LoadMenuUI.cs
+│   ├── LoadMenuUI.cs
+│   ├── PartyMenuUI.cs
+│   └── TitleScreenOptionsUI.cs
 │
 └── Characters/                     # Overworld control
     ├── OverworldCharacter.cs
     ├── PlayerCharacter.cs
-    ├── States/
-    │   ├── IdleState.cs
-    │   ├── WalkingState.cs
-    │   ├── RunningState.cs
-    │   ├── JumpingState.cs
-    │   ├── ClimbingState.cs
-    │   ├── PullingState.cs
-    │   └── PushingState.cs
-    └── FishingState.cs
+    ├── FollowerCharacter.cs
+    └── States/
+        ├── IdleState.cs
+        ├── WalkingState.cs
+        ├── RunningState.cs
+        ├── JumpingState.cs
+        ├── ClimbingState.cs
+        ├── PullingState.cs
+        ├── PushingState.cs
+        ├── LockedState.cs
+        └── FishingState.cs
 ```
 
 ---
@@ -313,564 +337,289 @@ A complete **Persona 5 Royal-style** turn-based combat system with advanced stra
 
 Main battle controller handling all combat logic.
 
-#### Key Signals
-```csharp
-BattleStarted()
-TurnStarted(string characterName)
-ActionExecuted(string actor, BattleAction action)
-WeaknessHit(string attacker, string target)
-EnemyKnockedDown(string enemy)
-AllEnemiesKnockedDown()
-OneMoreGranted(string character)
-AllOutAttackAvailable()
-BatonPassExecuted(string from, string to, int level)
-TechnicalDamage(string attacker, string target, string combo)
-ShowtimeTriggered(string name, string char1, string char2)
-LimitBreakReady(string character)
-LimitBreakUsed(string character, string name, bool isDuo)
-BattleEnded(bool victory)
-```
+**Core Features:**
+- Turn-based combat system
+- Element system (8 types: Physical, Fire, Ice, Electric, Wind, Light, Dark, Almighty)
+- Weakness exploitation → One More mechanic
+- Status effects
+- Battle flow management
 
-#### Key Methods
+**Key Methods:**
 ```csharp
 // Initialize battle
-void InitializeBattle(
-    List<CharacterStats> playerParty,
+BattleManager.InitializeBattle(
+    List<CharacterStats> playerParty, 
     List<CharacterStats> enemies,
-    List<ShowtimeAttackData> showtimes = null,
-    List<LimitBreakData> limitBreaks = null,
-    bool isBossBattle = false,
-    bool canEscape = true
+    List<ShowtimePair> showtimePairs
 );
 
 // Execute action
-void ExecuteAction(BattleAction action);
+BattleManager.ExecuteAction(BattleAction action);
 
-// Turn management
-void NextTurn();
-void SkipTurn();
+// Advance turn
+BattleManager.NextTurn();
 
-// Special mechanics
-void ExecuteAllOutAttack();
-bool CanAllOutAttack();
-bool CanBatonPass();
-bool ExecuteBatonPass(BattleMember target);
+// Check battle end
+bool isOver = BattleManager.IsBattleOver();
 ```
 
-### Battle Mechanics
+### Advanced Mechanics
 
-#### 1. Elemental System
+#### 1. Baton Pass System
+**Location:** `Combat/BatonPassManager.cs`
 
-**8 Element Types:**
-- Fire 🔥
-- Ice ❄️
-- Thunder ⚡
-- Water 💧
-- Earth 🌍
-- Light ✨
-- Dark 🌑
-- Physical ⚔️
-
-**Affinity Types:**
-- **Weak** (150% damage) → Knockdown + One More
-- **Normal** (100% damage)
-- **Resist** (50% damage)
-- **Immune** (0% damage)
-- **Absorb** (Heals instead of damages)
-
-**Weakness Exploitation:**
-```csharp
-// Hitting a weakness grants:
-- 1.5x damage multiplier
-- Knocks down the enemy
-- Grants "One More" extra turn
-- Enables All-Out Attack when all enemies down
-```
-
-#### 2. One More System
-
-After hitting a weakness or landing a critical hit, the attacker gains an immediate extra turn.
+Strategic turn-passing system with stacking bonuses.
 
 **Features:**
-- Can chain multiple times
-- Resets at end of round
-- Can be passed to allies via Baton Pass
-- Enables strategic turn optimization
-
-#### 3. Baton Pass System
-**Location:** `Combat/BatonPassSystem.cs`
-
-Pass your One More turn to an ally with stacking bonuses.
-
-**Bonus Levels:**
-- **Level 1:** +50% damage, +50% healing, +10% crit
-- **Level 2:** +100% damage, +100% healing, +20% crit
-- **Level 3:** +150% damage, +150% healing, +30% crit
-
-**Restrictions:**
-- Cannot pass to yourself
-- Target must be alive and not acted yet
-- Requires One More turn active
+- Chain bonus multipliers (1.2x → 1.4x → 1.6x)
+- Requires weakness exploitation or critical hit
+- Can only pass to allies who haven't acted
+- Visual chain indicators
 
 **Usage:**
 ```csharp
 // Check if can baton pass
-bool canPass = battleManager.CanBatonPass();
+bool canPass = BatonPassManager.CanBatonPass(currentChar, targetChar);
 
-// Get available targets
-var targets = battleManager.GetBatonPassTargets();
+// Execute baton pass
+BatonPassManager.ExecuteBatonPass(currentChar, targetChar);
 
-// Execute pass
-bool success = battleManager.ExecuteBatonPass(targetAlly);
+// Get current bonus
+float bonus = BatonPassManager.GetCurrentBonus();
+
+// Reset chain
+BatonPassManager.ResetChain();
 ```
 
-#### 4. Technical Damage
+#### 2. Technical Damage System
 **Location:** `Combat/TechnicalDamage.cs`
 
-Bonus damage from combining status effects with specific elements (1.5x multiplier).
+Advanced combo system combining status effects with elements.
 
-**Combos:**
-- **Burn** + Thunder/Ice → Technical!
-- **Freeze** + Physical → Shatter!
-- **Shock/Paralysis** + Physical → Critical strike!
-- **Sleep** + Any attack → Wake violently!
-- **Poison** + Fire/Thunder → Detonate!
-- **Confusion** + Light/Dark → Exploit!
+**Technical Combos:**
+- **Burn** + Ice/Wind → Technical damage
+- **Frozen** + Physical/Fire → Technical damage
+- **Shocked** + Physical/Fire → Technical damage
+- **Dizzy** + Any attack → Technical damage
 
-**Implementation:**
+**Usage:**
 ```csharp
 // Check for technical
-bool isTech = TechnicalDamage.CheckTechnicalDamage(
-    skill.Element, 
-    target
+var result = TechnicalDamage.CheckTechnicalDamage(
+    target,
+    attackElement
 );
 
-// Apply technical multiplier
-if (isTech)
+if (result.IsTechnical)
 {
-    result.DamageMultiplier *= 1.5f;
-    result.IsTechnical = true;
+    float damage = baseDamage * result.DamageMultiplier; // 1.5x
+    // Apply technical effects
 }
 ```
 
-#### 5. Showtime Attacks
+#### 3. Showtime Attacks
 **Location:** `Combat/ShowtimeAttacks.cs`
 
 Cinematic duo attacks between specific character pairs.
 
 **Features:**
-- Random trigger chance (15% per turn)
-- Very high damage multiplier (3.0-4.0x)
-- High critical chance (50%)
-- Hits all enemies
-- Cooldown system (3-5 turns)
-- Requires both characters alive
+- Character pair relationships
+- Gauge buildup system
+- Unique animations per pair
+- Powerful combined attacks
 
-**Creating Showtimes:**
+**Usage:**
 ```csharp
-var showtime = new ShowtimeAttackData
+// Define showtime pair
+var pair = new ShowtimePair
 {
-    Character1Id = "aria",
-    Character2Id = "echo_walker",
-    Name = "Frozen Echo",
-    Description = "A devastating ice-lightning combo",
-    Element = ElementType.Ice,
-    BasePower = 300,
-    Multiplier = 3.5f,
-    TriggerChance = 15,
-    CooldownTurns = 5
+    CharacterA = "aria",
+    CharacterB = "dominic",
+    ShowtimeName = "Eternal Duet",
+    ShowtimeId = "aria_dominic_showtime",
+    RequiredGauge = 100
 };
+
+// Check availability
+bool canUse = ShowtimeAttacks.CanUseShowtime(pair);
+
+// Execute showtime
+ShowtimeAttacks.ExecuteShowtime(pair, targets);
 ```
 
-#### 6. Limit Break System
+#### 4. Limit Break System
 **Location:** `Combat/LimitBreakSystem.cs`
 
-Ultimate attacks powered by the Limit Gauge (0-100).
+Ultimate attack system with solo and duo variants.
 
-**Types:**
-- **Solo Limit Break:** Single character ultimate
-- **DUO Limit Break:** Pair ultimate (requires both gauges full)
-
-**Gauge Building:**
-- Take damage: +3 per 10% HP lost
-- Deal damage: +2 per hit
-- Hit weakness: +5
-- Knock down enemy: +5
-- Critical hit: +5
-- Baton Pass: +8
-- Technical: +10
-- Showtime: +15
-- Ally KO'd: +20
+**Features:**
+- Individual limit gauges (max 100)
+- Solo Limit Breaks (requires 100 gauge)
+- DUO Limit Breaks (requires both characters at 100)
+- Gauge building from taking/dealing damage
 
 **Usage:**
 ```csharp
 // Build gauge
-LimitBreakSystem.BuildLimitGauge(member, amount);
+LimitBreakSystem.BuildLimitGauge(character, amount);
 
 // Check if ready
-bool ready = LimitBreakSystem.IsLimitBreakReady(member);
+bool ready = LimitBreakSystem.IsLimitBreakReady(character);
 
-// Execute solo
-LimitBreakSystem.ExecuteSoloLimitBreak(member, target);
+// Execute solo limit
+LimitBreakSystem.ExecuteSoloLimit(character, target);
 
-// Execute DUO
-LimitBreakSystem.ExecuteDUOLimitBreak(member1, member2, enemies);
+// Execute DUO limit
+LimitBreakSystem.ExecuteDuoLimit(charA, charB, targets);
 ```
 
-#### 7. All-Out Attack
+#### 5. All-Out Attack
+**Location:** `Combat/AllOutAttackSystem.cs`
 
-Team finisher when all enemies are knocked down.
+Finisher when all enemies are knocked down.
 
-**Features:**
-- Massive damage (2x Attack stat per party member)
-- Hits all enemies
-- Consumes all party member turns
-- Enemies stand back up after
-
-**Trigger:**
-```csharp
-// Automatically available when all enemies knocked down
-if (battleManager.CanAllOutAttack())
-{
-    battleManager.ExecuteAllOutAttack();
-}
-```
-
-#### 8. Guard System
-**Location:** `Combat/GuardSystem.cs`
-
-Defensive stance reducing incoming damage.
-
-**Effects:**
-- 50% damage reduction
-- Small HP/MP regeneration
-- Builds Limit Gauge (+5)
-- Must reapply each turn
+**Trigger Conditions:**
+- All enemies must be in "Down" state
+- At least one player character must have acted
+- Player chooses to initiate
 
 **Usage:**
 ```csharp
-var guardAction = new BattleAction(member, BattleActionType.Guard);
-battleManager.ExecuteAction(guardAction);
-```
+// Check if available
+bool canAOA = AllOutAttackSystem.CanAllOutAttack(enemies);
 
-#### 9. Item System
-**Location:** `Combat/BattleItemSystem.cs`
-
-Use consumable items during battle.
-
-**Item Types:**
-- **Healing:** Restore HP
-- **Recovery:** Restore MP
-- **Revival:** Revive KO'd allies
-- **Offensive:** Damage items (bombs, etc.)
-- **Status:** Cure or inflict status effects
-
-**Usage:**
-```csharp
-var itemAction = new BattleAction(user, BattleActionType.Item)
-{
-    ItemData = healthPotion
-};
-itemAction = itemAction.WithTargets(ally);
-battleManager.ExecuteAction(itemAction);
-```
-
-#### 10. Escape System
-**Location:** `Combat/EscapeSystem.cs`
-
-Flee from battle (not available in boss battles).
-
-**Formula:**
-- Base 50% chance
-- Modified by party speed vs enemy speed
-- +10% per failed attempt
-- HP penalty on failure
-
-**Usage:**
-```csharp
-// Check if can escape
-bool canEscape = battleManager.CanEscape();
-
-// Attempt escape
-var escapeAction = new BattleAction(member, BattleActionType.Escape);
-battleManager.ExecuteAction(escapeAction);
-```
-
-### Battle Flow Diagram
-
-```
-┌─────────────────────────────────┐
-│   1. Initialize Battle          │
-│   - Load characters & enemies   │
-│   - Set up turn order           │
-└────────────┬────────────────────┘
-             │
-             ▼
-┌─────────────────────────────────┐
-│   2. Start Turn                 │
-│   - Process status effects      │
-│   - Check for auto-actions      │
-└────────────┬────────────────────┘
-             │
-             ▼
-┌─────────────────────────────────┐
-│   3. Action Selection           │
-│   - Attack / Skill              │
-│   - Guard / Item / Escape       │
-│   - Baton Pass / Limit Break    │
-└────────────┬────────────────────┘
-             │
-             ▼
-┌─────────────────────────────────┐
-│   4. Execute Action             │
-│   - Calculate damage            │
-│   - Apply status effects        │
-└────────────┬────────────────────┘
-             │
-             ▼
-┌─────────────────────────────────┐
-│   5. Check for Special Events   │
-│   - Weakness hit?               │
-│   - Critical hit?               │
-│   - Technical damage?           │
-└────────────┬────────────────────┘
-             │
-             ▼
-┌─────────────────────────────────┐
-│   6. Grant One More?            │
-│   - If yes, actor acts again    │
-│   - Can Baton Pass              │
-└────────────┬────────────────────┘
-             │
-             ▼
-┌─────────────────────────────────┐
-│   7. Check Battle State         │
-│   - All enemies down? → AOA     │
-│   - Showtime available?         │
-│   - Battle ended?               │
-└────────────┬────────────────────┘
-             │
-             ▼
-┌─────────────────────────────────┐
-│   8. Next Turn or End Battle    │
-│   - Continue to next actor      │
-│   - Or end with victory/defeat  │
-└─────────────────────────────────┘
+// Execute All-Out Attack
+AllOutAttackSystem.ExecuteAllOutAttack(
+    playerParty, 
+    enemies,
+    leadCharacter
+);
 ```
 
 ---
 
-## UI & Menu Systems
+## Advanced AI Systems
 
-### Main Menu System
-**Location:** `UI/MainMenuUI.cs`
+### Overview
 
-Comprehensive pause menu integrating all game systems.
+Sophisticated enemy AI that learns from player behavior and adapts strategies over time.
+
+### 1. Advanced AI Pattern
+**Location:** `Combat/Advance/AdvancedAIPattern.cs`
+
+Core AI decision-making system.
 
 **Features:**
-- Opens with ESC/Tab
-- Pauses game
-- Shows location, playtime, gold
-- Access to all sub-menus
-- Sound effects
-- Keyboard/controller navigation
+- **Pattern Recognition** - Learns player habits
+- **Adaptive Behavior** - Changes strategy based on battle conditions
+- **Priority Targeting** - Intelligent target selection
+- **Skill Selection** - Context-aware ability usage
+- **Learning System** - Improves over multiple battles
 
-**Sub-Menus:**
-1. **Item Menu** - Browse/use items
-2. **Skill Menu** - View/equip skills
-3. **Equipment Menu** - Manage equipment
-4. **Status Menu** - Character stats
-5. **Crafting Menu** - Craft items
-6. **Party Menu** - Party management
-7. **Bestiary** - Enemy encyclopedia
-8. **Quest Log** - Quest journal
-9. **Options** - Game settings
-10. **Save** - Save game
-11. **Load** - Load game
+**AI Systems:**
+- Pattern learning and prediction
+- Target priority analysis
+- Skill effectiveness tracking
+- Behavior adaptation
+- Memory persistence
 
 **Usage:**
 ```csharp
-// Open menu
-var mainMenu = GetNode<MainMenuUI>("%MainMenuUI");
-mainMenu.OpenMenu();
+// Initialize AI
+var ai = new AdvancedAIPattern();
 
-// Close menu
-mainMenu.CloseMenu();
+// Record player action for learning
+ai.RecordPlayerAction(character, skill, target);
+
+// Get AI decision
+var action = ai.DecideAction(
+    aiCharacter,
+    playerParty,
+    enemyParty,
+    turnNumber
+);
 ```
 
-### Sub-Menu Systems
+### 2. Advanced AI Debugger
+**Location:** `Combat/Advance/AdvancedAIDebugger.cs`
 
-#### Item Menu
-**Location:** `UI/ItemMenuUI.cs`
-
-**Features:**
-- Filter by type (Consumable, Key, Material, Equipment)
-- Use items on party members
-- Sort inventory
-- Item details display
-- Discard items
-
-#### Skill Menu
-**Location:** `UI/SkillMenuUI.cs`
+Real-time debugging overlay for AI systems.
 
 **Features:**
-- Per-character skill management
-- Equip/unequip skills
-- Skill details (MP cost, power, element)
-- Equipped vs available view
-- Skill slot limits
+- Visual AI state display
+- Decision logging
+- Pattern analysis
+- System status tracking
+- Performance metrics
 
-#### Equipment Menu
-**Location:** `UI/EquipMenuUI.cs`
+**Usage:**
+```csharp
+// Attach debugger to AI
+advancedAIDebugger.AttachToAI(aiPattern);
 
-**Features:**
-- Equip weapons, armor, accessories
-- Stat preview with changes
-- Per-character equipment
-- Requirements checking
-- Swap between inventory and character
+// Log decisions
+advancedAIDebugger.LogDecision(
+    "Attack Aria",
+    "High HP target, vulnerable to fire"
+);
 
-#### Status Menu
-**Location:** `UI/StatusMenuUI.cs`
+// Toggle with F3 key in-game
+```
 
-**Features:**
-- Character portraits
-- Level and experience bars
-- Detailed stats display
-- Element affinities
-- Equipment bonuses
-- Active status effects
+### 3. AI Director
+**Location:** `Combat/Advance/AdvancedAIDirector.cs`
 
-#### Options Menu
-**Location:** `UI/OptionsMenuUI.cs`
+Coordinates all AI behaviors and manages difficulty.
 
 **Features:**
-- Audio volumes (BGM, SFX, Voice)
-- Display settings (Fullscreen, VSync)
-- Gameplay options (Text speed, Auto-save)
-- Controls display
-- Settings persistence
+- Dynamic difficulty adjustment
+- AI coordination between enemies
+- Behavior scheduling
+- Learning rate management
+
+### 4. AI Achievements
+**Location:** `Combat/Advance/AdvancedAIAchievements.cs`
+
+Tracks player interactions with AI systems.
+
+**Achievements:**
+- "Predicted!" - Get countered by AI prediction
+- "Read Like a Book" - Get countered 10 times
+- "They're Learning!" - AI learns your patterns
 
 ---
 
-## Game Systems
+## RPG Systems
 
-### 1. Inventory System
-**Location:** `Items/InventorySystem.cs`
-
-Manages all items, gold, and consumables.
-
-**Features:**
-- Item stacking
-- Maximum capacity
-- Item categories
-- Gold management
-- Item usage
-
-**Usage:**
-```csharp
-// Add items
-InventorySystem.Instance.AddItem(itemData, quantity);
-
-// Remove items
-InventorySystem.Instance.RemoveItem("item_id", quantity);
-
-// Check if has item
-bool hasItem = InventorySystem.Instance.HasItem("item_id", quantity);
-
-// Get item count
-int count = InventorySystem.Instance.GetItemCount("item_id");
-
-// Use item
-InventorySystem.Instance.UseItem("item_id", target);
-
-// Gold management
-InventorySystem.Instance.AddGold(amount);
-InventorySystem.Instance.RemoveGold(amount);
-int gold = InventorySystem.Instance.GetGold();
-```
-
-### 2. Equipment System
-**Location:** `Items/EquipmentManager.cs`
-
-Manages character equipment and stat bonuses.
-
-**Equipment Slots:**
-- Weapon
-- Armor
-- Accessory 1
-- Accessory 2
-
-**Stat Bonuses:**
-- MaxHP / MaxMP
-- Attack / Defense
-- Magic Attack / Magic Defense
-- Speed / Luck
-- Critical Rate / Evasion Rate
-
-**Usage:**
-```csharp
-// Equip item from inventory
-EquipmentManager.Instance.EquipFromInventory(
-    "character_id", 
-    "item_id", 
-    characterData
-);
-
-// Unequip to inventory
-EquipmentManager.Instance.UnequipToInventory(
-    "character_id", 
-    EquipSlot.Weapon
-);
-
-// Get equipped item
-var weapon = EquipmentManager.Instance.GetEquippedItem(
-    "character_id", 
-    EquipSlot.Weapon
-);
-
-// Apply equipment bonuses to stats
-EquipmentManager.Instance.ApplyEquipmentBonuses(
-    "character_id", 
-    characterStats
-);
-
-// Unequip all
-EquipmentManager.Instance.UnequipAll("character_id");
-```
-
-### 3. Shop System
+### 1. Shop System
 **Location:** `Shops/` (Autoload: ShopManager)
 
-Complete buy/sell system with stock management.
+Complete merchant and trading system.
 
 **Features:**
-- Buy/sell items
-- Limited or unlimited stock
-- Auto-restocking
-- Item unlocking (level, quest, story requirements)
-- Featured items
-- Transaction validation
-- Save/load integration
+- Multiple shop types (General, Weapon, Armor, Item)
+- Stock management and restocking
+- Buy/sell mechanics
+- Price adjustments
+- Shop availability conditions
 
 **Creating Shops:**
 ```csharp
 var shop = new ShopData
 {
-    ShopId = "weapon_shop_01",
-    ShopName = "Steel & Edge Armory",
-    ShopDescription = "Fine weapons for discerning warriors",
-    IsUnlocked = true,
-    CanSellItems = true,
-    SellPriceMultiplier = 0.5f // Sell for 50% of buy price
+    ShopId = "general_store",
+    ShopName = "Merchant's Emporium",
+    ShopType = ShopType.General,
+    BuyPriceMultiplier = 1.0f,
+    SellPriceMultiplier = 0.5f
 };
 
-// Add items for sale
+// Add items to shop
 shop.ItemsForSale.Add(new ShopItem
 {
-    ItemId = "iron_sword",
-    BuyPrice = 100,
-    UnlimitedStock = true
+    ItemId = "health_potion",
+    Stock = 10,
+    RestockAmount = 5
 });
 
 ShopManager.Instance.RegisterShop(shop);
@@ -879,19 +628,19 @@ ShopManager.Instance.RegisterShop(shop);
 **Using Shops:**
 ```csharp
 // Open shop
-ShopManager.Instance.OpenShop("weapon_shop_01");
+ShopManager.Instance.OpenShop("general_store");
 
 // Buy item
-bool success = ShopManager.Instance.BuyItem("iron_sword", 1);
+bool success = ShopManager.Instance.BuyItem("health_potion", quantity: 3);
 
 // Sell item
-bool success = ShopManager.Instance.SellItem("old_sword", 1);
+bool success = ShopManager.Instance.SellItem("old_sword", quantity: 1);
 
-// Check if can afford
-bool canAfford = ShopManager.Instance.CanAfford("iron_sword", 1);
+// Restock shop
+ShopManager.Instance.RestockShop("general_store");
 ```
 
-### 4. Quest System
+### 2. Quest System
 **Location:** `Quests/` (Autoload: QuestManager)
 
 Comprehensive quest tracking with objectives.
@@ -963,7 +712,7 @@ var activeQuests = QuestManager.Instance.GetActiveQuests();
 var completedQuests = QuestManager.Instance.GetCompletedQuests();
 ```
 
-### 5. Bestiary System
+### 3. Bestiary System
 **Location:** `Beastiary/` (Autoload: BestiaryManager)
 
 Automatic enemy encyclopedia with progressive discovery.
@@ -1004,106 +753,89 @@ var bestiaryUI = GetNode<BestiaryUI>("%BestiaryUI");
 bestiaryUI.ShowBestiary();
 ```
 
-### 6. Skit System
+### 4. Skit System
 **Location:** `Skits/` (Autoload: SkitManager)
 
 Tales of Series-style optional character conversations.
 
 **Features:**
-- 2D character portraits with emotions
-- Typewriter text effect
+- Triggered by events or locations
+- Character portraits and expressions
+- Branching dialogue
 - Voice acting support
-- Skippable scenes
-- Auto and manual triggers
-- Notification icons
-- Availability rules (party composition, story progress)
+- Skippable content
 
 **Creating Skits:**
 ```csharp
 var skit = new SkitData
 {
     SkitId = "skit_001",
-    Title = "First Meeting",
-    IsRepeatable = false,
-    RequiresAllCharacters = new[] { "aria", "dominic" }
+    SkitTitle = "First Meeting",
+    TriggerLocation = "town_square",
+    RequiredCharacters = new List<string> { "aria", "dominic" }
 };
 
-// Add dialogue lines
-skit.Dialogue.Add(new SkitDialogueLine
+// Add dialogue
+skit.DialogueLines.Add(new SkitLine
 {
     CharacterId = "aria",
-    Emotion = CharacterEmotion.Happy,
-    Text = "Hey there! I'm Aria!",
-    VoiceFile = "aria_greeting.ogg"
-});
-
-skit.Dialogue.Add(new SkitDialogueLine
-{
-    CharacterId = "dominic",
-    Emotion = CharacterEmotion.Normal,
-    Text = "Nice to meet you. I'm Dominic.",
-    VoiceFile = "dominic_greeting.ogg"
+    Text = "This town seems peaceful.",
+    Expression = "happy",
+    VoiceClip = "aria_skit001_01.ogg"
 });
 
 SkitManager.Instance.RegisterSkit(skit);
 ```
 
-**Playing Skits:**
+**Using Skits:**
 ```csharp
-// Manual play
+// Play skit
 SkitManager.Instance.PlaySkit("skit_001");
 
-// Check availability
+// Check if available
 bool canPlay = SkitManager.Instance.CanPlaySkit("skit_001");
 
-// Get available skits
-var available = SkitManager.Instance.GetAvailableSkits();
+// Mark as viewed
+SkitManager.Instance.MarkSkitAsViewed("skit_001");
 ```
 
-### 7. Lore Codex System
+### 5. Lore Codex System
 **Location:** `LoreCodex/` (Autoload: LoreCodexManager)
 
-World-building encyclopedia for discovering lore.
+Comprehensive lore encyclopedia.
 
 **Categories:**
 - Characters
 - Locations
 - Events
-- Concepts
 - Items
-- Organizations
+- Monsters
 
 **Features:**
-- Progressive discovery system
-- Detailed entries with lore text
-- Image support
-- Search and filter functionality
-- Completion tracking
-- Discovery notifications
+- Progressive unlocking
+- Category organization
+- Search functionality
+- Reading tracking
 
 **Usage:**
 ```csharp
-var entry = new LoreCodexEntry
-{
-    EntryId = "ancient_city",
-    Category = LoreCategory.Location,
-    Title = "The Ancient City",
-    ShortDescription = "A lost civilization",
-    FullText = "Long ago, a great city stood here...",
-    IsDiscovered = false
-};
-
-LoreCodexManager.Instance.RegisterEntry(entry);
-
 // Discover entry
-LoreCodexManager.Instance.DiscoverEntry("ancient_city");
+LoreCodexManager.Instance.DiscoverEntry("char_aria_bio");
+
+// Check if discovered
+bool discovered = LoreCodexManager.Instance.IsDiscovered("char_aria_bio");
+
+// Get entries by category
+var entries = LoreCodexManager.Instance.GetEntriesByCategory(
+    LoreCategory.Characters
+);
 
 // Open UI
 var codexUI = GetNode<LoreCodexUI>("%LoreCodexUI");
 codexUI.ShowCodex();
 ```
 
-### 8. Crafting System
+### 6. Crafting System
 **Location:** `Crafting/`
 
 Recipe-based item and equipment crafting.
@@ -1152,25 +884,30 @@ bool canCraft = CraftingManager.Instance.CanCraft("iron_sword_recipe");
 bool success = CraftingManager.Instance.CraftItem("iron_sword_recipe");
 ```
 
-### 9. Bond System
+### 7. Bond System
 **Location:** `Bonds/` (Autoload: BondManager, RelationshipManager)
 
 Character relationship and bond progression system.
 
 **Features:**
 - Bond levels (1-10)
+- Bond points accumulation
 - Relationship tracking between characters
-- Bond points system
 - Bond events and rewards
 - Relationship types (Friend, Rival, Romance, etc.)
+- Daily point caps
+- Save/load integration
 
 **Usage:**
 ```csharp
 // Add bond points
-BondManager.Instance.AddBondPoints("aria", 10);
+BondManager.Instance.AddBondPoints("aria", "dominic", 10);
 
 // Check bond level
-int level = BondManager.Instance.GetBondLevel("aria");
+int level = BondManager.Instance.GetBondLevel("aria", "dominic");
+
+// Get bond rank
+BondRank rank = BondManager.Instance.GetRank("aria", "dominic");
 
 // Set relationship
 RelationshipManager.Instance.SetRelationship(
@@ -1184,9 +921,14 @@ var relationship = RelationshipManager.Instance.GetRelationship(
     "aria", 
     "dominic"
 );
+
+// Convenience hooks
+BondManager.Instance.OnAllyHealed("aria", "dominic");
+BondManager.Instance.OnGuarded("aria", "dominic");
+BondManager.Instance.OnRevive("aria", "dominic");
 ```
 
-### 10. Encounter System
+### 8. Encounter System
 **Location:** `Encounters/` (Autoload: EncounterManager)
 
 Random battle encounter system for overworld.
@@ -1218,6 +960,203 @@ if (EncounterManager.Instance.CheckEncounter())
 }
 ```
 
+### 9. Inventory & Equipment
+**Location:** `Items/`
+
+Complete item management system.
+
+**Features:**
+- Item storage with stacking
+- Equipment management
+- Consumable items
+- Material items
+- Gold tracking
+
+**Usage:**
+```csharp
+// Inventory
+InventorySystem.Instance.AddItem("health_potion", quantity: 5);
+InventorySystem.Instance.RemoveItem("health_potion", quantity: 1);
+InventorySystem.Instance.AddGold(100);
+
+// Equipment
+EquipmentManager.Instance.EquipFromInventory(
+    "aria",
+    "iron_sword",
+    characterStats
+);
+EquipmentManager.Instance.UnequipItem("aria", EquipSlot.Weapon);
+```
+
+---
+
+## Audio & Visual Systems
+
+### 1. Audio Manager
+**Location:** `Audio/AudioManager.cs` (Autoload)
+
+Centralized audio playback system.
+
+**Features:**
+- BGM (Background Music) control
+- SFX (Sound Effects) playback
+- Voice clip playback
+- Volume control
+- Fade in/out
+- Audio ducking
+
+**Usage:**
+```csharp
+// Play BGM
+AudioManager.Instance.PlayBGM("battle_theme");
+AudioManager.Instance.StopBGM();
+AudioManager.Instance.FadeBGM(targetVolume: 0.5f, duration: 2.0f);
+
+// Play SFX
+AudioManager.Instance.PlaySFX("sword_slash");
+AudioManager.Instance.PlaySFX("explosion", volume: 0.8f);
+
+// Play Voice
+AudioManager.Instance.PlayVoice("aria_attack_01");
+
+// Volume control
+AudioManager.Instance.SetBGMVolume(0.7f);
+AudioManager.Instance.SetSFXVolume(0.8f);
+```
+
+### 2. HUD Manager
+**Location:** `UI/HUDManager.cs` (Autoload)
+
+On-screen display management.
+
+**Features:**
+- Health/MP bars
+- Minimap display
+- Quest tracker
+- Status indicators
+- Notification system
+
+**Usage:**
+```csharp
+// Show/hide HUD
+HudManager.Instance.ShowHUD();
+HudManager.Instance.HideHUD();
+
+// Update party display
+HudManager.Instance.UpdatePartyDisplay(partyMembers);
+
+// Show notification
+HudManager.Instance.ShowNotification("Quest Complete!");
+```
+
+### 3. Retro Effects Manager
+**Location:** `UI/RetroEffectsManager.cs` (Autoload)
+
+Shader-based visual filter system.
+
+**Available Effects:**
+- Pixelation
+- Scanlines
+- Dithering
+- VHS distortion
+- RGB Glitch
+- Color Palette reduction
+- Combined effects
+
+**Usage:**
+```csharp
+// Set single effect
+RetroEffectsManager.Instance.SetEffect(RetroEffectType.Pixelation);
+
+// Set combined effects
+RetroEffectsManager.Instance.SetCombinedEffect(
+    RetroEffectType.Scanlines,
+    RetroEffectType.ColorPalette
+);
+
+// Apply preset
+RetroEffectsManager.Instance.ApplyPreset("retro_gaming");
+
+// Adjust parameters
+RetroEffectsManager.Instance.SetPixelationSize(4);
+RetroEffectsManager.Instance.SetScanlinesParameters(0.5f, 480f);
+RetroEffectsManager.Instance.SetRGBGlitchIntensity(0.8f, 0.03f);
+
+// Trigger glitch burst
+RetroEffectsManager.Instance.TriggerGlitchBurst(duration: 0.3f);
+
+// Disable effects
+RetroEffectsManager.Instance.SetEffect(RetroEffectType.None);
+```
+
+### 4. FPS Counter
+**Location:** `UI/FPSCounter.cs` (Autoload)
+
+Performance monitoring overlay.
+
+**Features:**
+- Real-time FPS display
+- Frame time measurement
+- Toggle visibility
+- Performance statistics
+
+**Usage:**
+```csharp
+// Toggle FPS counter
+FPSCounter.Instance.ToggleVisibility();
+
+// Get current FPS
+int fps = FPSCounter.Instance.GetCurrentFPS();
+```
+
+---
+
+## UI & Menu Systems
+
+### Main Menu System
+**Location:** `UI/MainMenuUI.cs`
+
+Complete menu navigation system.
+
+**Menu Screens:**
+- **Items** - Inventory management
+- **Skills** - Skill viewing and equipment
+- **Equip** - Equipment management
+- **Status** - Character status viewing
+- **Party** - Party composition
+- **Quests** - Quest log
+- **Bestiary** - Enemy encyclopedia
+- **Lore Codex** - Lore entries
+- **Options** - Game settings
+- **Save/Load** - Save management
+
+**Usage:**
+```csharp
+// Open main menu
+MainMenuUI.Instance.OpenMenu();
+
+// Open specific submenu
+MainMenuUI.Instance.OpenItemMenu();
+MainMenuUI.Instance.OpenStatusMenu();
+MainMenuUI.Instance.OpenQuestMenu();
+
+// Close menu
+MainMenuUI.Instance.CloseMenu();
+```
+
+### Individual Menu Systems
+
+Each menu has dedicated UI classes:
+- `ItemMenuUI.cs` - Item management
+- `SkillMenuUI.cs` - Skill viewing
+- `EquipMenuUI.cs` - Equipment screen
+- `StatusMenuUI.cs` - Character stats
+- `PartyMenuUI.cs` - Party management
+- `SaveMenuUI.cs` - Save game
+- `LoadMenuUI.cs` - Load game
+- `OptionsMenuUI.cs` - Settings
+- `TitleScreenOptionsUI.cs` - Title screen options
+
 ---
 
 ## Event & Dialogue System
@@ -1227,135 +1166,54 @@ if (EncounterManager.Instance.CheckEncounter())
 
 Flexible command-based system for scripting cutscenes and story events.
 
-**Core Components:**
-- **EventCommand.cs** - Base class for all event commands
-- **EventCommandExecutor.cs** - Executes command sequences
-- **EventObject.cs** - Scene objects that trigger events
-- **DialogueData.cs** - Dialogue content structure
+**Event Commands:**
+- **Show Message** - Display dialogue
+- **Show Choices** - Player decisions
+- **Transfer Player** - Scene transitions
+- **Set Variable** - Modify game variables
+- **Conditional Branch** - If/else logic
+- **Control Switches** - Boolean flags
+- **Wait** - Pause execution
+- **Play BGM/SE** - Audio playback
+- **Show Picture** - Display images
+- **Move Character** - Character movement
+- **Start Battle** - Initiate combat
+- **Add/Remove Item** - Inventory changes
+- **Add/Remove Party Member** - Party changes
+- **Call Common Event** - Reusable events
 
-### Event Command Types
-
+**Event Object:**
 ```csharp
-public enum EventCommandType
+// EventObject in scene
+var eventObject = new EventObject
 {
-    ShowText,              // Display dialogue
-    ShowChoices,           // Player choices
-    Wait,                  // Wait duration
-    ChangeGold,            // Add/remove gold
-    ChangeItems,           // Add/remove items
-    ChangeWeapons,         // Equip/unequip
-    HealCharacter,         // Heal party member
-    ChangePartyMembers,    // Add/remove from party
-    MovePlayer,            // Move character
-    FadeScreen,            // Screen fade effect
-    TintScreen,            // Screen tint
-    FlashScreen,           // Screen flash
-    ShakeScreen,           // Camera shake
-    PlayBGM,               // Play background music
-    StopBGM,               // Stop music
-    PlaySE,                // Play sound effect
-    TransferMap,           // Change scene
-    ConditionalBranch,     // If/else logic
-    SetVariable,           // Set variable
-    CallCommonEvent,       // Call reusable event
-    ControlSelfSwitch,     // Local switches
-    NameInput,             // Character naming
-    ChangeTransparency,    // Hide/show character
-    ShowBalloonIcon,       // Emotion icon
-    InitiateBattle,        // Start battle
-    InitiateShop           // Open shop
-}
-```
-
-### Creating Event Commands
-
-**Show Dialogue:**
-```csharp
-var showText = new ShowTextCommand
-{
-    Dialogue = new DialogueData
+    TriggerType = EventTriggerType.ActionButton,
+    EventPages = new List<EventPage>
     {
-        SpeakerName = "Aria",
-        Message = "Hello! Welcome to the village.",
-        PortraitPath = "res://Characters/Portraits/aria.png",
-        VoiceClip = voiceAudioStream
+        new EventPage
+        {
+            Commands = new List<EventCommand>
+            {
+                new ShowMessageCommand 
+                { 
+                    Text = "Hello, traveler!" 
+                },
+                new AddItemCommand 
+                { 
+                    ItemId = "health_potion", 
+                    Quantity = 1 
+                }
+            }
+        }
     }
 };
 ```
-
-**Show Player Choices:**
-```csharp
-var showChoices = new ShowChoicesCommand
-{
-    Choices = new[] { "Accept quest", "Decline quest", "Ask for details" },
-    DefaultChoice = 0,
-    VariableName = "quest_choice"
-};
-```
-
-**Conditional Branch:**
-```csharp
-var conditional = new ConditionalBranchCommand
-{
-    ConditionType = ConditionType.Switch,
-    SwitchName = "quest_complete",
-    ExpectedValue = true,
-    CommandsIfTrue = new[] { /* commands */ },
-    CommandsIfFalse = new[] { /* commands */ }
-};
-```
-
-**Initiate Battle:**
-```csharp
-var battle = new InitiateBattleCommand
-{
-    TroopId = "forest_encounter_01",
-    CanEscape = true,
-    CanLose = false,
-    BattleBGM = battleMusicStream
-};
-```
-
-**Transfer to Another Map:**
-```csharp
-var transfer = new TransferMapCommand
-{
-    MapPath = "res://Maps/Town.tscn",
-    SpawnPosition = new Vector2(100, 200),
-    FacingDirection = 2, // Down
-    FadeOut = true,
-    FadeIn = true
-};
-```
-
-### Event Objects
-
-**Location:** `Events/EventObject.cs`
-
-Scene objects that trigger events in the world.
 
 **Trigger Types:**
 - **Action Button:** Trigger on interact (E key)
 - **Player Touch:** Trigger on collision
 - **Autorun:** Trigger automatically once
 - **Parallel:** Run continuously in background
-
-**Creating Event Objects:**
-```gdscript
-# In Godot scene
-EventObject (Node2D)
-├── Sprite2D (Character sprite)
-├── Area2D (Collision detection)
-│   └── CollisionShape2D
-└── EventPages (Array of EventPage resources)
-```
-
-**Event Page Conditions:**
-- Switch states
-- Variable comparisons
-- Item possession
-- Party member presence
-- Self switches (A, B, C, D)
 
 ---
 
@@ -1391,8 +1249,7 @@ State machine-based character control system.
 ### Player Control
 
 **Input Actions:**
-```gdscript
-# In Project Settings → Input Map
+```
 move_up
 move_down
 move_left
@@ -1416,77 +1273,106 @@ playerCharacter.ChangeState(new IdleState());
 
 ---
 
+## Database System
+
+### GameDatabase
+**Location:** `Database/GameDatabase.cs`
+
+Central repository for all game data.
+
+**Data Categories:**
+- **Playable Characters** - Player party members
+- **Enemies** - Regular enemies
+- **Bosses** - Boss enemies
+- **Skills** - All abilities
+- **Items** - All items (consumables, equipment, materials)
+- **Common Events** - Reusable event scripts
+- **Dialogue Tables** - Dialogue data
+- **Troops** - Predefined enemy groups
+
+**Usage:**
+```csharp
+// Access database
+var database = GameManager.Instance.Database;
+
+// Get character
+var character = database.GetCharacter("aria");
+
+// Get skill
+var skill = database.GetSkill("fireball");
+
+// Get item
+var item = database.GetItem("health_potion");
+
+// Get all playable characters
+var party = database.GetAllPlayableCharacters();
+```
+
+### CharacterDatabase
+**Location:** `Database/CharacterDatabase.cs`
+
+Specialized character data management.
+
+**Features:**
+- Character lookup by ID
+- Character type filtering
+- Skill management
+- Validation
+
+**Usage:**
+```csharp
+// Initialize
+characterDatabase.Initialize();
+
+// Get character
+var character = characterDatabase.GetCharacter("aria");
+
+// Get by type
+var playable = characterDatabase.GetPlayableCharacters();
+var enemies = characterDatabase.GetEnemies();
+var bosses = characterDatabase.GetBosses();
+
+// Get skill
+var skill = characterDatabase.GetSkill("fireball");
+```
+
+---
+
 ## Save System
 
 ### SaveManager
-**Location:** `Managers/SaveManager.cs`
+**Location:** `SaveSystem/SaveManager.cs`
 
 Complete save/load system with 10 save slots.
 
-**Features:**
-- 10 independent save slots
-- Auto-save functionality
-- Save preview information
-- Corrupted save detection
-- Custom data dictionary for extensions
+**Save Data Includes:**
+- Player position and scene
+- Party composition and stats
+- Inventory and equipment
+- Quest progress
+- Switches and variables
+- Bestiary discoveries
+- Lore codex entries
+- Bond progression
+- Relationships
+- Custom system data
 
-### SaveData Structure
+**Save/Load Operations:**
 
 ```csharp
-public class SaveData
-{
-    // Meta info
-    public string SaveName { get; set; }
-    public DateTime SaveTime { get; set; }
-    public float PlayTime { get; set; }
-    public string CurrentLocation { get; set; }
-    
-    // Player data
-    public int Gold { get; set; }
-    public List<SavedCharacter> Party { get; set; }
-    public Dictionary<string, int> Inventory { get; set; }
-    public Dictionary<string, EquipmentSlot> Equipment { get; set; }
-    
-    // Progress
-    public List<string> CompletedQuests { get; set; }
-    public List<string> ActiveQuests { get; set; }
-    public Dictionary<string, BestiaryEntryData> BestiaryEntries { get; set; }
-    
-    // Story
-    public Dictionary<string, bool> StoryFlags { get; set; }
-    public Dictionary<string, int> Variables { get; set; }
-    
-    // Custom data for extensions
-    public Dictionary<string, Variant> CustomData { get; set; }
-}
-```
-
-### Using Save System
-
-**Save Game:**
-```csharp
-// Save to slot
+// Create new save
 SaveManager.Instance.SaveGame(slotIndex: 0, "My Save");
 
-// Auto-save
-SaveManager.Instance.AutoSave();
-```
-
-**Load Game:**
-```csharp
-// Check if save exists
-bool exists = SaveManager.Instance.SaveExists(slotIndex: 0);
-
-// Load game
+// Load save
 SaveManager.Instance.LoadGame(slotIndex: 0);
 
-// Get save info for preview
-SaveSlotInfo info = SaveManager.Instance.GetSaveSlotInfo(slotIndex: 0);
-// info.SaveName, info.PlayTime, info.Location, etc.
-```
+// Check if slot has save
+bool hasSave = SaveManager.Instance.HasSave(slotIndex: 0);
 
-**Delete Save:**
-```csharp
+// Get save info
+var info = SaveManager.Instance.GetSaveInfo(slotIndex: 0);
+
+// Delete save
 SaveManager.Instance.DeleteSave(slotIndex: 0);
 ```
 
@@ -1507,6 +1393,10 @@ public void CaptureCustomData()
     // Add lore codex
     var loreData = LoreCodexManager.Instance.GetSaveData();
     saveData.CustomData["LoreCodex"] = Json.Stringify(loreData);
+    
+    // Add bonds
+    var bondData = BondManager.Instance.GetSaveData();
+    saveData.CustomData["Bonds"] = Json.Stringify(bondData);
 }
 
 // Loading custom data
@@ -1524,6 +1414,12 @@ public void RestoreCustomData()
     {
         var json = saveData.CustomData["LoreCodex"].AsString();
         LoreCodexManager.Instance.LoadSaveData(json);
+    }
+    
+    if (saveData.CustomData.ContainsKey("Bonds"))
+    {
+        var json = saveData.CustomData["Bonds"].AsString();
+        BondManager.Instance.LoadSaveData(json);
     }
 }
 ```
@@ -1549,91 +1445,80 @@ public void RestoreCustomData()
 | `ShowtimeAttacks.CanUseShowtime()` | Check showtime availability |
 | `ShowtimeAttacks.ExecuteShowtime()` | Use showtime attack |
 | `LimitBreakSystem.BuildLimitGauge()` | Add to limit gauge |
-| `LimitBreakSystem.IsLimitBreakReady()` | Check if gauge full |
-| `LimitBreakSystem.ExecuteSoloLimitBreak()` | Use solo ultimate |
-| `LimitBreakSystem.ExecuteDUOLimitBreak()` | Use pair ultimate |
+| `LimitBreakSystem.IsLimitBreakReady()` | Check if limit ready |
+| `LimitBreakSystem.ExecuteSoloLimit()` | Use solo limit break |
+| `LimitBreakSystem.ExecuteDuoLimit()` | Use DUO limit break |
 
-#### Party Management API
+#### Party & Character API
 
 | Method | Description |
 |--------|-------------|
-| `PartyManager.GetMainParty()` | Get active party members |
-| `PartyManager.GetSubParty()` | Get reserve members |
-| `PartyManager.AddToMainParty()` | Add to active party |
-| `PartyManager.AddToSubParty()` | Add to reserve |
-| `PartyManager.SwapToMainParty()` | Move to active |
-| `PartyManager.SwapToSubParty()` | Move to reserve |
-| `PartyManager.RemoveFromParty()` | Remove character |
+| `PartyManager.GetMainParty()` | Get active party |
+| `PartyManager.GetSubParty()` | Get reserve party |
+| `PartyManager.AddToMainParty()` | Add character to main |
+| `PartyManager.SwapToSubParty()` | Move to reserves |
 | `PartyManager.LockCharacter()` | Lock/unlock character |
-| `PartyManager.DistributeExperience()` | Award battle exp |
+| `PartyManager.DistributeExperience()` | Give EXP to party |
 
-#### Inventory API
+#### Item & Equipment API
 
 | Method | Description |
 |--------|-------------|
 | `InventorySystem.AddItem()` | Add item to inventory |
 | `InventorySystem.RemoveItem()` | Remove item |
-| `InventorySystem.HasItem()` | Check if has item |
-| `InventorySystem.GetItemCount()` | Get item quantity |
-| `InventorySystem.UseItem()` | Use consumable item |
 | `InventorySystem.AddGold()` | Add gold |
-| `InventorySystem.RemoveGold()` | Remove gold |
-| `InventorySystem.GetGold()` | Get gold amount |
-| `InventorySystem.IsFull()` | Check if inventory full |
-
-#### Equipment API
-
-| Method | Description |
-|--------|-------------|
-| `EquipmentManager.EquipFromInventory()` | Equip item from inventory |
-| `EquipmentManager.UnequipToInventory()` | Unequip item to inventory |
-| `EquipmentManager.GetEquippedItem()` | Get equipped in slot |
-| `EquipmentManager.GetCharacterEquipment()` | Get all equipment |
-| `EquipmentManager.GetCharacterBonuses()` | Get stat bonuses |
-| `EquipmentManager.ApplyEquipmentBonuses()` | Apply bonuses to stats |
-| `EquipmentManager.UnequipAll()` | Remove all equipment |
+| `EquipmentManager.EquipFromInventory()` | Equip item |
+| `EquipmentManager.UnequipItem()` | Unequip item |
 
 #### Quest System API
 
 | Method | Description |
 |--------|-------------|
-| `QuestManager.RegisterQuest()` | Add quest to system |
-| `QuestManager.StartQuest()` | Begin quest |
-| `QuestManager.CompleteQuest()` | Complete quest |
-| `QuestManager.FailQuest()` | Fail quest |
-| `QuestManager.UpdateObjective()` | Manual objective update |
-| `QuestManager.OnEnemyDefeated()` | Auto-track enemy kill |
-| `QuestManager.OnItemCollected()` | Auto-track item collection |
-| `QuestManager.OnNPCTalked()` | Auto-track NPC talk |
-| `QuestManager.OnLocationReached()` | Auto-track location |
-| `QuestManager.GetQuest()` | Get quest data |
+| `QuestManager.StartQuest()` | Begin a quest |
+| `QuestManager.CompleteQuest()` | Finish quest |
+| `QuestManager.UpdateObjective()` | Update progress |
 | `QuestManager.GetActiveQuests()` | Get active quests |
-| `QuestManager.GetCompletedQuests()` | Get completed quests |
 
 #### Shop System API
 
 | Method | Description |
 |--------|-------------|
-| `ShopManager.RegisterShop()` | Add shop to system |
-| `ShopManager.OpenShop()` | Open shop UI |
-| `ShopManager.CloseShop()` | Close shop UI |
+| `ShopManager.OpenShop()` | Open shop by ID |
 | `ShopManager.BuyItem()` | Purchase item |
-| `ShopManager.SellItem()` | Sell item to shop |
-| `ShopManager.CanAfford()` | Check if can buy |
-| `ShopManager.UnlockShop()` | Unlock shop |
-| `ShopManager.UnlockItem()` | Unlock shop item |
-| `ShopManager.RestockShop()` | Refill stock |
+| `ShopManager.SellItem()` | Sell item |
+| `ShopManager.RestockShop()` | Restock shop inventory |
 
 #### Bestiary API
 
 | Method | Description |
 |--------|-------------|
-| `BestiaryManager.RecordEncounter()` | Log enemy encounter |
-| `BestiaryManager.RecordDefeat()` | Log enemy defeat |
-| `BestiaryManager.RecordWeaknessDiscovered()` | Log weakness found |
-| `BestiaryManager.RecordSkillDiscovered()` | Log skill seen |
+| `BestiaryManager.RecordEncounter()` | Track enemy encounter |
+| `BestiaryManager.RecordDefeat()` | Track enemy defeat |
+| `BestiaryManager.RecordWeaknessDiscovered()` | Track weakness |
 | `BestiaryManager.GetEntry()` | Get bestiary entry |
-| `BestiaryManager.CompletionPercentage` | Get completion % |
+
+#### Bond System API
+
+| Method | Description |
+|--------|-------------|
+| `BondManager.AddBondPoints()` | Add bond points |
+| `BondManager.GetBondLevel()` | Get bond level |
+| `BondManager.GetRank()` | Get bond rank |
+| `BondManager.OnAllyHealed()` | Bond event: healing |
+| `BondManager.OnGuarded()` | Bond event: guarding |
+| `BondManager.OnRevive()` | Bond event: revival |
+| `RelationshipManager.SetRelationship()` | Set relationship type |
+| `RelationshipManager.GetRelationship()` | Get relationship |
+
+#### Audio API
+
+| Method | Description |
+|--------|-------------|
+| `AudioManager.PlayBGM()` | Play background music |
+| `AudioManager.StopBGM()` | Stop BGM |
+| `AudioManager.PlaySFX()` | Play sound effect |
+| `AudioManager.PlayVoice()` | Play voice clip |
+| `AudioManager.SetBGMVolume()` | Set BGM volume |
 
 #### Save System API
 
@@ -1641,312 +1526,126 @@ public void RestoreCustomData()
 |--------|-------------|
 | `SaveManager.SaveGame()` | Save to slot |
 | `SaveManager.LoadGame()` | Load from slot |
-| `SaveManager.SaveExists()` | Check if save exists |
+| `SaveManager.HasSave()` | Check if slot used |
 | `SaveManager.DeleteSave()` | Delete save |
-| `SaveManager.GetSaveSlotInfo()` | Get save preview |
-| `SaveManager.AutoSave()` | Auto-save game |
 
 ---
 
 ## Development Guide
 
+### Adding New Systems
+
+#### 1. Create New Autoload Manager
+
+```csharp
+// MyNewManager.cs
+using Godot;
+
+public partial class MyNewManager : Node
+{
+    public static MyNewManager Instance { get; private set; }
+    
+    public override void _Ready()
+    {
+        Instance = this;
+        Initialize();
+    }
+    
+    private void Initialize()
+    {
+        // Setup code here
+    }
+}
+```
+
+Then add to Autoload in Project Settings.
+
+#### 2. Integrate with Save System
+
+```csharp
+// Create save data class
+public class MySystemSaveData
+{
+    public Dictionary<string, int> MyData { get; set; }
+    // Add properties
+}
+
+// In your manager
+public MySystemSaveData GetSaveData()
+{
+    return new MySystemSaveData
+    {
+        MyData = currentData
+    };
+}
+
+public void LoadSaveData(MySystemSaveData data)
+{
+    currentData = data.MyData;
+}
+```
+
+Add to SaveData.cs CustomData:
+```csharp
+// In CaptureCurrentState()
+saveData.CustomData["MySystem"] = Json.Stringify(
+    MyNewManager.Instance.GetSaveData()
+);
+
+// In ApplyToGame()
+if (saveData.CustomData.ContainsKey("MySystem"))
+{
+    var json = saveData.CustomData["MySystem"].AsString();
+    MyNewManager.Instance.LoadSaveData(json);
+}
+```
+
 ### Best Practices
 
-1. **Always initialize databases before systems**
-    - Load GameDatabase first
-    - Initialize managers in correct order
-    - Verify autoloads are loaded
-
-2. **Connect signals in _Ready()**
-    - Use Connect() for code-based connections
-    - Use inspector for scene-based connections
-    - Always check null before emitting
-
-3. **Use unique names for UI nodes**
-   ```csharp
-   // Mark nodes in inspector with unique name
-   var healthBar = GetNode<ProgressBar>("%HealthBar");
-   ```
-
-4. **Save frequently during gameplay**
-    - Auto-save at checkpoints
-    - Save before major events
-    - Implement save reminders
-
-5. **Test individual systems with test scenes**
-    - Create isolated test scenes
-    - Test edge cases
-    - Verify integrations
-
-6. **Use proper error handling**
-   ```csharp
-   try
-   {
-       // Risky operation
-   }
-   catch (Exception ex)
-   {
-       GD.PrintErr($"Error: {ex.Message}");
-   }
-   ```
-
-7. **Follow consistent naming conventions**
-    - PascalCase for classes and methods
-    - camelCase for fields
-    - UPPER_CASE for constants
+1. **Use Autoloads for Managers** - Singleton pattern for global access
+2. **Implement Save/Load** - All persistent data should be saveable
+3. **Document Public APIs** - Use XML comments
+4. **Error Handling** - Check for null, validate parameters
+5. **Events for Decoupling** - Use signals/events for communication
+6. **Resource-Based Data** - Use Godot Resources for game data
+7. **Scene Composition** - Break down complex scenes
+8. **Testing** - Create test scenes for each system
 
 ### Common Patterns
 
-#### Starting a New Game
-
+#### Singleton Autoload
 ```csharp
-public void StartNewGame()
-{
-    // Initialize save data
-    var saveData = new SaveData
-    {
-        SaveName = "New Game",
-        SaveTime = DateTime.Now,
-        PlayTime = 0,
-        CurrentLocation = "starting_village",
-        Gold = 500
-    };
-    
-    // Add starting characters
-    var startingChars = new[] { "aria", "dominic", "echo_walker" };
-    foreach (var charId in startingChars)
-    {
-        var charData = GameManager.Instance.Database.GetCharacter(charId);
-        if (charData != null)
-        {
-            PartyManager.Instance.AddToMainParty(charData);
-        }
-    }
-    
-    // Give starting items
-    InventorySystem.Instance.AddItem("health_potion", 5);
-    InventorySystem.Instance.AddItem("mana_potion", 3);
-    
-    // Initialize systems
-    QuestManager.Instance.LoadQuestsFromFolder("res://Data/Quests");
-    ShopManager.Instance.LoadShopsFromFolder("res://Data/Shops");
-    BestiaryManager.Instance.InitializeFromDatabase(
-        GameManager.Instance.Database
-    );
-    
-    // Start game
-    GetTree().ChangeSceneToFile("res://Scenes/Overworld.tscn");
-}
-```
+public static MyManager Instance { get; private set; }
 
-#### Implementing Enemy AI
-
-```csharp
-public BattleAction DecideEnemyAction(
-    BattleMember enemy, 
-    List<BattleMember> allies, 
-    List<BattleMember> players)
-{
-    // Check HP - heal if low
-    if (enemy.Stats.CurrentHP < enemy.Stats.MaxHP * 0.3f)
-    {
-        var healSkill = enemy.Skills.FirstOrDefault(s => s.HealsHP);
-        if (healSkill != null)
-        {
-            return new BattleAction(enemy, BattleActionType.Skill)
-            {
-                Skill = healSkill
-            }.WithTargets(enemy);
-        }
-    }
-    
-    // Target weakest player
-    var weakestPlayer = players
-        .Where(p => p.Stats.IsAlive)
-        .OrderBy(p => p.Stats.CurrentHP)
-        .FirstOrDefault();
-    
-    // Use strongest skill
-    var bestSkill = enemy.Skills
-        .Where(s => s.MPCost <= enemy.Stats.CurrentMP)
-        .OrderByDescending(s => s.BasePower)
-        .FirstOrDefault();
-    
-    if (bestSkill != null)
-    {
-        return new BattleAction(enemy, BattleActionType.Skill)
-        {
-            Skill = bestSkill
-        }.WithTargets(weakestPlayer);
-    }
-    
-    // Default to basic attack
-    return new BattleAction(enemy, BattleActionType.Attack)
-        .WithTargets(weakestPlayer);
-}
-```
-
-#### Integrating Battle System
-
-```csharp
-// In overworld encounter
-private void OnEncounterTriggered()
-{
-    // Get player party
-    var playerParty = PartyManager.Instance.GetMainPartyStats();
-    
-    // Get random enemies
-    var enemies = EncounterManager.Instance.GetRandomEncounter("forest_zone");
-    
-    // Get available showtimes
-    var showtimes = GetAvailableShowtimes();
-    
-    // Save overworld state
-    GameManager.Instance.SaveOverworldState(
-        GetTree().CurrentScene.SceneFilePath,
-        playerPosition
-    );
-    
-    // Start battle
-    GameManager.Instance.StartBattle(playerParty, enemies);
-}
-
-// In battle scene _Ready()
 public override void _Ready()
 {
-    var battleManager = GetNode<BattleManager>("BattleManager");
-    
-    // Connect to battle ended signal
-    battleManager.BattleEnded += OnBattleEnded;
-    
-    // Initialize battle
-    battleManager.InitializeBattle(
-        GameManager.Instance.PlayerParty,
-        GameManager.Instance.Enemies,
-        GameManager.Instance.AvailableShowtimes
-    );
-}
-
-private void OnBattleEnded(bool victory)
-{
-    if (victory)
+    if (Instance != null)
     {
-        // Award rewards
-        // Distribute experience
-        // Return to overworld
-        GameManager.Instance.ReturnToOverworld();
+        QueueFree();
+        return;
     }
-    else
-    {
-        // Game over screen
-        GetTree().ChangeSceneToFile("res://UI/GameOver.tscn");
-    }
+    Instance = this;
 }
 ```
 
-### Debugging Tips
+#### Resource Data
+```csharp
+[GlobalClass]
+public partial class MyData : Resource
+{
+    [Export] public string Id { get; set; }
+    [Export] public string Name { get; set; }
+}
+```
 
-#### Battle Issues
-- Check signals are properly connected
-- Verify character stats are valid (HP > 0, etc.)
-- Use `GD.Print()` to trace execution flow
-- Test with simple scenarios first
-- Check turn order calculation
+#### Event Pattern
+```csharp
+[Signal]
+public delegate void ItemAddedEventHandler(string itemId, int quantity);
 
-#### Save/Load Issues
-- Verify all data is properly serializable
-- Check file permissions
-- Test with new saves before existing ones
-- Use try-catch for error handling
-- Validate data after loading
-
-#### UI Issues
-- Verify unique names are set (`%NodeName`)
-- Check node paths are correct
-- Ensure scripts are attached
-- Test input actions in Project Settings
-- Check for null references
-
-#### Performance Issues
-- Profile with Godot's performance monitor
-- Check for memory leaks
-- Optimize heavy loops
-- Use object pooling for particles
-- Minimize signal connections
-
-### Testing Checklist
-
-**Battle System:**
-- [ ] Basic attack works
-- [ ] Skills execute correctly
-- [ ] Weaknesses grant One More
-- [ ] Baton Pass chains work
-- [ ] Technical damage triggers
-- [ ] Showtimes activate
-- [ ] Limit Breaks execute
-- [ ] All-Out Attack works
-- [ ] Guard reduces damage
-- [ ] Items work in battle
-- [ ] Escape succeeds/fails
-- [ ] Victory rewards granted
-- [ ] Defeat handled correctly
-
-**UI Systems:**
-- [ ] Main menu opens/closes
-- [ ] All sub-menus accessible
-- [ ] Item menu displays items
-- [ ] Skill menu shows skills
-- [ ] Equipment menu works
-- [ ] Status menu shows stats
-- [ ] Save/Load work correctly
-- [ ] Options persist
-
-**Game Systems:**
-- [ ] Shops buy/sell correctly
-- [ ] Quests track objectives
-- [ ] Bestiary records enemies
-- [ ] Skits play correctly
-- [ ] Inventory manages items
-- [ ] Equipment applies bonuses
-- [ ] Crafting creates items
-- [ ] Party management works
-
-### Next Steps for Development
-
-1. **Create Content**
-    - Design characters with stats and skills
-    - Create enemies and bosses
-    - Write quests and dialogue
-    - Design items and equipment
-    - Create crafting recipes
-
-2. **Build World**
-    - Create maps and areas
-    - Place NPCs and events
-    - Set up encounters
-    - Design dungeons
-    - Create town shops
-
-3. **Balance Game**
-    - Adjust stat values
-    - Balance skill costs and powers
-    - Set appropriate prices
-    - Tune encounter rates
-    - Test difficulty curve
-
-4. **Add Polish**
-    - Create particle effects
-    - Add sound effects
-    - Implement transitions
-    - Add battle animations
-    - Create cutscenes
-
-5. **Playtest**
-    - Internal testing
-    - Get feedback
-    - Iterate on feedback
-    - Fix bugs
-    - Optimize performance
+// Emit signal
+EmitSignal(SignalName.ItemAdded, itemId, quantity);
+```
 
 ---
 
@@ -1957,23 +1656,59 @@ private void OnBattleEnded(bool victory)
 ### What You Have
 
 ✅ **Complete battle system** with advanced mechanics  
-✅ **Full RPG systems** (quests, shops, bestiary, etc.)  
+✅ **Advanced AI systems** with learning and adaptation  
+✅ **Full RPG systems** (quests, shops, bestiary, bonds, etc.)  
 ✅ **Comprehensive UI** integrating all features  
 ✅ **Event/cutscene system** for storytelling  
 ✅ **Save/load system** with multiple slots  
-✅ **Overworld character control**  
+✅ **Overworld character control** with state machine  
+✅ **Audio management** with BGM, SFX, and voice  
+✅ **Visual effects** with retro shader filters  
+✅ **Database system** for all game data  
 ✅ **Well-documented codebase**  
 ✅ **Modular, extensible architecture**
 
-### You Have Everything You Need to Create an Amazing JRPG! 🎮⚔️✨
+### System Count: 30+ Major Systems
+
+1. Battle Manager
+2. Advanced AI Pattern
+3. Advanced AI Debugger
+4. Advanced AI Director
+5. AI Achievements
+6. Party Manager
+7. Quest Manager
+8. Shop Manager
+9. Bestiary Manager
+10. Skit Manager
+11. Lore Codex Manager
+12. Bond Manager
+13. Relationship Manager
+14. Encounter Manager
+15. Crafting System
+16. Inventory System
+17. Equipment Manager
+18. Audio Manager
+19. HUD Manager
+20. Retro Effects Manager
+21. FPS Counter
+22. Save Manager
+23. Event System
+24. Dialogue System
+25. Character Control System
+26. State Machine
+27. Game Database
+28. Character Database
+29. Main Menu System
+30. All submenu systems
 
 ### Quick Commands Cheat Sheet
 
 ```csharp
-// Start battle
-battleManager.InitializeBattle(party, enemies, showtimes);
+// Battle
+BattleManager.InitializeBattle(party, enemies, showtimes);
+BattleManager.ExecuteAction(action);
 
-// Party management
+// Party
 PartyManager.Instance.AddToMainParty(character);
 PartyManager.Instance.DistributeExperience(1000);
 
@@ -1982,7 +1717,7 @@ InventorySystem.Instance.AddItem("item_id", quantity);
 InventorySystem.Instance.AddGold(amount);
 
 // Equipment
-EquipmentManager.Instance.EquipFromInventory("char_id", "item_id", character);
+EquipmentManager.Instance.EquipFromInventory("char_id", "item_id", stats);
 
 // Quests
 QuestManager.Instance.StartQuest("quest_id");
@@ -1994,6 +1729,19 @@ ShopManager.Instance.BuyItem("item_id", quantity);
 
 // Bestiary
 BestiaryManager.Instance.RecordEncounter("enemy_id");
+BestiaryManager.Instance.RecordWeaknessDiscovered("enemy_id", element);
+
+// Bonds
+BondManager.Instance.AddBondPoints("char_a", "char_b", points);
+BondManager.Instance.GetBondLevel("char_a", "char_b");
+
+// Audio
+AudioManager.Instance.PlayBGM("track_name");
+AudioManager.Instance.PlaySFX("sound_name");
+
+// Retro Effects
+RetroEffectsManager.Instance.SetEffect(RetroEffectType.Pixelation);
+RetroEffectsManager.Instance.ApplyPreset("retro_gaming");
 
 // Save/Load
 SaveManager.Instance.SaveGame(slotIndex, "Save Name");
@@ -2003,34 +1751,17 @@ SaveManager.Instance.LoadGame(slotIndex);
 SkitManager.Instance.PlaySkit("skit_id");
 LoreCodexManager.Instance.DiscoverEntry("entry_id");
 
-// Bonds
-BondManager.Instance.AddBondPoints("character_id", points);
+// AI
+advancedAI.RecordPlayerAction(character, skill, target);
+var action = advancedAI.DecideAction(character, party, enemies, turn);
 ```
 
-### Support & Resources
-
-**Documentation Files:**
-- All documentation is in the `Docs/` folder
-- Battle system guides
-- UI system guides
-- System integration examples
-
-**Test Scenes:**
-- `BattleTest.cs` - Basic battle mechanics
-- `Phase2BattleTest.cs` - Advanced battle features
-- `CoreCommandsTest.cs` - Guard/Item/Escape
-- Individual system test scenes
-
-**Community:**
-- Report issues on GitHub
-- Join Discord for discussions
-- Check wiki for tutorials
-- Contribute improvements
+### You Have Everything You Need to Create an Amazing JRPG! 🎮⚔️✨
 
 ---
 
 **Happy game development! 🚀**
 
-*Documentation Version: 1.0.0*  
+*Documentation Version: 2.0.0*  
 *Last Updated: 2025*  
 *Project: Echoes Across Time (Godot 4.5 / C#)*
