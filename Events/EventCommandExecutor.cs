@@ -330,6 +330,27 @@ namespace EchoesAcrossTime.Events
             await tcs.Task;
             MessageBox.MessageAdvanced -= OnMessageAdvanced;
         }
+        
+        /// <summary>
+        /// Get all flag names that are currently set to true
+        /// Useful for systems that need to check multiple flags (like SkitTrigger)
+        /// </summary>
+        public List<string> GetAllActiveFlags()
+        {
+            var activeFlags = new List<string>();
+    
+            foreach (var kvp in variables)
+            {
+                if (kvp.Value is bool boolValue && boolValue)
+                {
+                    activeFlags.Add(kvp.Key);
+                }
+            }
+    
+            return activeFlags;
+        }
+        
+        
 
         public async Task<int> ShowChoices(List<string> choices, int defaultChoice = 0)
         {
@@ -341,6 +362,78 @@ namespace EchoesAcrossTime.Events
             int result = await tcs.Task;
             ChoiceBox.ChoiceSelected -= OnChoiceSelected;
             return result;
+        }
+        
+        /// <summary>
+        /// Check if a flag is set (convenience method)
+        /// </summary>
+        public bool HasFlag(string flagName)
+        {
+            return GetVariable<bool>(flagName, false);
+        }
+        
+        /// <summary>
+        /// Set a flag to true (convenience method)
+        /// </summary>
+        public void SetFlag(string flagName)
+        {
+            SetVariable(flagName, true);
+        }
+        
+        /// <summary>
+        /// Clear a flag (set to false)
+        /// </summary>
+        public void ClearFlag(string flagName)
+        {
+            SetVariable(flagName, false);
+        }
+        
+        /// <summary>
+        /// Get all variables of a specific type
+        /// </summary>
+        public Dictionary<string, T> GetVariablesOfType<T>()
+        {
+            var result = new Dictionary<string, T>();
+    
+            foreach (var kvp in variables)
+            {
+                if (kvp.Value is T typedValue)
+                {
+                    result[kvp.Key] = typedValue;
+                }
+            }
+    
+            return result;
+        }
+        
+        /// <summary>
+        /// Check if any of the given flags are set
+        /// </summary>
+        public bool HasAnyFlag(params string[] flagNames)
+        {
+            foreach (var flag in flagNames)
+            {
+                if (HasFlag(flag))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        /// <summary>
+        /// Check if all of the given flags are set
+        /// </summary>
+        public bool HasAllFlags(params string[] flagNames)
+        {
+            foreach (var flag in flagNames)
+            {
+                if (!HasFlag(flag))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public async Task Wait(float duration) => await ToSignal(GetTree().CreateTimer(duration), SceneTreeTimer.SignalName.Timeout);

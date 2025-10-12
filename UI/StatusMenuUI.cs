@@ -1,6 +1,7 @@
 ﻿using Godot;
 using System;
 using EchoesAcrossTime.Combat;
+using EchoesAcrossTime.Database;
 using EchoesAcrossTime.Items;
 using EchoesAcrossTime.Managers;
 
@@ -45,6 +46,7 @@ namespace EchoesAcrossTime.UI
         
         // Status effects
         [Export] private Label statusEffectsLabel;
+        [Export] public VBoxContainer statusEffectsContainer { get; set; }
         
         [Export] private Button closeButton;
         #endregion
@@ -105,17 +107,41 @@ namespace EchoesAcrossTime.UI
         {
             if (selectedCharacter == null) return;
             
-            // Basic info
-            characterNameLabel.Text = selectedCharacter.CharacterName;
-            levelLabel.Text = $"Level {selectedCharacter.Level}";
-            // FIXED: Class info needs to be stored/retrieved differently
-            classLabel.Text = "Fighter"; // TODO: Add class property to CharacterStats
+            // Get CharacterData from GameManager database
+            CharacterData characterData = null;
+            if (GameManager.Instance?.Database != null)
+            {
+                characterData = GameManager.Instance.Database.GetCharacter(selectedCharacter.CharacterId);
+            }
             
-            // Portrait - TODO: Add portrait reference to CharacterStats
-            // if (selectedCharacter.Portrait != null)
-            // {
-            //     characterPortrait.Texture = selectedCharacter.Portrait;
-            // }
+           // Basic info
+            characterNameLabel.Text = selectedCharacter.CharacterName;
+            levelLabel.Text = $"Lv. {selectedCharacter.Level}";
+            
+            // Class - Use CharacterData.Class property
+            if (characterData != null)
+            {
+                classLabel.Text = characterData.Class.ToString();
+            }
+            else
+            {
+                classLabel.Text = "Unknown"; // Fallback if no CharacterData found
+            }
+            
+            // Portrait - Use CharacterData.GetPortrait() method
+            if (characterData != null && characterPortrait != null)
+            {
+                var portrait = characterData.GetPortrait(PortraitType.Menu);
+                if (portrait != null)
+                {
+                    characterPortrait.Texture = portrait;
+                    characterPortrait.Visible = true;
+                }
+                else
+                {
+                    characterPortrait.Visible = false;
+                }
+            }
             
             // Experience
             currentExpLabel.Text = $"EXP: {selectedCharacter.CurrentExp}";
@@ -141,7 +167,7 @@ namespace EchoesAcrossTime.UI
             magicDefenseLabel.Text = $"Magic Defense: {selectedCharacter.MagicDefense}";
             speedLabel.Text = $"Speed: {selectedCharacter.Speed}";
             
-            // FIXED: Access through BattleStats
+            // Battle stats
             luckLabel.Text = $"Luck: {selectedCharacter.Luck}";
             criticalRateLabel.Text = $"Critical Rate: {selectedCharacter.BattleStats?.CriticalRate ?? 0}%";
             evasionRateLabel.Text = $"Evasion Rate: {selectedCharacter.BattleStats?.EvasionRate ?? 0}%";
@@ -160,75 +186,125 @@ namespace EchoesAcrossTime.UI
         {
             if (selectedCharacter == null) return;
             
-            // FIXED: Use EquipmentManager to get bonuses
-            // Need character ID - TODO: Add CharacterId property to CharacterStats
-            var characterId = selectedCharacter.CharacterName.ToLower().Replace(" ", "_");
-            var bonuses = EquipmentManager.Instance?.GetCharacterBonuses(characterId) ?? new EquipmentBonuses();
+            // Use CharacterId from CharacterStats (already exists)
+            var bonuses = EquipmentManager.Instance?.GetCharacterBonuses(selectedCharacter.CharacterId) 
+                          ?? new EquipmentBonuses();
             
-            var bonusList = new System.Collections.Generic.List<string>();
-            
-            if (bonuses.MaxHPBonus > 0) bonusList.Add($"HP+{bonuses.MaxHPBonus}");
-            if (bonuses.MaxMPBonus > 0) bonusList.Add($"MP+{bonuses.MaxMPBonus}");
-            if (bonuses.AttackBonus > 0) bonusList.Add($"ATK+{bonuses.AttackBonus}");
-            if (bonuses.DefenseBonus > 0) bonusList.Add($"DEF+{bonuses.DefenseBonus}");
-            if (bonuses.MagicAttackBonus > 0) bonusList.Add($"M.ATK+{bonuses.MagicAttackBonus}");
-            if (bonuses.MagicDefenseBonus > 0) bonusList.Add($"M.DEF+{bonuses.MagicDefenseBonus}");
-            if (bonuses.SpeedBonus > 0) bonusList.Add($"SPD+{bonuses.SpeedBonus}");
-            
-            equipmentBonusesLabel.Text = bonusList.Count > 0 
-                ? string.Join(", ", bonusList) 
-                : "No equipment bonuses";
+            // Display equipment bonuses
+            if (equipmentBonusesLabel != null)
+            {
+                var bonusText = "";
+                
+                if (bonuses.AttackBonus > 0) bonusText += $"+{bonuses.AttackBonus} ATK ";
+                if (bonuses.DefenseBonus > 0) bonusText += $"+{bonuses.DefenseBonus} DEF ";
+                if (bonuses.MagicAttackBonus > 0) bonusText += $"+{bonuses.MagicAttackBonus} MAG ";
+                if (bonuses.MagicDefenseBonus > 0) bonusText += $"+{bonuses.MagicDefenseBonus} MDF ";
+                if (bonuses.SpeedBonus > 0) bonusText += $"+{bonuses.SpeedBonus} SPD ";
+                if (bonuses.LuckBonus > 0) bonusText += $"+{bonuses.LuckBonus} LCK ";
+                if (bonuses.MaxHPBonus > 0) bonusText += $"+{bonuses.MaxHPBonus} HP ";
+                if (bonuses.MaxMPBonus > 0) bonusText += $"+{bonuses.MaxMPBonus} MP ";
+                
+                equipmentBonusesLabel.Text = string.IsNullOrEmpty(bonusText) 
+                    ? "No equipment bonuses" 
+                    : $"Equipment: {bonusText.Trim()}";
+            }
         }
         
         private void DisplayElementAffinities()
         {
-            if (selectedCharacter == null || elementAffinitiesContainer == null) return;
+            if (selectedCharacter == null || selectedCharacter.ElementAffinities == null) return;
             
-            // Clear existing
-            foreach (var child in elementAffinitiesContainer.GetChildren())
+            if (elementAffinitiesContainer != null)
             {
-                child.QueueFree();
-            }
-            
-            // Display affinities
-            if (selectedCharacter.ElementAffinities != null)
-            {
-                foreach (ElementType element in System.Enum.GetValues(typeof(ElementType)))
+                // Clear existing children
+                foreach (Node child in elementAffinitiesContainer.GetChildren())
                 {
-                    if (element == ElementType.None) continue;
-                    
-                    var affinity = selectedCharacter.ElementAffinities.GetAffinity(element);
-                    
-                    if (affinity != ElementAffinity.Normal)
-                    {
-                        var label = new Label();
-                        label.Text = $"{element}: {affinity}";
-                        elementAffinitiesContainer.AddChild(label);
-                    }
+                    child.QueueFree();
                 }
+                
+                // Display affinities
+                var affinities = selectedCharacter.ElementAffinities;
+                
+                AddAffinityLabel("Physical", affinities.PhysicalAffinity);
+                AddAffinityLabel("Fire", affinities.FireAffinity);
+                AddAffinityLabel("Ice", affinities.IceAffinity);
+                AddAffinityLabel("Electric", affinities.ThunderAffinity);
+                AddAffinityLabel("Wind", affinities.WindAffinity);
+                AddAffinityLabel("Light", affinities.LightAffinity);
+                AddAffinityLabel("Dark", affinities.DarkAffinity);
+                AddAffinityLabel("Almighty", affinities.AlmightyAffinity);
             }
         }
         
+        private void AddAffinityLabel(string element, ElementAffinity affinity)
+        {
+            if (affinity == ElementAffinity.Normal) return; // Don't show neutral affinities
+            
+            var label = new Label();
+            label.Text = $"{element}: {GetAffinityText(affinity)}";
+            label.AddThemeColorOverride("font_color", GetAffinityColor(affinity));
+            elementAffinitiesContainer.AddChild(label);
+        }
+        
+        private string GetAffinityText(ElementAffinity affinity)
+        {
+            return affinity switch
+            {
+                ElementAffinity.Weak => "Weak",
+                ElementAffinity.Resist => "Resist",
+                ElementAffinity.Immune => "Immune",
+                ElementAffinity.Absorb => "Absorb",
+                ElementAffinity.Reflect => "Reflect",
+                _ => "Normal"
+            };
+        }
+        
+        private Color GetAffinityColor(ElementAffinity affinity)
+        {
+            return affinity switch
+            {
+                ElementAffinity.Weak => new Color(1.0f, 0.3f, 0.3f), // Red
+                ElementAffinity.Resist => new Color(0.5f, 0.5f, 1.0f), // Blue
+                ElementAffinity.Immune => new Color(0.7f, 0.7f, 0.7f), // Gray
+                ElementAffinity.Absorb => new Color(0.3f, 1.0f, 0.3f), // Green
+                ElementAffinity.Reflect => new Color(1.0f, 1.0f, 0.3f), // Yellow
+                _ => Colors.White
+            };
+        }
+
         private void DisplayStatusEffects()
         {
             if (selectedCharacter == null) return;
-            
-            // FIXED: Use ActiveStatuses instead of StatusEffects
-            if (selectedCharacter.ActiveStatuses == null || selectedCharacter.ActiveStatuses.Count == 0)
+
+            if (statusEffectsContainer != null)
             {
-                statusEffectsLabel.Text = "No status effects";
-            }
-            else
-            {
-                var effects = new System.Collections.Generic.List<string>();
-                foreach (var status in selectedCharacter.ActiveStatuses)
+                // Clear existing children
+                foreach (Node child in statusEffectsContainer.GetChildren())
                 {
-                    effects.Add($"{status.Effect} ({status.Duration} turns)");
+                    child.QueueFree();
                 }
-                statusEffectsLabel.Text = string.Join(", ", effects);
+
+                // Display active status effects
+                if (selectedCharacter.ActiveStatuses != null && selectedCharacter.ActiveStatuses.Count > 0)
+                {
+                    foreach (var status in selectedCharacter.ActiveStatuses)
+                    {
+                        var label = new Label();
+                        // Fixed: StatusEffect is an enum, use it directly. Duration is the correct property.
+                        label.Text = $"{status.Effect} ({status.Duration} turns)";
+                        statusEffectsContainer.AddChild(label);
+                    }
+                }
+                else
+                {
+                    var label = new Label();
+                    label.Text = "No status effects";
+                    label.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+                    statusEffectsContainer.AddChild(label);
+                }
             }
         }
-        
+
         private void OnClosePressed()
         {
             Hide();

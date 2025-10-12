@@ -1,134 +1,177 @@
-﻿using Godot;
-using System;
+﻿// Shops/ShopTrigger.cs - Updated with MessageBox integration
+using Godot;
+using System.Threading.Tasks;
+using EchoesAcrossTime.Events;
+using EchoesAcrossTime.UI;
 
 namespace EchoesAcrossTime.Shops
 {
     /// <summary>
-    /// Attach to NPCs or objects to make them open a shop
-    /// Can be triggered by interaction or automatically
+    /// Triggers shop opening when player interacts
     /// </summary>
-    public partial class ShopTrigger : Node
+    public partial class ShopTrigger : Area2D
     {
-        [ExportGroup("Shop Configuration")]
         [Export] public ShopData ShopToOpen { get; set; }
         [Export] public string ShopId { get; set; } = "";
-        
-        [ExportGroup("Trigger Settings")]
-        [Export] public bool OpenOnInteract { get; set; } = true;
-        [Export] public bool OpenOnEnter { get; set; } = false;
-        [Export] public string InteractionKey { get; set; } = "ui_accept";
-        
-        [ExportGroup("Optional")]
-        [Export] public string ShopkeeperDialogue { get; set; } = "Welcome to my shop!";
         [Export] public bool ShowDialogueBeforeOpening { get; set; } = true;
+        [Export(PropertyHint.MultilineText)] public string ShopkeeperDialogue { get; set; } = "Welcome to my shop!";
+        [Export] public string ShopkeeperName { get; set; } = "Shopkeeper";
+        [Export] public string ShopkeeperPortraitPath { get; set; } = "";
+        [Export] public NodePath MessageBoxPath { get; set; }
         
+        private MessageBox messageBox;
         private bool playerInRange = false;
-        private Area2D triggerArea;
+        private bool isInteracting = false;
+        private Label interactionPrompt;
         
         public override void _Ready()
         {
-            // Try to find Area2D for interaction
-            triggerArea = GetNodeOrNull<Area2D>("Area2D");
-            if (triggerArea != null)
+            BodyEntered += OnBodyEntered;
+            BodyExited += OnBodyExited;
+            
+            // Get MessageBox reference
+            if (MessageBoxPath != null && !MessageBoxPath.IsEmpty)
             {
-                triggerArea.BodyEntered += OnBodyEntered;
-                triggerArea.BodyExited += OnBodyExited;
+                messageBox = GetNode<MessageBox>(MessageBoxPath);
+            }
+            else
+            {
+                // Try to find it in the scene tree with unique name
+                messageBox = GetTree().Root.GetNodeOrNull<MessageBox>("%MessageBox");
             }
             
-            // If ShopData is directly assigned, register it
-            if (ShopToOpen != null && ShopManager.Instance != null)
+            if (messageBox == null)
             {
-                ShopManager.Instance.RegisterShop(ShopToOpen);
-                ShopId = ShopToOpen.ShopId;
+                GD.PrintErr("[ShopTrigger] MessageBox not found! Dialogue will not work.");
             }
+            
+            CreateInteractionPrompt();
         }
         
-        public override void _Process(double delta)
+        private void CreateInteractionPrompt()
         {
-            if (!OpenOnInteract) return;
-            if (!playerInRange) return;
-            
-            // Check for interaction key
-            if (Input.IsActionJustPressed(InteractionKey))
-            {
-                OpenShop();
-            }
+            interactionPrompt = new Label();
+            interactionPrompt.Text = "Press E to talk";
+            interactionPrompt.Position = new Vector2(-40, -50);
+            interactionPrompt.Visible = false;
+            AddChild(interactionPrompt);
         }
         
         private void OnBodyEntered(Node2D body)
         {
-            if (body.IsInGroup("Player"))
+            if (body.IsInGroup("player"))
             {
                 playerInRange = true;
-                
-                if (OpenOnEnter)
+                if (interactionPrompt != null)
                 {
-                    OpenShop();
+                    interactionPrompt.Visible = true;
                 }
             }
         }
         
         private void OnBodyExited(Node2D body)
         {
-            if (body.IsInGroup("Player"))
+            if (body.IsInGroup("player"))
             {
                 playerInRange = false;
+                if (interactionPrompt != null)
+                {
+                    interactionPrompt.Visible = false;
+                }
             }
         }
         
-        /// <summary>
-        /// Open the shop
-        /// </summary>
-        public void OpenShop()
+        public override void _Input(InputEvent @event)
         {
-            if (ShopManager.Instance == null)
+            if (playerInRange && !isInteracting)
             {
-                GD.PushError("[ShopTrigger] ShopManager not found!");
+                if (@event.IsActionPressed("interact"))
+                {
+                    _ = OnInteract(); // Fire and forget
+                }
+            }
+        }
+        
+        private async Task OnInteract()
+        {
+            if (isInteracting) return;
+            isInteracting = true;
+            
+            if (ShopToOpen == null && string.IsNullOrEmpty(ShopId))
+            {
+                GD.PrintErr("[ShopTrigger] No shop assigned!");
+                isInteracting = false;
                 return;
             }
             
             // Show dialogue first if enabled
             if (ShowDialogueBeforeOpening && !string.IsNullOrEmpty(ShopkeeperDialogue))
             {
-                ShowDialogue(ShopkeeperDialogue);
+                await ShowDialogue(ShopkeeperDialogue);
             }
             
             // Open the shop
             if (ShopToOpen != null)
             {
-                ShopManager.Instance.OpenShop(ShopToOpen);
+                ShopManager.Instance?.OpenShop(ShopToOpen);
             }
             else if (!string.IsNullOrEmpty(ShopId))
             {
-                ShopManager.Instance.OpenShop(ShopId);
+                ShopManager.Instance?.OpenShop(ShopId);
             }
             else
             {
                 GD.PushError("[ShopTrigger] No shop assigned!");
             }
+            
+            isInteracting = false;
         }
         
         /// <summary>
-        /// Show shopkeeper dialogue
-        /// TODO: Integrate with your dialogue system
+        /// Show shopkeeper dialogue using MessageBox
         /// </summary>
-        private void ShowDialogue(string text)
+        private async Task ShowDialogue(string text)
         {
-            GD.Print($"[Shopkeeper] {text}");
+            if (messageBox == null)
+            {
+                GD.PrintErr("[ShopTrigger] MessageBox not available - showing debug message");
+                GD.Print($"[Shopkeeper] {text}");
+                return;
+            }
             
-            // TODO: Connect to your dialogue system
-            // Example:
-            // var dialogueManager = GetNode<DialogueManager>("/root/DialogueManager");
-            // dialogueManager?.ShowDialogue(text);
+            // Create DialogueData
+            var dialogueData = new DialogueData
+            {
+                Text = text,
+                SpeakerName = ShopkeeperName,
+                ShowSpeakerName = !string.IsNullOrEmpty(ShopkeeperName),
+                PortraitPath = ShopkeeperPortraitPath,
+                ShowPortrait = !string.IsNullOrEmpty(ShopkeeperPortraitPath),
+                UseTypewriterEffect = true,
+                TextSpeed = 0.05f,
+                Position = MessageBoxPosition.Bottom
+            };
+            
+            // Wait for message to be shown and advanced
+            var tcs = new TaskCompletionSource<bool>();
+            
+            void OnMessageAdvanced()
+            {
+                tcs.TrySetResult(true);
+            }
+            
+            messageBox.MessageAdvanced += OnMessageAdvanced;
+            messageBox.ShowMessage(dialogueData);
+            
+            await tcs.Task;
+            
+            messageBox.MessageAdvanced -= OnMessageAdvanced;
         }
         
         public override void _ExitTree()
         {
-            if (triggerArea != null)
-            {
-                triggerArea.BodyEntered -= OnBodyEntered;
-                triggerArea.BodyExited -= OnBodyExited;
-            }
+            BodyEntered -= OnBodyEntered;
+            BodyExited -= OnBodyExited;
         }
     }
 }

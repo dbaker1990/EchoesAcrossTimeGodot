@@ -46,6 +46,7 @@ namespace EchoesAcrossTime.Combat
         [Export] public float ImmuneMultiplier { get; set; } = 0f;
         [Export] public float NullMultiplier { get; set; } = 0f;
         [Export] public float AbsorbMultiplier { get; set; } = -1f; // Negative = healing
+        [Export] public float ReflectMultiplier { get; set; } = 0f;
         
         /// <summary>
         /// Set affinity for a specific element
@@ -122,6 +123,7 @@ namespace EchoesAcrossTime.Combat
                 ElementAffinity.Immune => ImmuneMultiplier,
                 ElementAffinity.Absorb => AbsorbMultiplier,
                 ElementAffinity.Null => NullMultiplier,
+                
                 _ => 1f
             };
         }

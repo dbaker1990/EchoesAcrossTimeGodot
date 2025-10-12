@@ -1,58 +1,79 @@
 ﻿// Skits/SkitTrigger.cs
 using Godot;
 using System.Collections.Generic;
+using System.Linq;
+using EchoesAcrossTime.Events;
+using EchoesAcrossTime.Managers;
 
 namespace EchoesAcrossTime.Skits
 {
-    /// <summary>
-    /// Place this in your scene to automatically trigger skits based on conditions
-    /// Can be attached to Area2D nodes, events, or used standalone
-    /// </summary>
     public partial class SkitTrigger : Node2D
     {
-        [ExportGroup("Skit Configuration")]
-        [Export] public SkitData SkitToTrigger { get; set; }
-        [Export] public string SkitId { get; set; } = ""; // Alternative to SkitData
-        
-        [ExportGroup("Trigger Settings")]
+        [Export] public SkitData SkitToPlay { get; set; }
         [Export] public SkitTriggerMode TriggerMode { get; set; } = SkitTriggerMode.PlayerEnter;
-        [Export] public bool AutoRemoveAfterTrigger { get; set; } = true;
-        [Export] public bool RequireInteraction { get; set; } = false;
+        [Export] public bool OneTimeOnly { get; set; } = true;
+        [Export] public bool CanReplay { get; set; } = false;
         
-        [ExportGroup("Conditions")]
-        [Export] public bool CheckPartyComposition { get; set; } = true;
-        [Export] public bool CheckFlags { get; set; } = true;
-        [Export] public Godot.Collections.Array<string> RequiredFlags { get; set; }
-        [Export] public Godot.Collections.Array<string> ForbiddenFlags { get; set; }
-        
-        // Internal
         private Area2D triggerArea;
         private bool hasTriggered = false;
         private bool playerInRange = false;
-
+        
         public override void _Ready()
         {
-            RequiredFlags = RequiredFlags ?? new Godot.Collections.Array<string>();
-            ForbiddenFlags = ForbiddenFlags ?? new Godot.Collections.Array<string>();
-            
-            // Auto-create trigger area if not exists
-            triggerArea = GetNodeOrNull<Area2D>("TriggerArea");
-            if (triggerArea == null && TriggerMode == SkitTriggerMode.PlayerEnter)
+            if (SkitToPlay == null)
             {
-                CreateDefaultTriggerArea();
+                GD.PrintErr("[SkitTrigger] No SkitData assigned!");
+                return;
             }
             
-            // Connect signals
-            if (triggerArea != null)
+            // Create trigger area based on mode
+            if (TriggerMode == SkitTriggerMode.PlayerEnter || TriggerMode == SkitTriggerMode.Interaction)
             {
-                triggerArea.BodyEntered += OnBodyEntered;
-                triggerArea.BodyExited += OnBodyExited;
+                SetupTriggerArea();
             }
         }
-
+        
+        private void SetupTriggerArea()
+        {
+            triggerArea = new Area2D
+            {
+                Name = "TriggerArea"
+            };
+            AddChild(triggerArea);
+            
+            var shape = new CollisionShape2D();
+            var rectShape = new RectangleShape2D { Size = new Vector2(64, 64) };
+            shape.Shape = rectShape;
+            triggerArea.AddChild(shape);
+            
+            triggerArea.BodyEntered += OnBodyEntered;
+            triggerArea.BodyExited += OnBodyExited;
+        }
+        
+        private void OnBodyEntered(Node2D body)
+        {
+            if (body.IsInGroup("player"))
+            {
+                playerInRange = true;
+                
+                if (TriggerMode == SkitTriggerMode.PlayerEnter)
+                {
+                    TryTriggerSkit();
+                }
+            }
+        }
+        
+        private void OnBodyExited(Node2D body)
+        {
+            if (body.IsInGroup("player"))
+            {
+                playerInRange = false;
+            }
+        }
+        
         public override void _Input(InputEvent @event)
         {
-            if (RequireInteraction && playerInRange && !hasTriggered)
+            if (TriggerMode == SkitTriggerMode.Interaction && playerInRange)
             {
                 if (@event.IsActionPressed("interact"))
                 {
@@ -60,164 +81,148 @@ namespace EchoesAcrossTime.Skits
                 }
             }
         }
-
-        private void OnBodyEntered(Node2D body)
+        
+        public void TryTriggerSkit()
         {
-            if (body.Name == "Player" || body is PlayerCharacter)
+            // Check if already triggered and one-time only
+            if (hasTriggered && OneTimeOnly && !CanReplay)
             {
-                playerInRange = true;
-                
-                if (!RequireInteraction && !hasTriggered)
-                {
-                    TryTriggerSkit();
-                }
-            }
-        }
-
-        private void OnBodyExited(Node2D body)
-        {
-            if (body.Name == "Player" || body is PlayerCharacter)
-            {
-                playerInRange = false;
-            }
-        }
-
-        /// <summary>
-        /// Attempt to trigger the skit
-        /// </summary>
-        public async void TryTriggerSkit()
-        {
-            if (hasTriggered)
-                return;
-
-            if (SkitManager.Instance == null)
-            {
-                GD.PrintErr("SkitManager not found!");
                 return;
             }
-
-            // Get skit data
-            SkitData skitData = SkitToTrigger;
-            if (skitData == null && !string.IsNullOrEmpty(SkitId))
-            {
-                skitData = SkitManager.Instance.GetSkit(SkitId);
-            }
-
-            if (skitData == null)
-            {
-                GD.PrintErr("No skit data specified!");
-                return;
-            }
-
+            
             // Check conditions
-            if (!CheckConditions(skitData))
+            if (!CheckConditions())
             {
                 return;
             }
-
-            // Mark as triggered
-            hasTriggered = true;
-
-            // Play skit
-            await SkitManager.Instance.PlaySkit(skitData);
-
-            // Auto-remove if set
-            if (AutoRemoveAfterTrigger)
-            {
-                QueueFree();
-            }
+            
+            // Trigger the skit
+            PlaySkit();
         }
-
-        /// <summary>
-        /// Check if all conditions are met
-        /// </summary>
-        private bool CheckConditions(SkitData skit)
+        
+        private bool CheckConditions()
         {
-            // Check if already viewed
-            if (skit.OnceOnly && SkitManager.Instance.HasViewedSkit(skit.SkitId))
+            if (SkitToPlay == null) return false;
+            
+            // Get current party
+            var currentParty = GetCurrentParty();
+            
+            // Check if all participants are in party (if required)
+            if (SkitToPlay.RequiresAllParticipantsInParty && SkitToPlay.ParticipantIds != null)
             {
-                return false;
-            }
-
-            // Check required flags
-            if (CheckFlags && RequiredFlags.Count > 0)
-            {
-                var gameFlags = GetGameFlags();
-                foreach (var flag in RequiredFlags)
-                {
-                    if (!gameFlags.Contains(flag))
-                    {
-                        GD.Print($"Skit blocked: Missing required flag '{flag}'");
-                        return false;
-                    }
-                }
-            }
-
-            // Check forbidden flags
-            if (CheckFlags && ForbiddenFlags.Count > 0)
-            {
-                var gameFlags = GetGameFlags();
-                foreach (var flag in ForbiddenFlags)
-                {
-                    if (gameFlags.Contains(flag))
-                    {
-                        GD.Print($"Skit blocked: Forbidden flag '{flag}' is set");
-                        return false;
-                    }
-                }
-            }
-
-            // Check party composition
-            if (CheckPartyComposition && skit.RequiresAllParticipantsInParty)
-            {
-                var currentParty = GetCurrentParty();
-                foreach (var participantId in skit.ParticipantIds)
+                foreach (var participantId in SkitToPlay.ParticipantIds)
                 {
                     if (!currentParty.Contains(participantId))
                     {
-                        GD.Print($"Skit blocked: '{participantId}' not in party");
                         return false;
                     }
                 }
             }
-
+            
+            // Check required flag
+            if (!string.IsNullOrEmpty(SkitToPlay.RequiredFlag))
+            {
+                if (!GetGameFlag(SkitToPlay.RequiredFlag))
+                {
+                    return false;
+                }
+            }
+            
             return true;
         }
-
-        /// <summary>
-        /// Create default trigger area
-        /// </summary>
-        private void CreateDefaultTriggerArea()
+        
+        private void PlaySkit()
         {
-            triggerArea = new Area2D { Name = "TriggerArea" };
-            AddChild(triggerArea);
-            
-            var shape = new CollisionShape2D();
-            var rectShape = new RectangleShape2D { Size = new Vector2(64, 64) };
-            shape.Shape = rectShape;
-            triggerArea.AddChild(shape);
+            if (SkitManager.Instance != null)
+            {
+                SkitManager.Instance.PlaySkit(SkitToPlay);
+                hasTriggered = true;
+            }
+            else
+            {
+                GD.PrintErr("[SkitTrigger] SkitManager not found!");
+            }
         }
-
+        
         /// <summary>
-        /// Get current game flags (integrate with your save system)
+        /// Get current game flags from EventCommandExecutor
         /// </summary>
         private List<string> GetGameFlags()
         {
-            // TODO: Integrate with your game's flag/variable system
-            // For now, return empty list
-            return new List<string>();
+            var flags = new List<string>();
+            
+            if (EventCommandExecutor.Instance != null)
+            {
+                // Get all boolean variables that are set to true
+                // These are treated as flags
+                // Note: We can't directly access the private variables dictionary,
+                // so we check common flag names or rely on a getter method
+                
+                // For now, we'll add a helper method to get all active flags
+                // You can expand this by implementing GetAllActiveFlags() in EventCommandExecutor
+                
+                // Example flags to check (you can expand this list):
+                var commonFlags = new List<string>
+                {
+                    "met_aria", "chapter_1_complete", "defeated_boss",
+                    "unlocked_fast_travel", "learned_about_time_magic"
+                };
+                
+                foreach (var flagName in commonFlags)
+                {
+                    if (EventCommandExecutor.Instance.GetVariable<bool>(flagName, false))
+                    {
+                        flags.Add(flagName);
+                    }
+                }
+            }
+            
+            return flags;
         }
-
+        
         /// <summary>
-        /// Get current party composition (integrate with your party system)
+        /// Get current party composition from PartyManager
         /// </summary>
         private List<string> GetCurrentParty()
         {
-            // TODO: Integrate with your game's party system
-            // For now, return example party
-            return new List<string> { "dominic", "aria", "echo" };
+            var partyIds = new List<string>();
+            
+            if (PartyMenuManager.Instance != null)
+            {
+                var mainParty = PartyMenuManager.Instance.GetMainParty();
+                foreach (var member in mainParty)
+                {
+                    if (member?.CharacterId != null)
+                    {
+                        partyIds.Add(member.CharacterId);
+                    }
+                }
+            }
+            
+            return partyIds;
+        }
+        
+        public override void _ExitTree()
+        {
+            if (triggerArea != null)
+            {
+                triggerArea.BodyEntered -= OnBodyEntered;
+                triggerArea.BodyExited -= OnBodyExited;
+            }
+        }
+        
+        private bool GetGameFlag(string flagName)
+        {
+            if (Events.EventCommandExecutor.Instance != null)
+            {
+                return Events.EventCommandExecutor.Instance.GetVariable<bool>(flagName, false);
+            }
+            
+            return false;
         }
     }
+    
+    
 
     public enum SkitTriggerMode
     {

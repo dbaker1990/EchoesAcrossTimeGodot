@@ -2,7 +2,9 @@
 using Godot;
 using Godot.Collections;
 using System.Linq;
+using System.Threading.Tasks;
 using EchoesAcrossTime;
+using EchoesAcrossTime.Bonds;
 
 public partial class RelationshipManager : Node
 {
@@ -12,6 +14,13 @@ public partial class RelationshipManager : Node
     [Export] public Array<string> CandidateIds = new() { "elara", "seraphine", "naledi" };
 
     private readonly Dictionary<string, RelationshipState> _map = new();
+    
+    public static RelationshipManager Instance { get; private set; }
+    
+    [Export] public NodePath SpouseSelectionUIPath { get; set; }
+    
+    private SpouseSelectionUI spouseSelectionUI;
+    private string chosenSpouseId = null;
 
     [Signal] public delegate void RelationshipChangedEventHandler(string candidateId, int newPoints, string newStage, bool lockedIn);
     [Signal] public delegate void RelationshipStageUpEventHandler(string candidateId, string newStage);
@@ -19,9 +28,43 @@ public partial class RelationshipManager : Node
 
     public override void _Ready()
     {
+        if (Instance != null)
+        {
+            QueueFree();
+            return;
+        }
+        Instance = this;
+        
+        // Initialize candidates
         foreach (var id in CandidateIds)
+        {
             if (!_map.ContainsKey(id))
-                _map[id] = new RelationshipState { CandidateId = id, Points = 0, Stage = "Acquaintance", LockedIn = false };
+            {
+                _map[id] = new RelationshipState 
+                { 
+                    CandidateId = id, 
+                    Points = 0, 
+                    Stage = "Acquaintance", 
+                    LockedIn = false 
+                };
+            }
+        }
+        
+        // Get SpouseSelectionUI reference
+        if (SpouseSelectionUIPath != null && !SpouseSelectionUIPath.IsEmpty)
+        {
+            spouseSelectionUI = GetNode<SpouseSelectionUI>(SpouseSelectionUIPath);
+        }
+        else
+        {
+            // Try to find it in the scene tree
+            spouseSelectionUI = GetTree().Root.GetNodeOrNull<SpouseSelectionUI>("%SpouseSelectionUI");
+        }
+        
+        if (spouseSelectionUI != null)
+        {
+            spouseSelectionUI.SpouseChosen += OnSpouseChosenFromUI;
+        }
     }
     
     #region Save/Load
@@ -57,6 +100,8 @@ public partial class RelationshipManager : Node
         
         return saveData;
     }
+    
+    
 
     /// <summary>
     /// Load relationship data from save
@@ -136,30 +181,125 @@ public partial class RelationshipManager : Node
         EmitSignal(SignalName.RouteLockedIn, id);
     }
 
-    // Endgame resolution: if no explicit lock-in was made, pick top; if within window, show a choice.
-    public string ResolveSpouseId()
+    /// <summary>
+    /// Resolve which candidate becomes the spouse.
+    /// Shows choice UI if multiple candidates are tied.
+    /// </summary>
+    public async Task<string> ResolveSpouseId()
     {
         var top = _map.Values.OrderByDescending(v => v.Points).ToArray();
         if (top.Length == 0) return "";
 
         var topPts = top[0].Points;
-        var secondPts = (top.Length > 1)? top[1].Points : -999;
+        var secondPts = (top.Length > 1) ? top[1].Points : -999;
 
-        // If within SoftChoiceWindow, surface a choice UI; else take top (or the locked-in one if set)
+        // If a spouse is already locked in, return that
+        var locked = _map.Values.FirstOrDefault(v => v.LockedIn);
+        if (locked != null)
+        {
+            return locked.CandidateId;
+        }
+
+        // If within SoftChoiceWindow, present choice UI
+        if (Mathf.Abs(topPts - secondPts) <= Config.SoftChoiceWindow)
+        {
+            // Get all candidates within the choice window
+            var tiedCandidates = _map.Values
+                .Where(v => Mathf.Abs(v.Points - topPts) <= Config.SoftChoiceWindow)
+                .OrderByDescending(v => v.Points)
+                .ToList();
+            
+            if (tiedCandidates.Count > 1)
+            {
+                // Show choice UI and wait for player decision
+                if (spouseSelectionUI != null)
+                {
+                    chosenSpouseId = null;
+                    spouseSelectionUI.ShowSelection(tiedCandidates);
+                    
+                    // Wait for player to make a choice
+                    while (chosenSpouseId == null)
+                    {
+                        await Task.Delay(100);
+                    }
+                    
+                    return chosenSpouseId;
+                }
+                else
+                {
+                    GD.PrintErr("[RelationshipManager] SpouseSelectionUI not found! Defaulting to top candidate.");
+                    return top[0].CandidateId;
+                }
+            }
+        }
+
+        // Clear winner - return top candidate
+        return top[0].CandidateId;
+    }
+    
+    /// <summary>
+    /// Synchronous version for backward compatibility
+    /// Returns empty string if choice UI is needed
+    /// </summary>
+    public string ResolveSpouseIdSync()
+    {
+        var top = _map.Values.OrderByDescending(v => v.Points).ToArray();
+        if (top.Length == 0) return "";
+
+        var topPts = top[0].Points;
+        var secondPts = (top.Length > 1) ? top[1].Points : -999;
+
         var locked = _map.Values.FirstOrDefault(v => v.LockedIn);
         if (locked != null) return locked.CandidateId;
 
         if (Mathf.Abs(topPts - secondPts) <= Config.SoftChoiceWindow)
         {
-            // TODO: Present choice UI between the tied/top few and return that result.
-            // For now return top[0] but your endgame scene should branch to a choice prompt.
-            return top[0].CandidateId;
+            // Needs UI choice - return empty to signal this
+            return "";
         }
 
         return top[0].CandidateId;
     }
     
+    /// <summary>
+    /// Called when player chooses spouse from UI
+    /// </summary>
+    private void OnSpouseChosenFromUI(string candidateId)
+    {
+        chosenSpouseId = candidateId;
+        
+        // Lock in the choice
+        if (_map.TryGetValue(candidateId, out var chosenCandidate))
+        {
+            chosenCandidate.LockedIn = true;
+            SetGameFlag($"spouse_{candidateId}", true);
+            SetGameFlag("spouse_chosen", true);
+            
+            GD.Print($"[RelationshipManager] Spouse locked in: {candidateId}");
+        }
+    }
+    
 
-    // Stub for your story flag system
-    private void SetGameFlag(string flag, bool val) { /* hook into your save/state */ }
+    // Stub for your story flag system - integrate with EventCommandExecutor
+    private void SetGameFlag(string flag, bool val)
+    {
+        if (EchoesAcrossTime.Events.EventCommandExecutor.Instance != null)
+        {
+            EchoesAcrossTime.Events.EventCommandExecutor.Instance.SetVariable(flag, val);
+            GD.Print($"[RelationshipManager] Set flag: {flag} = {val}");
+        }
+        else
+        {
+            GD.PrintErr($"[RelationshipManager] Could not set flag {flag} - EventCommandExecutor not found");
+        }
+    }
+    
+    public override void _ExitTree()
+    {
+        if (spouseSelectionUI != null)
+        {
+            spouseSelectionUI.SpouseChosen -= OnSpouseChosenFromUI;
+        }
+    }
+    
 }

@@ -7,6 +7,7 @@
   <ItemGroup>
     <Content Include="Beastiary\BeastiaryUI.tscn" />
     <Content Include="Beastiary\BestiaryNotification.tscn" />
+    <Content Include="Bonds\SpouseSelectionUI.tscn" />
     <Content Include="Database\CharacterDatabase.tres" />
     <Content Include="Docs\CompleteDocumentation.md" />
     <Content Include="Images\TitleScreen\Title Screen.png" />

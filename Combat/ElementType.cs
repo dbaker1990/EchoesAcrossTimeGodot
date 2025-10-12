@@ -25,6 +25,7 @@ namespace EchoesAcrossTime.Combat
         Resist,    // 50% damage
         Immune,    // 0% damage
         Absorb,     // Heals instead of damages
-        Null
+        Null,
+        Reflect
     }
 }
