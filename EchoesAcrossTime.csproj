@@ -11,7 +11,6 @@
     <Content Include="Docs\CompleteDocumentation.md" />
     <Content Include="Images\TitleScreen\Title Screen.png" />
     <Content Include="Skits\SkitUI.tscn" />
-    <Content Include="UI\Materials\LiquidGlass.shader" />
     <Content Include="UI\PartyMenuUI.tscn" />
   </ItemGroup>
   <ItemGroup>
@@ -22,5 +21,7 @@
     <Folder Include="Data\Lore\Events\" />
     <Folder Include="Data\Lore\Locations\" />
     <Folder Include="Scenes\" />
+  </ItemGroup>
+  <ItemGroup>
   </ItemGroup>
 </Project>
