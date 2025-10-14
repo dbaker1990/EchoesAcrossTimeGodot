@@ -5,6 +5,8 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="addons\character_builder\plugin.cfg" />
+    <Content Include="addons\skill_builder\plugin.cfg" />
     <Content Include="Beastiary\BeastiaryUI.tscn" />
     <Content Include="Beastiary\BestiaryNotification.tscn" />
     <Content Include="Bonds\SpouseSelectionUI.tscn" />

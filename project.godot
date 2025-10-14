@@ -44,7 +44,7 @@ project/assembly_name="EchoesAcrossTime"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/effekseer/plugin.cfg")
+enabled=PackedStringArray("res://addons/character_builder/plugin.cfg", "res://addons/effekseer/plugin.cfg", "res://addons/skill_builder/plugin.cfg")
 
 [rendering]
 
