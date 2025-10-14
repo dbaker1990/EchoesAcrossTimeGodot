@@ -68,12 +68,20 @@ namespace EchoesAcrossTime.UI
             
             if (loadGamePanel != null)
             {
-                loadGamePanel.Visible = true;
-                // TODO: Populate load game panel with save files
+                // Cast to LoadGameTitleUI and call OpenMenu
+                var loadUI = loadGamePanel as LoadGameTitleUI;
+                if (loadUI != null)
+                {
+                    loadUI.OpenMenu();
+                }
+                else
+                {
+                    GD.PrintErr("Load Game Panel is not a LoadGameTitleUI!");
+                }
             }
             else
             {
-                GD.Print("Load Game Panel not assigned!");
+                GD.PrintErr("Load Game Panel not assigned!");
             }
         }
         

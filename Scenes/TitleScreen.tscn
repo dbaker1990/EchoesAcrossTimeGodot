@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://b8k4hvurghe8k"]
+[gd_scene load_steps=5 format=3 uid="uid://b8k4hvurghe8k"]
 
 [ext_resource type="Script" uid="uid://bis4htr86mh3q" path="res://UI/TitleScreen.cs" id="1_vmg2h"]
 [ext_resource type="Texture2D" uid="uid://baf4agafp2sms" path="res://Images/TitleScreen/Title Screen.png" id="2_8l4an"]
 [ext_resource type="PackedScene" uid="uid://brq0qsl863qu8" path="res://UI/TitleScreenOptionsUI.tscn" id="3_8l4an"]
+[ext_resource type="Script" uid="uid://ddimp1ea4ubth" path="res://UI/LoadGameTitleUI.cs" id="4_n15yj"]
 
 [node name="TitleScreen" type="Control" node_paths=PackedStringArray("newGameButton", "loadGameButton", "optionsButton", "quitButton", "titleBackground", "titleLabel", "loadGamePanel", "optionsPanel")]
 layout_mode = 3
@@ -113,7 +114,7 @@ vertical_alignment = 1
 [node name="TitleScreenOptionsUI" parent="." instance=ExtResource("3_8l4an")]
 layout_mode = 1
 
-[node name="LoadGamePanel" type="Control" parent="."]
+[node name="LoadGamePanel" type="Control" parent="." node_paths=PackedStringArray("slotsContainer", "detailsPanel", "slotNumberLabel", "locationLabel", "playtimeLabel", "saveDateLabel", "levelLabel", "screenshotPreview", "loadButton", "backButton")]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -121,14 +122,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="Spacer1" type="Control" parent="LoadGamePanel"]
-custom_minimum_size = Vector2(0, 20)
-anchors_preset = 0
-offset_left = 200.0
-offset_top = 530.0
-offset_right = 600.0
-offset_bottom = 550.0
+script = ExtResource("4_n15yj")
+slotsContainer = NodePath("MainContainer/LeftSide/ScrollContainer/SlotsContainer")
+detailsPanel = NodePath("MainContainer/RightSide/DetailsPanel")
+slotNumberLabel = NodePath("MainContainer/LeftSide/SlotsLabel")
+locationLabel = NodePath("MainContainer/RightSide/LocationLabel")
+playtimeLabel = NodePath("MainContainer/RightSide/PlaytimeLabel")
+saveDateLabel = NodePath("MainContainer/RightSide/SaveDateLabel")
+levelLabel = NodePath("MainContainer/RightSide/LevelLabel")
+screenshotPreview = NodePath("MainContainer/RightSide/ScreenshotPreview")
+loadButton = NodePath("MainContainer/ButtonContainer/LoadButton")
+backButton = NodePath("MainContainer/ButtonContainer/BackButton")
 
 [node name="ColorRect" type="ColorRect" parent="LoadGamePanel"]
 layout_mode = 1
@@ -139,19 +143,79 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.8)
 
-[node name="Label" type="Label" parent="LoadGamePanel"]
+[node name="Title" type="Label" parent="LoadGamePanel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -11.5
-offset_right = 20.0
-offset_bottom = 11.5
+offset_left = -253.5
+offset_top = -22.5
+offset_right = 253.5
+offset_bottom = 22.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 32
-text = "Load Game Panel - Coming Soon!"
+text = "Load Game"
 horizontal_alignment = 1
+
+[node name="MainContainer" type="HBoxContainer" parent="LoadGamePanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="LeftSide" type="VBoxContainer" parent="LoadGamePanel/MainContainer"]
+layout_mode = 2
+
+[node name="SlotsLabel" type="Label" parent="LoadGamePanel/MainContainer/LeftSide"]
+layout_mode = 2
+text = "Save Files"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="LoadGamePanel/MainContainer/LeftSide"]
+layout_mode = 2
+
+[node name="SlotsContainer" type="VBoxContainer" parent="LoadGamePanel/MainContainer/LeftSide/ScrollContainer"]
+custom_minimum_size = Vector2(0, 500)
+layout_mode = 2
+
+[node name="RightSide" type="VBoxContainer" parent="LoadGamePanel/MainContainer"]
+layout_mode = 2
+
+[node name="DetailsPanel" type="Panel" parent="LoadGamePanel/MainContainer/RightSide"]
+custom_minimum_size = Vector2(400, 500)
+layout_mode = 2
+
+[node name="SlotNumberLabel" type="Label" parent="LoadGamePanel/MainContainer/RightSide/DetailsPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="ScreenshotPreview" type="TextureRect" parent="LoadGamePanel/MainContainer/RightSide"]
+custom_minimum_size = Vector2(320, 180)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LocationLabel" type="Label" parent="LoadGamePanel/MainContainer/RightSide"]
+layout_mode = 2
+
+[node name="PlaytimeLabel" type="Label" parent="LoadGamePanel/MainContainer/RightSide"]
+layout_mode = 2
+
+[node name="SaveDateLabel" type="Label" parent="LoadGamePanel/MainContainer/RightSide"]
+layout_mode = 2
+
+[node name="LevelLabel" type="Label" parent="LoadGamePanel/MainContainer/RightSide"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="HBoxContainer" parent="LoadGamePanel/MainContainer"]
+layout_mode = 2
+
+[node name="LoadButton" type="Button" parent="LoadGamePanel/MainContainer/ButtonContainer"]
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="LoadGamePanel/MainContainer/ButtonContainer"]
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
