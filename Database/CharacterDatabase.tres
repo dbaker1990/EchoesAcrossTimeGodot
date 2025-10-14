@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterDatabase" load_steps=10 format=3 uid="uid://7nnsth8dj7jj"]
+[gd_resource type="Resource" script_class="CharacterDatabase" load_steps=13 format=3 uid="uid://7nnsth8dj7jj"]
 
 [ext_resource type="Resource" uid="uid://dj6vgrbs78vf4" path="res://Data/Skills/Steal.tres" id="1_nwlej"]
 [ext_resource type="Script" uid="uid://c6fwhavejbuqu" path="res://Database/CharacterDatabase.cs" id="1_script"]
@@ -9,9 +9,12 @@
 [ext_resource type="Resource" uid="uid://bfk0y7ncto0ad" path="res://Data/Skills/Somnus.tres" id="6_nafxu"]
 [ext_resource type="Resource" uid="uid://cvi2ohtd1nsf6" path="res://Data/Skills/Mend.tres" id="7_6755j"]
 [ext_resource type="Resource" uid="uid://bjtgg8e8onwey" path="res://Data/Skills/SpatialCut.tres" id="8_6755j"]
+[ext_resource type="Resource" uid="uid://p5caihrjiduk" path="res://Data/Skills/AquaLance.tres" id="9_thsg7"]
+[ext_resource type="Resource" uid="uid://xjxloglwrei2" path="res://Data/Skills/GaleSlash.tres" id="10_qnyql"]
+[ext_resource type="Resource" uid="uid://co7pedgujt8b3" path="res://Data/Skills/StoneSpike.tres" id="11_uuy82"]
 
 [resource]
 script = ExtResource("1_script")
 Characters = null
-Skills = Array[Object]([ExtResource("1_nwlej"), ExtResource("2_o33u2"), ExtResource("3_dn0qv"), ExtResource("4_ftcsv"), ExtResource("5_nafxu"), ExtResource("6_nafxu"), ExtResource("7_6755j"), ExtResource("8_6755j")])
+Skills = Array[Object]([ExtResource("1_nwlej"), ExtResource("2_o33u2"), ExtResource("3_dn0qv"), ExtResource("4_ftcsv"), ExtResource("5_nafxu"), ExtResource("6_nafxu"), ExtResource("7_6755j"), ExtResource("8_6755j"), ExtResource("9_thsg7"), ExtResource("10_qnyql"), ExtResource("11_uuy82"), null])
 AllItems = null

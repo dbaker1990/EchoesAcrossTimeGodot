@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://b8i2ulhtqx5do"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_x7hqj"]
+
+[resource]
+script = ExtResource("1_x7hqj")
+SkillId = "sacred_ray"
+DisplayName = "Sacred Ray"
+Description = "Strike with holy light."
+MPCost = 8
+DamageFormula = 1
+DamageType = 1
+Element = 7
+BasePower = 80
+Accuracy = 95
+CriticalBonus = 5
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

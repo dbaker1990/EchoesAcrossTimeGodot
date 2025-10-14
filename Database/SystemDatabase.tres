@@ -15,7 +15,7 @@
 script = ExtResource("1_g2q08")
 TitleScreenImage = ExtResource("9_janac")
 UseGlobalFormulaOverride = true
-GlobalDamageFormula = 2
+GlobalDamageFormula = 1
 TitleMusic = ExtResource("8_t55o4")
 BattleMusic = ExtResource("1_g308u")
 CursorSE = ExtResource("4_liid0")

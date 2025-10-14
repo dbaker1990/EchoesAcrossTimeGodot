@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://p5caihrjiduk"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_4mbb8"]
+
+[resource]
+script = ExtResource("1_4mbb8")
+SkillId = "aqua_lance"
+DisplayName = "Aqua Lance"
+Description = "Pierce with a pressurized water jet."
+MPCost = 8
+DamageFormula = 1
+DamageType = 1
+Element = 2
+BasePower = 80
+Accuracy = 95
+CriticalBonus = 5
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

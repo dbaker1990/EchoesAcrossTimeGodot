@@ -743,32 +743,94 @@ namespace EchoesAcrossTime.Combat
         #region Damage Calculation
         
         /// <summary>
-        /// Calculate physical damage
+        /// Calculate physical damage using SystemDatabase formula
+        /// Creates a temporary basic attack skill to pass to the formula system
         /// </summary>
         private int CalculatePhysicalDamage(BattleMember attacker, BattleMember target)
         {
+            // Create a temporary "basic attack" skill for formula calculation
+            var basicAttackSkill = new SkillData
+            {
+                SkillId = "basic_attack",
+                DisplayName = "Attack",
+                DamageType = DamageType.Physical,
+                Element = ElementType.Physical,
+                BasePower = 100, // Base power for normal attacks
+                PowerMultiplier = 1.0f,
+                DamageFormula = DamageFormulaType.Persona // Default, will be overridden if UseGlobalFormulaOverride is true
+            };
+
+            // Use SystemManager to calculate damage with the selected formula
+            if (SystemManager.Instance?.SystemData != null)
+            {
+                return SystemManager.Instance.CalculateDamage(
+                    attacker.Stats, 
+                    target.Stats, 
+                    basicAttackSkill, 
+                    isCritical: false // Crit is handled separately
+                );
+            }
+            else
+            {
+                // Fallback if SystemManager not available
+                GD.PrintErr("SystemManager not available, using fallback damage calculation");
+                return CalculateFallbackPhysicalDamage(attacker, target);
+            }
+        }
+        
+        /// <summary>
+        /// Calculate magic damage using SystemDatabase formula
+        /// </summary>
+        private int CalculateMagicDamage(BattleMember attacker, BattleMember target, SkillData skill)
+        {
+            // Use SystemManager to calculate damage with the selected formula
+            if (SystemManager.Instance?.SystemData != null)
+            {
+                return SystemManager.Instance.CalculateDamage(
+                    attacker.Stats, 
+                    target.Stats, 
+                    skill, 
+                    isCritical: false // Crit is handled separately
+                );
+            }
+            else
+            {
+                // Fallback if SystemManager not available
+                GD.PrintErr("SystemManager not available, using fallback damage calculation");
+                return CalculateFallbackMagicDamage(attacker, target, skill);
+            }
+        }
+        
+        /// <summary>
+        /// Fallback physical damage calculation (simple formula)
+        /// Only used if SystemManager is not available
+        /// </summary>
+        private int CalculateFallbackPhysicalDamage(BattleMember attacker, BattleMember target)
+        {
             float attackPower = attacker.Stats.Attack;
             float defense = target.Stats.Defense;
-            
+    
             float baseDamage = (attackPower * attackPower) / (defense + attackPower);
             baseDamage *= 10;
-            
+    
             return Mathf.Max(1, Mathf.RoundToInt(baseDamage));
         }
         
         /// <summary>
-        /// Calculate magic damage
+        /// Fallback magic damage calculation (simple formula)
+        /// Only used if SystemManager is not available
         /// </summary>
-        private int CalculateMagicDamage(BattleMember attacker, BattleMember target, SkillData skill)
+        private int CalculateFallbackMagicDamage(BattleMember attacker, BattleMember target, SkillData skill)
         {
             float magicPower = attacker.Stats.MagicAttack;
             float magicDefense = target.Stats.MagicDefense;
-            
+    
             float baseDamage = (magicPower * magicPower) / (magicDefense + magicPower);
-            baseDamage *= (skill.BasePower / 100.0f);
-            
+            baseDamage *= (skill.BasePower / 100f) * skill.PowerMultiplier;
+    
             return Mathf.Max(1, Mathf.RoundToInt(baseDamage));
         }
+
         
         public List<BattleMember> GetTurnOrder()
         {
