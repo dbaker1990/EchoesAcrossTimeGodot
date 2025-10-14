@@ -9,7 +9,7 @@ public partial class SkillBuilderPlugin : EditorPlugin
 
     public override void _EnterTree()
     {
-        // Load the scene file
+        // Load the scene
         var scene = GD.Load<PackedScene>("res://addons/skill_builder/SkillBuilderUI.tscn");
         dock = scene.Instantiate<Control>();
         
@@ -19,7 +19,7 @@ public partial class SkillBuilderPlugin : EditorPlugin
         // Make it visible
         MakeBottomPanelItemVisible(dock);
         
-        GD.Print("Skill Builder Plugin loaded with scene!");
+        GD.Print("✅ Skill Builder Plugin loaded with scene!");
     }
 
     public override void _ExitTree()

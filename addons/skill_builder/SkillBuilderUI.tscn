@@ -1,26 +1,356 @@
-[gd_scene format=3 uid="uid://b7e23t4vvmhj2"]
+[gd_scene load_steps=2 format=3 uid="uid://b7e23t4vvmhj2"]
+
+[ext_resource type="Script" uid="uid://bry0garmelp3v" path="res://addons/skill_builder/SkillBuilderUI.cs" id="1_qmuik"]
 
 [node name="SkillBuilderUI" type="Control"]
-custom_minimum_size = Vector2(400, 300)
+custom_minimum_size = Vector2(400, 600)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_qmuik")
 
-[node name="Label" type="Label" parent="."]
+[node name="MainScroll" type="ScrollContainer" parent="."]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -102.5
-offset_top = -11.5
-offset_right = 102.5
-offset_bottom = 11.5
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 20
-text = "SKILL BUILDER WORKS! 🎉"
+horizontal_scroll_mode = 0
+
+[node name="MainContainer" type="VBoxContainer" parent="MainScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TitleLabel" type="Label" parent="MainScroll/MainContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 18
+text = "⚔️ Visual Skill Builder ⚔️"
+
+[node name="HSeparator" type="HSeparator" parent="MainScroll/MainContainer"]
+layout_mode = 2
+
+[node name="BasicInfoSection" type="VBoxContainer" parent="MainScroll/MainContainer"]
+layout_mode = 2
+
+[node name="BasicInfoTitle" type="Label" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3019608, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "📝 Basic Information"
+
+[node name="SkillIDRow" type="HBoxContainer" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+
+[node name="SkillIDLabel" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/SkillIDRow"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "Skill ID:"
+
+[node name="SkillIDEdit" type="LineEdit" parent="MainScroll/MainContainer/BasicInfoSection/SkillIDRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "fire_spell"
+
+[node name="DisplayNameRow" type="HBoxContainer" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+
+[node name="DisplayNameLabel" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/DisplayNameRow"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "Display Name:"
+
+[node name="DisplayNameEdit" type="LineEdit" parent="MainScroll/MainContainer/BasicInfoSection/DisplayNameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Fire"
+
+[node name="DescriptionLabel" type="Label" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+text = "Description:"
+
+[node name="DescriptionEdit" type="TextEdit" parent="MainScroll/MainContainer/BasicInfoSection"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+placeholder_text = "Unleashes flames on the enemy..."
+
+[node name="SkillTypeRow" type="HBoxContainer" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/SkillTypeRow"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "Skill Type:"
+
+[node name="SkillTypeOption" type="OptionButton" parent="MainScroll/MainContainer/BasicInfoSection/SkillTypeRow"]
+layout_mode = 2
+item_count = 5
+popup/item_0/text = "Active Attack"
+popup/item_0/id = 0
+popup/item_1/text = "Active Support"
+popup/item_1/id = 1
+popup/item_2/text = "Passive"
+popup/item_2/id = 2
+popup/item_3/text = "Cosmic Ability"
+popup/item_3/id = 3
+popup/item_4/text = "Political Skill"
+popup/item_4/id = 4
+
+[node name="HSeparator" type="HSeparator" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+
+[node name="TargetingSection" type="VBoxContainer" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/TargetingSection"]
+layout_mode = 2
+text = "🎯 Targeting"
+
+[node name="HSeparator" type="HSeparator" parent="MainScroll/MainContainer/BasicInfoSection/TargetingSection"]
+layout_mode = 2
+
+[node name="TargetRow" type="HBoxContainer" parent="MainScroll/MainContainer/BasicInfoSection/TargetingSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/TargetingSection/TargetRow"]
+layout_mode = 2
+text = "Target:"
+
+[node name="TargetOption" type="OptionButton" parent="MainScroll/MainContainer/BasicInfoSection/TargetingSection/TargetRow"]
+layout_mode = 2
+item_count = 8
+popup/item_0/text = "Single Enemy"
+popup/item_0/id = 0
+popup/item_1/text = "All Enemies"
+popup/item_1/id = 1
+popup/item_2/text = "Random Enemy"
+popup/item_2/id = 2
+popup/item_3/text = "Single Ally"
+popup/item_3/id = 3
+popup/item_4/text = "All Allies"
+popup/item_4/id = 4
+popup/item_5/text = "Self"
+popup/item_5/id = 5
+popup/item_6/text = "Everyone"
+popup/item_6/id = 6
+popup/item_7/text = "Dead Ally"
+popup/item_7/id = 7
+
+[node name="HitsRow" type="HBoxContainer" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/HitsRow"]
+layout_mode = 2
+text = "Number of Hits:"
+
+[node name="HitsSpin" type="SpinBox" parent="MainScroll/MainContainer/BasicInfoSection/HitsRow"]
+layout_mode = 2
+min_value = 1.0
+max_value = 16.0
+value = 1.0
+
+[node name="HSeparator2" type="HSeparator" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+
+[node name="CostsSection" type="VBoxContainer" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/CostsSection"]
+layout_mode = 2
+text = "💰 Resource Costs"
+
+[node name="HSeparator" type="HSeparator" parent="MainScroll/MainContainer/BasicInfoSection/CostsSection"]
+layout_mode = 2
+
+[node name="MPCost" type="HBoxContainer" parent="MainScroll/MainContainer/BasicInfoSection/CostsSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/CostsSection/MPCost"]
+layout_mode = 2
+text = "MPCost"
+
+[node name="SpinBox" type="SpinBox" parent="MainScroll/MainContainer/BasicInfoSection/CostsSection/MPCost"]
+layout_mode = 2
+max_value = 999.0
+
+[node name="HPCost" type="HBoxContainer" parent="MainScroll/MainContainer/BasicInfoSection/CostsSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/CostsSection/HPCost"]
+layout_mode = 2
+text = "HPCost"
+
+[node name="SpinBox" type="SpinBox" parent="MainScroll/MainContainer/BasicInfoSection/CostsSection/HPCost"]
+layout_mode = 2
+max_value = 999.0
+
+[node name="GoldCost" type="HBoxContainer" parent="MainScroll/MainContainer/BasicInfoSection/CostsSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/CostsSection/GoldCost"]
+layout_mode = 2
+text = "GoldCost"
+
+[node name="SpinBox" type="SpinBox" parent="MainScroll/MainContainer/BasicInfoSection/CostsSection/GoldCost"]
+layout_mode = 2
+max_value = 9999.0
+
+[node name="HSeparator3" type="HSeparator" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+
+[node name="DamageSection" type="VBoxContainer" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+text = "⚔️ Damage Properties"
+
+[node name="HSeparator" type="HSeparator" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+text = "Damage Formula"
+
+[node name="Damage Formula" type="OptionButton" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+item_count = 7
+popup/item_0/text = "Simple"
+popup/item_0/id = 0
+popup/item_1/text = "Persona"
+popup/item_1/id = 1
+popup/item_2/text = "FF7"
+popup/item_2/id = 2
+popup/item_3/text = "FF8"
+popup/item_3/id = 3
+popup/item_4/text = "FF9"
+popup/item_4/id = 4
+popup/item_5/text = "Pokemon"
+popup/item_5/id = 5
+popup/item_6/text = "Custom"
+popup/item_6/id = 6
+
+[node name="Label3" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+text = "Damage Type"
+
+[node name="Damage Type" type="OptionButton" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+item_count = 5
+popup/item_0/text = "Physical"
+popup/item_0/id = 0
+popup/item_1/text = "Magical"
+popup/item_1/id = 1
+popup/item_2/text = "Fixed"
+popup/item_2/id = 2
+popup/item_3/text = "Percentage"
+popup/item_3/id = 3
+popup/item_4/text = "Recovery"
+popup/item_4/id = 4
+
+[node name="Label4" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+text = "Element"
+
+[node name="Element" type="OptionButton" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+item_count = 9
+popup/item_0/text = "Physical"
+popup/item_0/id = 0
+popup/item_1/text = "Fire"
+popup/item_1/id = 1
+popup/item_2/text = "Water"
+popup/item_2/id = 2
+popup/item_3/text = "Thunder"
+popup/item_3/id = 3
+popup/item_4/text = "Ice"
+popup/item_4/id = 4
+popup/item_5/text = "Earth"
+popup/item_5/id = 5
+popup/item_6/text = "Light"
+popup/item_6/id = 6
+popup/item_7/text = "Dark"
+popup/item_7/id = 7
+popup/item_8/text = "None"
+popup/item_8/id = 8
+
+[node name="Label5" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+text = "Base Power"
+
+[node name="Base Power" type="SpinBox" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+max_value = 9999.0
+value = 100.0
+
+[node name="Label6" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+text = "Power Multiplier"
+
+[node name="Power Multiplier" type="SpinBox" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+min_value = 0.1
+max_value = 10.0
+step = 0.1
+value = 1.0
+
+[node name="Label7" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+text = "Accuracy"
+
+[node name="Accuracy" type="SpinBox" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+value = 100.0
+
+[node name="Label8" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+text = "Critical Bonus"
+
+[node name="Critical Bonus" type="SpinBox" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+
+[node name="Label9" type="Label" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+text = "Ignore Defense"
+
+[node name="Ignore Defense" type="CheckBox" parent="MainScroll/MainContainer/BasicInfoSection/DamageSection"]
+layout_mode = 2
+
+[node name="HSeparator4" type="HSeparator" parent="MainScroll/MainContainer/BasicInfoSection"]
+layout_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="MainScroll/MainContainer"]
+layout_mode = 2
+
+[node name="ButtonRow1" type="HBoxContainer" parent="MainScroll/MainContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="SaveButton" type="Button" parent="MainScroll/MainContainer/ButtonRow1"]
+layout_mode = 2
+text = "💾 Save Skill"
+
+[node name="LoadButton" type="Button" parent="MainScroll/MainContainer/ButtonRow1"]
+layout_mode = 2
+text = "📂 Load Skill"
+
+[node name="DuplicateButton" type="Button" parent="MainScroll/MainContainer/ButtonRow1"]
+layout_mode = 2
+text = "📋 Duplicate"
+
+[node name="ButtonRow2" type="HBoxContainer" parent="MainScroll/MainContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="BatchCreateButton" type="Button" parent="MainScroll/MainContainer/ButtonRow2"]
+layout_mode = 2
+text = "⚡ Batch Create"
+
+[node name="ClearButton" type="Button" parent="MainScroll/MainContainer/ButtonRow2"]
+layout_mode = 2
+text = "🗑️ Clear All"
