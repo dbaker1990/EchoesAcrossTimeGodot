@@ -35,7 +35,7 @@ namespace EchoesAcrossTime.Combat
         
         // Systems
         private RandomNumberGenerator rng;
-        private StatusEffectManager statusManager;
+        private ActiveStatusEffect.StatusEffectManager statusManager;
         private BatonPassManager batonPassManager;
         private TechnicalDamageSystem technicalSystem;
         private ShowtimeManager showtimeManager;
@@ -96,7 +96,7 @@ namespace EchoesAcrossTime.Combat
             rng = new RandomNumberGenerator();
             rng.Randomize();
             
-            statusManager = new StatusEffectManager();
+            statusManager = new ActiveStatusEffect.StatusEffectManager();
             batonPassManager = new BatonPassManager();
             technicalSystem = new TechnicalDamageSystem();
             showtimeManager = new ShowtimeManager();

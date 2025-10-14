@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://cx3emw3qmkgpv"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_w4hnj"]
+
+[resource]
+script = ExtResource("1_w4hnj")
+SkillId = "enlighten"
+DisplayName = "Enlighten"
+Description = "Channel mystical power to boost Magic Attack by 50% for 4 turns."
+Type = 1
+Target = 5
+MPCost = 14
+DamageFormula = 1
+DamageType = 1
+Element = 0
+BasePower = 50
+InflictsStatuses = Array[int]([23])
+StatusChances = Array[int]([100])
+RemovesStatuses = null
+BuffDuration = 4
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

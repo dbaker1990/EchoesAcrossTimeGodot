@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://db04t04wibljq"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_0581y"]
+
+[resource]
+script = ExtResource("1_0581y")
+SkillId = "titans_wrath"
+DisplayName = "Titans Wrath"
+Description = "The earth itself rises to obliterate the enemy."
+MPCost = 18
+DamageFormula = 1
+DamageType = 1
+Element = 5
+BasePower = 190
+Accuracy = 95
+CriticalBonus = 5
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

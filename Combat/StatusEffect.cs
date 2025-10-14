@@ -20,6 +20,18 @@
         Doom,
         Regen,        // Positive status
         Haste,        // Positive status
-        Barrier       // Positive status
+        Barrier,       // Positive status
+        AttackUp,
+        AttackDown,
+        DefenseUp,
+        DefenseDown,
+        MagicAttackUp,
+        MagicAttackDown,
+        MagicDefenseUp,
+        MagicDefenseDown,
+        SpeedUp,
+        SpeedDown,
+        LuckUp,
+        LuckDown
     }
 }

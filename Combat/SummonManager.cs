@@ -184,7 +184,7 @@ namespace EchoesAcrossTime.Combat
                 {
                     if (target.Stats.IsAlive)
                     {
-                        StatusEffectManager.Instance?.ApplyStatus(
+                        ActiveStatusEffect.StatusEffectManager.Instance?.ApplyStatus(
                             target.Stats, status, 3, 10, summonData.SummonId);
                     }
                 }

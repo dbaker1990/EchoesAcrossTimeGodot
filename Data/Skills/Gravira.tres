@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://bwiohh4gaw7kx"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_7pxex"]
+
+[resource]
+script = ExtResource("1_7pxex")
+SkillId = "gravira"
+DisplayName = "Gravira"
+Description = "Powerful gravity magic that deals damage equal to 50% of the target's current HP. Less effective on bosses."
+MPCost = 18
+DamageFormula = 1
+DamageType = 3
+Element = 0
+BasePower = 50
+Accuracy = 85
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

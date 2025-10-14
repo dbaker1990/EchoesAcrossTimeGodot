@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://buy7x76ywj8cr"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_wbcqc"]
+
+[resource]
+script = ExtResource("1_wbcqc")
+SkillId = "ragnarok"
+DisplayName = "Ragnarok"
+Description = "Apocalyptic flames consume the target. Very high burn chance."
+MPCost = 18
+DamageFormula = 1
+DamageType = 1
+Element = 1
+BasePower = 190
+Accuracy = 95
+CriticalBonus = 5
+InflictsStatuses = Array[int]([8])
+StatusChances = Array[int]([40])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

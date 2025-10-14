@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://pw1qksqok0yj"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_xsfid"]
+
+[resource]
+script = ExtResource("1_xsfid")
+SkillId = "inferno_blast"
+DisplayName = "Inferno Blast"
+Description = "Unleash intense flames. High chance to burn."
+MPCost = 12
+DamageFormula = 1
+DamageType = 1
+Element = 1
+BasePower = 130
+Accuracy = 95
+CriticalBonus = 5
+InflictsStatuses = Array[int]([8])
+StatusChances = Array[int]([25])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

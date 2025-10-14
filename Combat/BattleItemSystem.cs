@@ -11,9 +11,9 @@ namespace EchoesAcrossTime.Combat
     /// </summary>
     public class BattleItemSystem
     {
-        private StatusEffectManager statusManager;
+        private ActiveStatusEffect.StatusEffectManager statusManager;
 
-        public BattleItemSystem(StatusEffectManager statusEffectManager)
+        public BattleItemSystem(ActiveStatusEffect.StatusEffectManager statusEffectManager)
         {
             statusManager = statusEffectManager;
         }

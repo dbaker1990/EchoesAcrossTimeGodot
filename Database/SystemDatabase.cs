@@ -196,7 +196,7 @@ namespace EchoesAcrossTime.Database
 
             if (skill.DamageType == Combat.DamageType.Percentage)
             {
-                int percentDamage = Mathf.RoundToInt(target.MaxHP * (skill.BasePower / 100f));
+                int percentDamage = Mathf.RoundToInt(target.CurrentHP * (skill.BasePower / 100f));
                 return (int)(percentDamage * BaseDamageMultiplier);
             }
 

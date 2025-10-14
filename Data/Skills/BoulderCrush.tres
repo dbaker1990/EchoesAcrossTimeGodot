@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://cqk2sp2vupplk"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_77ccd"]
+
+[resource]
+script = ExtResource("1_77ccd")
+SkillId = "boulder_crush"
+DisplayName = "BoulderCrush"
+Description = "Summon a massive boulder to crush the enemy."
+MPCost = 12
+DamageFormula = 1
+DamageType = 1
+Element = 5
+BasePower = 130
+Accuracy = 95
+CriticalBonus = 5
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

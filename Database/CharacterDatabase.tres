@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterDatabase" load_steps=13 format=3 uid="uid://7nnsth8dj7jj"]
+[gd_resource type="Resource" script_class="CharacterDatabase" load_steps=29 format=3 uid="uid://7nnsth8dj7jj"]
 
 [ext_resource type="Resource" uid="uid://dj6vgrbs78vf4" path="res://Data/Skills/Steal.tres" id="1_nwlej"]
 [ext_resource type="Script" uid="uid://c6fwhavejbuqu" path="res://Database/CharacterDatabase.cs" id="1_script"]
@@ -12,9 +12,25 @@
 [ext_resource type="Resource" uid="uid://p5caihrjiduk" path="res://Data/Skills/AquaLance.tres" id="9_thsg7"]
 [ext_resource type="Resource" uid="uid://xjxloglwrei2" path="res://Data/Skills/GaleSlash.tres" id="10_qnyql"]
 [ext_resource type="Resource" uid="uid://co7pedgujt8b3" path="res://Data/Skills/StoneSpike.tres" id="11_uuy82"]
+[ext_resource type="Resource" uid="uid://cqk2sp2vupplk" path="res://Data/Skills/BoulderCrush.tres" id="12_bey25"]
+[ext_resource type="Resource" uid="uid://cdsg62ddnm2im" path="res://Data/Skills/GlacialSpear.tres" id="13_xlcqw"]
+[ext_resource type="Resource" uid="uid://pw1qksqok0yj" path="res://Data/Skills/InfernoBlast.tres" id="14_wdv0s"]
+[ext_resource type="Resource" uid="uid://ct12v0kdvgufo" path="res://Data/Skills/ThunderStrike.tres" id="15_fa2k2"]
+[ext_resource type="Resource" uid="uid://b1mp5ht0fe13y" path="res://Data/Skills/TidalSurge.tres" id="16_0bpkk"]
+[ext_resource type="Resource" uid="uid://p4ah2ghexg2o" path="res://Data/Skills/TempestEdge.tres" id="17_wjnft"]
+[ext_resource type="Resource" uid="uid://buy7x76ywj8cr" path="res://Data/Skills/Ragnarok.tres" id="18_bl43h"]
+[ext_resource type="Resource" uid="uid://dweoco1qev4cc" path="res://Data/Skills/Maelstrom.tres" id="19_dxdnd"]
+[ext_resource type="Resource" uid="uid://83gfwveetuwm" path="res://Data/Skills/AbsoluteZero.tres" id="20_udfaq"]
+[ext_resource type="Resource" uid="uid://bt2ov5odlclfv" path="res://Data/Skills/Mjolnir.tres" id="21_2nmdn"]
+[ext_resource type="Resource" uid="uid://db04t04wibljq" path="res://Data/Skills/TitansWrath.tres" id="22_bevly"]
+[ext_resource type="Resource" uid="uid://cwprv42lo2v02" path="res://Data/Skills/Cyclone.tres" id="23_2w4qe"]
+[ext_resource type="Resource" uid="uid://dxxtef1ki8ma8" path="res://Data/Skills/Demi.tres" id="24_g2my1"]
+[ext_resource type="Resource" uid="uid://bwiohh4gaw7kx" path="res://Data/Skills/Gravira.tres" id="25_alu56"]
+[ext_resource type="Resource" uid="uid://dat06r3ouhggf" path="res://Data/Skills/Focus.tres" id="26_wdv0s"]
+[ext_resource type="Resource" uid="uid://cx3emw3qmkgpv" path="res://Data/Skills/Enlighten.tres" id="27_fa2k2"]
 
 [resource]
 script = ExtResource("1_script")
 Characters = null
-Skills = Array[Object]([ExtResource("1_nwlej"), ExtResource("2_o33u2"), ExtResource("3_dn0qv"), ExtResource("4_ftcsv"), ExtResource("5_nafxu"), ExtResource("6_nafxu"), ExtResource("7_6755j"), ExtResource("8_6755j"), ExtResource("9_thsg7"), ExtResource("10_qnyql"), ExtResource("11_uuy82"), null])
+Skills = Array[Object]([ExtResource("1_nwlej"), ExtResource("2_o33u2"), ExtResource("3_dn0qv"), ExtResource("4_ftcsv"), ExtResource("5_nafxu"), ExtResource("6_nafxu"), ExtResource("7_6755j"), ExtResource("8_6755j"), ExtResource("9_thsg7"), ExtResource("10_qnyql"), ExtResource("11_uuy82"), ExtResource("12_bey25"), ExtResource("13_xlcqw"), ExtResource("14_wdv0s"), ExtResource("15_fa2k2"), ExtResource("16_0bpkk"), ExtResource("17_wjnft"), ExtResource("18_bl43h"), ExtResource("19_dxdnd"), ExtResource("20_udfaq"), ExtResource("21_2nmdn"), ExtResource("22_bevly"), ExtResource("23_2w4qe"), ExtResource("24_g2my1"), ExtResource("25_alu56"), ExtResource("26_wdv0s"), ExtResource("27_fa2k2")])
 AllItems = null

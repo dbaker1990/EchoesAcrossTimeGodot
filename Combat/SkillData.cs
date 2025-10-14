@@ -91,6 +91,12 @@ namespace EchoesAcrossTime.Combat
         [Export] public int BuffDuration { get; set; } = 3;  // Turns
         [Export] public bool IsDebuff { get; set; } = false;
         
+        [ExportGroup("Stat Modifications")]
+        [Export] public float AttackMultiplier { get; set; } = 1.0f;
+        [Export] public float MagicAttackMultiplier { get; set; } = 1.0f;
+        [Export] public float DefenseMultiplier { get; set; } = 1.0f;
+        [Export] public float MagicDefenseMultiplier { get; set; } = 1.0f;
+        
         [ExportGroup("Special Effects")]
         [Export] public bool DrainHP { get; set; } = false;  // User heals for damage dealt
         [Export] public float DrainPercent { get; set; } = 0.5f;

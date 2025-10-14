@@ -61,13 +61,13 @@ namespace EchoesAcrossTime.Combat
         /// </summary>
         private static int CalculateSimple(CharacterStats attacker, CharacterStats defender, SkillData skill)
         {
-            int attackStat = skill.DamageType == Combat.DamageType.Magical 
-                ? attacker.MagicAttack 
-                : attacker.Attack;
+            int attackStat = skill.DamageType == DamageType.Magical 
+                ? attacker.GetEffectiveMagicAttack() 
+                : attacker.GetEffectiveAttack();
             
-            int defenseStat = skill.DamageType == Combat.DamageType.Magical
-                ? defender.MagicDefense
-                : defender.Defense;
+            int defenseStat = skill.DamageType == DamageType.Magical
+                ? defender.GetEffectiveMagicDefense()
+                : defender.GetEffectiveDefense();
 
             int baseDamage = attackStat - (defenseStat / 2);
             return Mathf.RoundToInt(baseDamage * (skill.BasePower / 100f) * skill.PowerMultiplier);

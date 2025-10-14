@@ -36,6 +36,20 @@ namespace EchoesAcrossTime.Combat
         
         public BattleStats BattleStats { get; set; }
         
+        public float TemporaryAttackMultiplier { get; set; } = 1.0f;
+        public float TemporaryMagicAttackMultiplier { get; set; } = 1.0f;
+        public float TemporaryDefenseMultiplier { get; set; } = 1.0f;
+        public float TemporaryMagicDefenseMultiplier { get; set; } = 1.0f;
+        public float TemporarySpeedMultiplier { get; set; } = 1.0f;
+        public float TemporaryLuckMultiplier { get; set; } = 1.0f;
+        
+        public int GetEffectiveAttack() => Mathf.RoundToInt(Attack * TemporaryAttackMultiplier);
+        public int GetEffectiveMagicAttack() => Mathf.RoundToInt(MagicAttack * TemporaryMagicAttackMultiplier);
+        public int GetEffectiveDefense() => Mathf.RoundToInt(Defense * TemporaryDefenseMultiplier);
+        public int GetEffectiveMagicDefense() => Mathf.RoundToInt(MagicDefense * TemporaryMagicDefenseMultiplier);
+        public int GetEffectiveSpeed() => Mathf.RoundToInt(Speed * TemporarySpeedMultiplier);
+        public int GetEffectiveLuck() => Mathf.RoundToInt(Luck * TemporaryLuckMultiplier);
+        
         // Experience system
         public int CurrentExp { get; set; } = 0;
         public int ExpToNextLevel { get; set; } = 100;
