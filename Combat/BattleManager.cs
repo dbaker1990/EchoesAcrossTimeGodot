@@ -456,77 +456,92 @@ namespace EchoesAcrossTime.Combat
         /// Execute a skill
         /// </summary>
         private async Task<BattleActionResult> ExecuteSkill(BattleAction action)
-{
-    var result = new BattleActionResult();
-    var attacker = action.Actor;
-    var skill = action.Skill;
-    
-    // ... existing MP cost check and deduction ...
-    
-    // Play casting animation
-    if (battlefieldVisuals != null)
-    {
-        await battlefieldVisuals.PlayCastSequence(attacker);
-    }
-    
-    // Apply to all targets
-    foreach (var target in action.Targets)
-    {
-        if (skill.DamageType == DamageType.Recovery)
         {
-            // Healing skill logic
-            // ... existing code ...
-        }
-        else
-        {
-            // Damage skill
-            await ApplySkillDamage(attacker, target, skill, result);
+            var result = new BattleActionResult();
+            var attacker = action.Actor;
+            var skill = action.Skill;
             
-            // NEW: Handle HP drain
-            if (skill.DrainsHP && result.DamageDealt > 0)
+            // Check MP cost
+            if (attacker.Stats.CurrentMP < skill.MPCost)
             {
-                int drainAmount = Mathf.RoundToInt(result.DamageDealt * (skill.DrainPercent / 100f));
-                int actualHeal = attacker.Stats.Heal(drainAmount);
-                result.HealingDone += actualHeal;
-                
-                GD.Print($"  {attacker.Stats.CharacterName} drained {actualHeal} HP!");
-                
-                if (battlefieldVisuals != null)
-                {
-                    await battlefieldVisuals.ShowDrainEffect(attacker, target);
-                }
+                GD.Print($"{attacker.Stats.CharacterName} doesn't have enough MP!");
+                return result;
             }
             
-            // NEW: Handle MP drain
-            if (skill.DrainsMP)
+            // Deduct MP
+            attacker.Stats.CurrentMP -= skill.MPCost;
+            GD.Print($">>> {attacker.Stats.CharacterName} uses {skill.DisplayName}! (MP: {attacker.Stats.CurrentMP}/{attacker.Stats.MaxMP}) <<<");
+            
+            // ===== MODIFIED: Pass skill to PlayCastSequence =====
+            if (battlefieldVisuals != null)
             {
-                int mpToDrain = skill.BasePower;
-                int actualDrain = Mathf.Min(mpToDrain, target.Stats.CurrentMP);
-                
-                if (actualDrain > 0)
+                await battlefieldVisuals.PlayCastSequence(attacker, skill); // <-- ADD skill parameter
+            }
+            
+            // Apply to all targets
+            foreach (var target in action.Targets)
+            {
+                if (skill.DamageType == DamageType.Recovery)
                 {
-                    target.Stats.CurrentMP -= actualDrain;
-                    int mpRestore = Mathf.RoundToInt(actualDrain * (skill.DrainPercent / 100f));
-                    attacker.Stats.RestoreMP(mpRestore);
+                    // ===== HEALING SKILL LOGIC =====
+                    // If you don't have CalculateHealing method, use this simple calculation:
+                    int healAmount = skill.BasePower + Mathf.RoundToInt(attacker.Stats.MagicAttack * 0.5f);
+                    int actualHeal = target.Stats.Heal(healAmount);
+                    result.HealingDone += actualHeal;
                     
-                    GD.Print($"  {attacker.Stats.CharacterName} drained {actualDrain} MP and restored {mpRestore}!");
+                    GD.Print($"  {target.Stats.CharacterName} healed for {actualHeal} HP!");
                     
+                    // ===== ADD: Play healing effect =====
                     if (battlefieldVisuals != null)
                     {
-                        await battlefieldVisuals.ShowDrainEffect(attacker, target);
+                        battlefieldVisuals.ShowBuffEffect(target); // Or make ShowHealEffect() if you want
                     }
                 }
                 else
                 {
-                    GD.Print($"  {target.Stats.CharacterName} has no MP to drain!");
+                    // Damage skill
+                    await ApplySkillDamage(attacker, target, skill, result);
+                    
+                    // ===== ADD: Play skill impact effect AFTER damage =====
+                    if (battlefieldVisuals != null)
+                    {
+                        await battlefieldVisuals.PlaySkillImpactEffect(target, skill);
+                    }
+                    
+                    // Handle HP drain (if you have this feature)
+                    if (skill.DrainsHP && result.DamageDealt > 0)
+                    {
+                        int drainAmount = Mathf.RoundToInt(result.DamageDealt * (skill.DrainPercent / 100f));
+                        int actualHeal = attacker.Stats.Heal(drainAmount);
+                        result.HealingDone += actualHeal;
+                        
+                        GD.Print($"  {attacker.Stats.CharacterName} drained {actualHeal} HP!");
+                        
+                        // ===== ADD: Play drain effect =====
+                        if (battlefieldVisuals != null)
+                        {
+                            await battlefieldVisuals.ShowDrainEffect(attacker, target);
+                        }
+                    }
+                }
+                
+                // If skill targets all enemies (AoE), show special effect once
+                if (action.Targets.Length > 1 && skill.Target == SkillTarget.AllEnemies)
+                {
+                    if (battlefieldVisuals != null)
+                    {
+                        // Use HitEffectPath or element-based path
+                        string aoeEffectPath = !string.IsNullOrEmpty(skill.HitEffectPath) 
+                            ? skill.HitEffectPath 
+                            : $"res://Effects/Elements/{skill.Element}_AoE.efkefc";
+                        
+                        battlefieldVisuals.ShowAoEEffect(action.Targets.ToList(), aoeEffectPath);
+                    }
                 }
             }
+            
+            return result;
         }
-    }
-    
-    result.Success = true;
-    return result;
-}
         
         /// <summary>
         /// Execute guard action
@@ -632,6 +647,12 @@ namespace EchoesAcrossTime.Combat
             GD.Print("║       ★ CONVERGENCE STRIKE! ★          ║");
             GD.Print("╚═══════════════════════════════════════╝\n");
             
+            /*
+            if (battlefieldVisuals != null)
+            {
+                await battlefieldVisuals.PlayAllOutAttackEffect();
+            }
+            */
             rewardsManager.RecordEvent("all_out_attack");
             
             // All party members attack knocked down enemies
@@ -997,6 +1018,13 @@ namespace EchoesAcrossTime.Combat
                 GD.PrintErr("Showtime characters not found!");
                 return;
             }
+            /*
+            if (battlefieldVisuals != null)
+            {
+                await battlefieldVisuals.PlayShowtimeEffect(showtime.AttackName);  // FIXED: AttackName
+            }
+            */
+
             
             // Get targets
             var targets = showtime.HitsAllEnemies

@@ -16,6 +16,8 @@ namespace EchoesAcrossTime.Combat
         [Signal] public delegate void MovementCompletedEventHandler(string memberName);
         #endregion
 
+        [Export] private EffekseerManager effectsManager;
+        
         #region Node References
         private Node2D partySpritesContainer;
         private Node2D enemySpritesContainer;
@@ -60,6 +62,13 @@ namespace EchoesAcrossTime.Combat
             {
                 effectsContainer = GetNode<Node2D>("Effects");
             }
+            
+            if (effectsManager == null)
+            {
+                effectsManager = new EffekseerManager();
+                effectsManager.BattlefieldNode = this;
+                AddChild(effectsManager);
+            }
         }
 
         #region Setup Methods
@@ -80,6 +89,11 @@ namespace EchoesAcrossTime.Combat
                 memberToSpriteMap[party[i]] = sprite;
                 spriteHomePositions[sprite] = positions[i];
             }
+        }
+        
+        public void ClearAllEffects()
+        {
+            effectsManager?.StopAllEffects();
         }
 
         /// <summary>
@@ -292,7 +306,7 @@ namespace EchoesAcrossTime.Combat
         /// <summary>
         /// Play casting animation (for magic/skills)
         /// </summary>
-        public async Task PlayCastSequence(BattleMember caster)
+        public async Task PlayCastSequence(BattleMember caster, SkillData skill = null)
         {
             var sprite = GetSpriteForMember(caster);
             if (sprite == null) return;
@@ -302,11 +316,69 @@ namespace EchoesAcrossTime.Combat
 
             PlayAnimation(sprite, GetAnimationName(caster, "cast"));
             
+            // ADD: Play Effekseer casting effect for ultimates
+            if (skill != null && effectsManager != null)
+            {
+                // Check if it's a screen-wide ultimate
+                bool isUltimate = skill.PowerMultiplier >= 5.0f || 
+                                  skill.DisplayName.Contains("Ultimate") ||  // FIXED: DisplayName not SkillName
+                                  skill.DisplayName.Contains("Limit");
+                
+                if (isUltimate)
+                {
+                    // SCREEN-WIDE EFFECT for ultimates
+                    // FIXED: Use HitEffectPath or DisplayName
+                    string effectPath = !string.IsNullOrEmpty(skill.HitEffectPath) 
+                        ? skill.HitEffectPath 
+                        : $"res://Effects/Ultimates/{skill.DisplayName}.efkefc";
+                    
+                    effectsManager.PlayScreenWideEffect(effectPath, scale: 1.0f, duration: castDuration + 2.0f);
+                }
+            }
+            
             await Task.Delay((int)(castDuration * 1000));
             
             PlayAnimation(sprite, GetAnimationName(caster, "idle"));
             EmitSignal(SignalName.AnimationFinished, "cast", caster.Stats.CharacterName);
         }
+        
+        public async Task PlaySkillImpactEffect(BattleMember target, SkillData skill)
+        {
+            if (effectsManager == null || target == null || skill == null) return;
+            
+            var sprite = GetSpriteForMember(target);
+            if (sprite == null) return;
+            
+            // FIXED: Use HitEffectPath from SkillData
+            string effectPath = skill.HitEffectPath;
+            
+            // If no custom path, use element-based path
+            if (string.IsNullOrEmpty(effectPath))
+            {
+                effectPath = skill.Element switch
+                {
+                    ElementType.Fire => "res://Effects/Elements/Fire.efkefc",
+                    ElementType.Ice => "res://Effects/Elements/Ice.efkefc",
+                    ElementType.Thunder => "res://Effects/Elements/Thunder.efkefc",
+                    ElementType.Wind => "res://Effects/Elements/Wind.efkefc",
+                    ElementType.Light => "res://Effects/Elements/Light.efkefc",
+                    ElementType.Dark => "res://Effects/Elements/Dark.efkefc",
+                    ElementType.Physical => "res://Effects/PhysicalHit.efkefc",
+                    _ => "res://Effects/MagicHit.efkefc"
+                };
+            }
+            
+            // Play effect at target position
+            effectsManager.PlayEffectAtPosition(
+                effectPath,
+                sprite.GlobalPosition,
+                scale: 1.2f,
+                duration: 1.5f
+            );
+            
+            await Task.Delay(500);
+        }
+
 
         /// <summary>
         /// Play defend animation
@@ -345,6 +417,22 @@ namespace EchoesAcrossTime.Combat
             string animName = isCritical ? "critical_hit" : "hit";
             PlayAnimation(sprite, GetAnimationName(target, animName));
 
+            // ADD: Play Effekseer particle effect
+            if (effectsManager != null)
+            {
+                var animData = target.SourceData?.BattleAnimations;
+                string effectPath = isCritical 
+                    ? animData?.CriticalHitEffectPath ?? "res://Effects/CriticalHit.efkefc"
+                    : animData?.DefaultHitEffectPath ?? "res://Effects/NormalHit.efkefc";
+                
+                effectsManager.PlayEffectOnSprite(
+                    effectPath, 
+                    sprite, 
+                    scale: isCritical ? 1.5f : 1.0f, 
+                    duration: 0.8f
+                );
+            }
+
             // Flash effect
             var flashColor = isCritical ? new Color(1, 1, 0) : new Color(1, 0.5f, 0.5f);
             var tween = CreateTween();
@@ -357,13 +445,34 @@ namespace EchoesAcrossTime.Combat
         
         public async Task ShowDrainEffect(BattleMember drainer, BattleMember target)
         {
-            // Visual effect showing energy being drained from target to caster
-            // You can implement a particle effect or animation here
-    
+            var drainerSprite = GetSpriteForMember(drainer);
+            var targetSprite = GetSpriteForMember(target);
+            
+            if (drainerSprite == null || targetSprite == null) return;
+            
+            // ADD: Play Effekseer drain effects
+            if (effectsManager != null)
+            {
+                // Spawn drain effect on target
+                effectsManager.PlayEffectOnSprite(
+                    "res://Effects/DrainSource.efkefc", 
+                    targetSprite, 
+                    scale: 1.0f, 
+                    duration: 1.5f
+                );
+                
+                // Spawn absorb effect on caster
+                await Task.Delay(500);
+                effectsManager.PlayEffectOnSprite(
+                    "res://Effects/DrainAbsorb.efkefc", 
+                    drainerSprite, 
+                    scale: 1.0f, 
+                    duration: 1.0f
+                );
+            }
+            
             GD.Print($"[Visual] Drain effect from {target.Stats.CharacterName} to {drainer.Stats.CharacterName}");
-    
-            // Placeholder: just wait a moment
-            await ToSignal(GetTree().CreateTimer(0.3), SceneTreeTimer.SignalName.Timeout);
+            await Task.Delay(1000);
         }
 
         /// <summary>
@@ -466,6 +575,14 @@ namespace EchoesAcrossTime.Combat
 
             PlayAnimation(sprite, GetAnimationName(target, "buff"));
             
+            // ADD: Buff particle effect
+            effectsManager?.PlayEffectOnSprite(
+                "res://Effects/Buff.efkefc", 
+                sprite, 
+                scale: 1.0f, 
+                duration: 2.0f
+            );
+            
             // Gold glow
             var tween = CreateTween();
             tween.TweenProperty(sprite, "modulate", new Color(1, 1, 0.5f), 0.3f);
@@ -482,10 +599,62 @@ namespace EchoesAcrossTime.Combat
 
             PlayAnimation(sprite, GetAnimationName(target, "debuff"));
             
+            // ADD: Debuff particle effect
+            effectsManager?.PlayEffectOnSprite(
+                "res://Effects/Debuff.efkefc", 
+                sprite, 
+                scale: 1.0f, 
+                duration: 2.0f
+            );
+            
             // Purple darkening
             var tween = CreateTween();
             tween.TweenProperty(sprite, "modulate", new Color(0.7f, 0.5f, 0.7f), 0.3f);
             tween.TweenProperty(sprite, "modulate", Colors.White, 0.3f);
+        }
+        
+        public async Task PlayAllOutAttackEffect()
+        {
+            effectsManager?.PlayScreenWideEffect(
+                "res://Effects/AllOutAttack.efkefc", 
+                scale: 1.0f, 
+                duration: 4.0f
+            );
+            
+            await Task.Delay(4000);
+        }
+        
+        // NEW: Showtime duo attack screen effect
+        public async Task PlayShowtimeEffect(string attackName)  // FIXED: parameter name
+        {
+            effectsManager?.PlayScreenWideEffect(
+                $"res://Effects/Showtimes/{attackName}.efkefc", 
+                scale: 1.0f, 
+                duration: 5.0f
+            );
+            
+            await Task.Delay(5000);
+        }
+        
+        public void ShowAoEEffect(List<BattleMember> targets, string effectPath)
+        {
+            if (effectsManager == null) return;
+            
+            var positions = new List<Vector2>();
+            foreach (var target in targets)
+            {
+                var sprite = GetSpriteForMember(target);
+                if (sprite != null)
+                    positions.Add(sprite.GlobalPosition);
+            }
+            
+            effectsManager.PlayEffectOnMultipleTargets(
+                effectPath, 
+                positions, 
+                scale: 1.2f, 
+                duration: 2.0f, 
+                staggerDelay: 0.1f
+            );
         }
 
         /// <summary>
