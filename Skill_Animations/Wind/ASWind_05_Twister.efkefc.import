@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://dn0vophl73hue"
+path="res://.godot/imported/ASWind_05_Twister.efkefc-e58d1108ff125bb2232283d1e055dfa6.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Wind/ASWind_05_Twister.efkefc"
+dest_files=["res://.godot/imported/ASWind_05_Twister.efkefc-e58d1108ff125bb2232283d1e055dfa6.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

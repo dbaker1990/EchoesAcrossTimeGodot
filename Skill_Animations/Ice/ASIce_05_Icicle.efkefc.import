@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://b4rbchnna5ha1"
+path="res://.godot/imported/ASIce_05_Icicle.efkefc-50db92b4e2f570a8d63974313f049b37.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Ice/ASIce_05_Icicle.efkefc"
+dest_files=["res://.godot/imported/ASIce_05_Icicle.efkefc-50db92b4e2f570a8d63974313f049b37.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

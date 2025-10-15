@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://7lp8dr1rwj2g"
+path="res://.godot/imported/ASFire_07_Flare.efkefc-bbe7fc2e4bd80e47f0b19d8ae9cac86a.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Fire/ASFire_07_Flare.efkefc"
+dest_files=["res://.godot/imported/ASFire_07_Flare.efkefc-bbe7fc2e4bd80e47f0b19d8ae9cac86a.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

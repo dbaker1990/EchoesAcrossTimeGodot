@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://b787385nfih88"
+path="res://.godot/imported/ASWater_10_Maelstrom.efkefc-b4ceceedd8caaaea850d71e29570b05f.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Water/ASWater_10_Maelstrom.efkefc"
+dest_files=["res://.godot/imported/ASWater_10_Maelstrom.efkefc-b4ceceedd8caaaea850d71e29570b05f.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

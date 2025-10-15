@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://yjyptjpebmtw"
+path="res://.godot/imported/ASLight_09_Photon.efkefc-197d60f92648d967962b2b07fbaae798.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Light/ASLight_09_Photon.efkefc"
+dest_files=["res://.godot/imported/ASLight_09_Photon.efkefc-197d60f92648d967962b2b07fbaae798.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

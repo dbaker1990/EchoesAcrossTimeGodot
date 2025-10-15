@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://c2px524kutqk"
+path="res://.godot/imported/ASThunder_03_Spark.efkefc-4c2343c67fe34eb8fe059c7a7fe75084.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Thunder/ASThunder_03_Spark.efkefc"
+dest_files=["res://.godot/imported/ASThunder_03_Spark.efkefc-4c2343c67fe34eb8fe059c7a7fe75084.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

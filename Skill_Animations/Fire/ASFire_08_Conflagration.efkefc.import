@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://duahvbhmewu8g"
+path="res://.godot/imported/ASFire_08_Conflagration.efkefc-62b165e691235d75ee198c9187dd21dd.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Fire/ASFire_08_Conflagration.efkefc"
+dest_files=["res://.godot/imported/ASFire_08_Conflagration.efkefc-62b165e691235d75ee198c9187dd21dd.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://dj8qsk8g8kqpu"
+path="res://.godot/imported/ASWind_07_Vacuum.efkefc-1571434baedd5dfeadc922aab74fe4b3.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Wind/ASWind_07_Vacuum.efkefc"
+dest_files=["res://.godot/imported/ASWind_07_Vacuum.efkefc-1571434baedd5dfeadc922aab74fe4b3.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

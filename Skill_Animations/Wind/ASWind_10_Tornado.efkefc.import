@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://b5ut4vquu0vw2"
+path="res://.godot/imported/ASWind_10_Tornado.efkefc-4b90e9c126311122a6cf9845741b13e9.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Wind/ASWind_10_Tornado.efkefc"
+dest_files=["res://.godot/imported/ASWind_10_Tornado.efkefc-4b90e9c126311122a6cf9845741b13e9.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

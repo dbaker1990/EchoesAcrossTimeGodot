@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://bk52lbpkpka1m"
+path="res://.godot/imported/ASIce_04_Chill.efkefc-f02a92a1ccefda350cb6648b3158d2e3.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Ice/ASIce_04_Chill.efkefc"
+dest_files=["res://.godot/imported/ASIce_04_Chill.efkefc-f02a92a1ccefda350cb6648b3158d2e3.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

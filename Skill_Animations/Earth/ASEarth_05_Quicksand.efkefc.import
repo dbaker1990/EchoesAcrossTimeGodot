@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://ca2bltnr48r8a"
+path="res://.godot/imported/ASEarth_05_Quicksand.efkefc-39c87aa31eb915c700facb2ab3cec36a.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Earth/ASEarth_05_Quicksand.efkefc"
+dest_files=["res://.godot/imported/ASEarth_05_Quicksand.efkefc-39c87aa31eb915c700facb2ab3cec36a.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://1mjd1cego83s"
+path="res://.godot/imported/ASLight_08_Twinkle.efkefc-ca5fd847a741c93e1e0cb9e648d87419.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Light/ASLight_08_Twinkle.efkefc"
+dest_files=["res://.godot/imported/ASLight_08_Twinkle.efkefc-ca5fd847a741c93e1e0cb9e648d87419.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

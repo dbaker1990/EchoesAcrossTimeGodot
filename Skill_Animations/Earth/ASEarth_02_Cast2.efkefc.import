@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://rfgelv6wimmi"
+path="res://.godot/imported/ASEarth_02_Cast2.efkefc-fba6db46afbd8591d7cb4140cd8c2274.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Earth/ASEarth_02_Cast2.efkefc"
+dest_files=["res://.godot/imported/ASEarth_02_Cast2.efkefc-fba6db46afbd8591d7cb4140cd8c2274.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

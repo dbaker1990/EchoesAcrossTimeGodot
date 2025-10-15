@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://cm2k53pu66m7p"
+path="res://.godot/imported/ASIce_06_Spike.efkefc-5a2fd272cf094f075207c9db5ba83c8f.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Ice/ASIce_06_Spike.efkefc"
+dest_files=["res://.godot/imported/ASIce_06_Spike.efkefc-5a2fd272cf094f075207c9db5ba83c8f.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

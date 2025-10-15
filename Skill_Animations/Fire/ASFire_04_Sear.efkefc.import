@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://d3fgkiwp1cdni"
+path="res://.godot/imported/ASFire_04_Sear.efkefc-e36f9fd1e510c116c8deadd029724ebf.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Fire/ASFire_04_Sear.efkefc"
+dest_files=["res://.godot/imported/ASFire_04_Sear.efkefc-e36f9fd1e510c116c8deadd029724ebf.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

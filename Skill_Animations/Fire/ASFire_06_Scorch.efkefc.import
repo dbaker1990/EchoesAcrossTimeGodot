@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://c781o5l23iudm"
+path="res://.godot/imported/ASFire_06_Scorch.efkefc-10864060010cd5cbf6856dcabc31f687.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Fire/ASFire_06_Scorch.efkefc"
+dest_files=["res://.godot/imported/ASFire_06_Scorch.efkefc-10864060010cd5cbf6856dcabc31f687.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

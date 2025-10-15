@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://d24pban5e0ken"
+path="res://.godot/imported/ASThunder_04_Thunderbolt.efkefc-3d0d85963660b0efbd417c989896f515.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Thunder/ASThunder_04_Thunderbolt.efkefc"
+dest_files=["res://.godot/imported/ASThunder_04_Thunderbolt.efkefc-3d0d85963660b0efbd417c989896f515.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

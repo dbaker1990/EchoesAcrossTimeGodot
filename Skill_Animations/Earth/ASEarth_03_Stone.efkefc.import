@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://capl7dva0e3tv"
+path="res://.godot/imported/ASEarth_03_Stone.efkefc-20aa3b64cc72c8af29cd4ec051e4c2ee.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Earth/ASEarth_03_Stone.efkefc"
+dest_files=["res://.godot/imported/ASEarth_03_Stone.efkefc-20aa3b64cc72c8af29cd4ec051e4c2ee.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

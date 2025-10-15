@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://d1v8miur1to6y"
+path="res://.godot/imported/ASEarth_08_Boulder.efkefc-d6b048bfad58420475f4d5d4d2a6eacd.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Earth/ASEarth_08_Boulder.efkefc"
+dest_files=["res://.godot/imported/ASEarth_08_Boulder.efkefc-d6b048bfad58420475f4d5d4d2a6eacd.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

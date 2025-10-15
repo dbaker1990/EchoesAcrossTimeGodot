@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://b0i0jynu0mwfi"
+path="res://.godot/imported/ASDark_06_Gloom.efkefc-b328ffbd3e33dbee1489a01cc0b69a3d.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Dark/ASDark_06_Gloom.efkefc"
+dest_files=["res://.godot/imported/ASDark_06_Gloom.efkefc-b328ffbd3e33dbee1489a01cc0b69a3d.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

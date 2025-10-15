@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://c57jgfd8base0"
+path="res://.godot/imported/ASThunder_06_Current.efkefc-17aac80e3a413435274add42ecb1048f.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Thunder/ASThunder_06_Current.efkefc"
+dest_files=["res://.godot/imported/ASThunder_06_Current.efkefc-17aac80e3a413435274add42ecb1048f.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

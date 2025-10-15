@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://bahk583ykvuhu"
+path="res://.godot/imported/ASDark_05_Subdue.efkefc-5ce1ceda65420b25cb4d1f50cbc575b4.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Dark/ASDark_05_Subdue.efkefc"
+dest_files=["res://.godot/imported/ASDark_05_Subdue.efkefc-5ce1ceda65420b25cb4d1f50cbc575b4.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

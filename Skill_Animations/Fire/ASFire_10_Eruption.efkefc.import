@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://b72na6oadfjgh"
+path="res://.godot/imported/ASFire_10_Eruption.efkefc-078f9963163192e672c959d4671a8b5e.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Fire/ASFire_10_Eruption.efkefc"
+dest_files=["res://.godot/imported/ASFire_10_Eruption.efkefc-078f9963163192e672c959d4671a8b5e.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

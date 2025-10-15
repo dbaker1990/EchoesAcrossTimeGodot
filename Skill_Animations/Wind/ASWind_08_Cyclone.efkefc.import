@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://dwfrrl1borvqj"
+path="res://.godot/imported/ASWind_08_Cyclone.efkefc-5bb771d4bcff73291dcd147243838021.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Wind/ASWind_08_Cyclone.efkefc"
+dest_files=["res://.godot/imported/ASWind_08_Cyclone.efkefc-5bb771d4bcff73291dcd147243838021.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

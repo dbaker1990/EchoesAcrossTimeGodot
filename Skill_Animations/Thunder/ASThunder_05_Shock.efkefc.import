@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://duk5x08t4vdhh"
+path="res://.godot/imported/ASThunder_05_Shock.efkefc-e0dd556a32693d57c904653384934ddd.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Thunder/ASThunder_05_Shock.efkefc"
+dest_files=["res://.godot/imported/ASThunder_05_Shock.efkefc-e0dd556a32693d57c904653384934ddd.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

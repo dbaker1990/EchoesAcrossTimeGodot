@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://66re20to6xs1"
+path="res://.godot/imported/ASEarth_10_Cataclysm.efkefc-c6cbfbe5962e23a374067d46b033e530.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Earth/ASEarth_10_Cataclysm.efkefc"
+dest_files=["res://.godot/imported/ASEarth_10_Cataclysm.efkefc-c6cbfbe5962e23a374067d46b033e530.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

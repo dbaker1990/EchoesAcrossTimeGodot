@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://dgswfcnpo80l5"
+path="res://.godot/imported/ASFire_05_Combust.efkefc-7498a8152e7873102a0751a321483ba9.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Fire/ASFire_05_Combust.efkefc"
+dest_files=["res://.godot/imported/ASFire_05_Combust.efkefc-7498a8152e7873102a0751a321483ba9.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

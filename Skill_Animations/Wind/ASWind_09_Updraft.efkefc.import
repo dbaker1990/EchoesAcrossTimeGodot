@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://bvxsyuaahvgh4"
+path="res://.godot/imported/ASWind_09_Updraft.efkefc-1dc44b6633fd6b933be91b696405efa3.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Wind/ASWind_09_Updraft.efkefc"
+dest_files=["res://.godot/imported/ASWind_09_Updraft.efkefc-1dc44b6633fd6b933be91b696405efa3.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

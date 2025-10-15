@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://cx6sfgepghxsw"
+path="res://.godot/imported/ASEarth_04_Tremor.efkefc-31db27e5284f4b30bba01c4547288dcb.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Earth/ASEarth_04_Tremor.efkefc"
+dest_files=["res://.godot/imported/ASEarth_04_Tremor.efkefc-31db27e5284f4b30bba01c4547288dcb.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

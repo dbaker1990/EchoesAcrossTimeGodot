@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://bhw0bvy7fmvxj"
+path="res://.godot/imported/ASEarth_07_Rupture.efkefc-5d116bfbd816f6219680b2aa3667dd12.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Earth/ASEarth_07_Rupture.efkefc"
+dest_files=["res://.godot/imported/ASEarth_07_Rupture.efkefc-5d116bfbd816f6219680b2aa3667dd12.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

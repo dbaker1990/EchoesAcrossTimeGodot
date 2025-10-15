@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://crnv7qotdno32"
+path="res://.godot/imported/ASFire_01_Cast1.efkefc-61fd33eb69b4205b617de9976c498508.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Fire/ASFire_01_Cast1.efkefc"
+dest_files=["res://.godot/imported/ASFire_01_Cast1.efkefc-61fd33eb69b4205b617de9976c498508.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

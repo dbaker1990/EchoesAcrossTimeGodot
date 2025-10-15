@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://dnlm5fkuaq0o6"
+path="res://.godot/imported/ASWind_04_Breeze.efkefc-4418caa6f1ecf870d0df541aa66e0944.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Wind/ASWind_04_Breeze.efkefc"
+dest_files=["res://.godot/imported/ASWind_04_Breeze.efkefc-4418caa6f1ecf870d0df541aa66e0944.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

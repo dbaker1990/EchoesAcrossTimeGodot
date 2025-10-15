@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://bnlbg51l6com8"
+path="res://.godot/imported/ASThunder_10_Fulmination.efkefc-3f3998f318e6b5f13c728f13f1bbf905.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Thunder/ASThunder_10_Fulmination.efkefc"
+dest_files=["res://.godot/imported/ASThunder_10_Fulmination.efkefc-3f3998f318e6b5f13c728f13f1bbf905.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

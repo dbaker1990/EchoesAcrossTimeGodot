@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://baqyef24nd3rv"
+path="res://.godot/imported/ASIce_10_Hail.efkefc-eec60df74015bc2b6a42fa1a9ece2c8c.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Ice/ASIce_10_Hail.efkefc"
+dest_files=["res://.godot/imported/ASIce_10_Hail.efkefc-eec60df74015bc2b6a42fa1a9ece2c8c.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

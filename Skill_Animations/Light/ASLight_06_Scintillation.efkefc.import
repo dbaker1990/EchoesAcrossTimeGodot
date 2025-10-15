@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://uhk2edwrelbx"
+path="res://.godot/imported/ASLight_06_Scintillation.efkefc-214b45e5202d51705c1f680c6c7afa64.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Light/ASLight_06_Scintillation.efkefc"
+dest_files=["res://.godot/imported/ASLight_06_Scintillation.efkefc-214b45e5202d51705c1f680c6c7afa64.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

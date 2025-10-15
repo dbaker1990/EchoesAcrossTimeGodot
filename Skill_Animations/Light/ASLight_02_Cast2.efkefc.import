@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://y772a362l2xn"
+path="res://.godot/imported/ASLight_02_Cast2.efkefc-2d07a17dfe86f524a2d968a2e83d7639.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Light/ASLight_02_Cast2.efkefc"
+dest_files=["res://.godot/imported/ASLight_02_Cast2.efkefc-2d07a17dfe86f524a2d968a2e83d7639.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

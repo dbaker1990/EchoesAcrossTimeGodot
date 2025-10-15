@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://csbyeyb2q6n57"
+path="res://.godot/imported/ASLight_04_Ray.efkefc-42c71c9d23a896abfcc89a147e984181.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Light/ASLight_04_Ray.efkefc"
+dest_files=["res://.godot/imported/ASLight_04_Ray.efkefc-42c71c9d23a896abfcc89a147e984181.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

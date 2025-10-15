@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://dp41kjc4g014x"
+path="res://.godot/imported/ASLight_05_Sparkle.efkefc-6fef3d2f1f7c0c4b57756107e61fd59d.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Light/ASLight_05_Sparkle.efkefc"
+dest_files=["res://.godot/imported/ASLight_05_Sparkle.efkefc-6fef3d2f1f7c0c4b57756107e61fd59d.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

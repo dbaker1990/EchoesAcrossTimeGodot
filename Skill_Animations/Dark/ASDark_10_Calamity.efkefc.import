@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://d16n7k15howq"
+path="res://.godot/imported/ASDark_10_Calamity.efkefc-75c70d4af92719a9771993b8435d1a59.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Dark/ASDark_10_Calamity.efkefc"
+dest_files=["res://.godot/imported/ASDark_10_Calamity.efkefc-75c70d4af92719a9771993b8435d1a59.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://dqk3cel2okowh"
+path="res://.godot/imported/ASThunder_09_Voltage.efkefc-9d879efea35d24b415fb51dd182361ff.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Thunder/ASThunder_09_Voltage.efkefc"
+dest_files=["res://.godot/imported/ASThunder_09_Voltage.efkefc-9d879efea35d24b415fb51dd182361ff.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

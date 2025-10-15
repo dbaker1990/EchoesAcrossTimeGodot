@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://45y2i7f65lw2"
+path="res://.godot/imported/ASDark_08_Oblivion.efkefc-08136f59da07306de564824bcd18f075.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Dark/ASDark_08_Oblivion.efkefc"
+dest_files=["res://.godot/imported/ASDark_08_Oblivion.efkefc-08136f59da07306de564824bcd18f075.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

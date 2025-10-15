@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://ivob57blibjj"
+path="res://.godot/imported/ASThunder_08_Dynamo.efkefc-54c02a7d59692e718e3bc7768701a013.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Thunder/ASThunder_08_Dynamo.efkefc"
+dest_files=["res://.godot/imported/ASThunder_08_Dynamo.efkefc-54c02a7d59692e718e3bc7768701a013.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

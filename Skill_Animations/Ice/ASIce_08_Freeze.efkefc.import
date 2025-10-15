@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://rrndpdpa6ecp"
+path="res://.godot/imported/ASIce_08_Freeze.efkefc-9e944e60b84cce2e75795b26927ff6a2.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Ice/ASIce_08_Freeze.efkefc"
+dest_files=["res://.godot/imported/ASIce_08_Freeze.efkefc-9e944e60b84cce2e75795b26927ff6a2.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true

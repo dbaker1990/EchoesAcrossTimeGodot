@@ -1,0 +1,17 @@
+[remap]
+
+importer="effekseer.effect"
+type="Resource"
+uid="uid://ndopq47x0r6c"
+path="res://.godot/imported/ASWind_06_Gust.efkefc-ca6378dd6abb360b74527f78e3207d5d.res"
+
+[deps]
+
+source_file="res://Skill_Animations/Wind/ASWind_06_Gust.efkefc"
+dest_files=["res://.godot/imported/ASWind_06_Gust.efkefc-ca6378dd6abb360b74527f78e3207d5d.res"]
+
+[params]
+
+scale=1.0
+data_type=0
+compress=true
