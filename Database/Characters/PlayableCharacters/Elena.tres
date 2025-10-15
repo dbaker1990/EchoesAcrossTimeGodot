@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=13 format=3 uid="uid://bf0ykbq17surk"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=14 format=3 uid="uid://bf0ykbq17surk"]
 
 [ext_resource type="Script" uid="uid://cii0v4krf5lb8" path="res://Combat/BattleStats.cs" id="1_ebtga"]
 [ext_resource type="Script" uid="uid://cr283ljrg7q0d" path="res://Combat/ElementAffinityData.cs" id="2_pvpl8"]
@@ -9,6 +9,7 @@
 [ext_resource type="Resource" uid="uid://betkn2p4qc5he" path="res://Data/Skills/EmberStrike.tres" id="6_mqrcc"]
 [ext_resource type="Resource" uid="uid://box8buw6a0d00" path="res://Data/Skills/FrostShard.tres" id="7_s3kl0"]
 [ext_resource type="Resource" uid="uid://cb4aoir1wwlww" path="res://Data/Skills/ShockBolt.tres" id="8_qsf7g"]
+[ext_resource type="Resource" uid="uid://dat06r3ouhggf" path="res://Data/Skills/Focus.tres" id="9_s3kl0"]
 
 [sub_resource type="Resource" id="Resource_cs3b2"]
 script = ExtResource("1_ebtga")
@@ -38,16 +39,16 @@ MagicAttack = 16
 MagicDefense = 12
 Speed = 11
 Luck = 11
-MPGrowthRate = 0.09
+MPGrowthRate = 0.04
 AttackGrowthRate = 0.05
-DefenseGrowthRate = 0.07
-MagicAttackGrowthRate = 0.14
-MagicDefenseGrowthRate = 0.11
-SpeedGrowthRate = 0.08
-LuckGrowthRate = 0.05
+DefenseGrowthRate = 0.05
+MagicAttackGrowthRate = 0.05
+MagicDefenseGrowthRate = 0.05
+SpeedGrowthRate = 0.04
+LuckGrowthRate = 0.04
 ElementAffinities = SubResource("Resource_mqrcc")
 ExpCurve = SubResource("Resource_s3kl0")
 BattleStats = SubResource("Resource_cs3b2")
-StartingSkills = Array[Object]([ExtResource("6_mqrcc"), ExtResource("7_s3kl0"), ExtResource("8_qsf7g")])
-SkillsLearnedAtLevel = null
+StartingSkills = Array[Object]([ExtResource("6_mqrcc"), ExtResource("7_s3kl0"), ExtResource("8_qsf7g"), ExtResource("9_s3kl0")])
+SkillsLearnedAtLevel = Dictionary[int, Object]({})
 metadata/_custom_type_script = "uid://uxwpgs5c4g7l"
