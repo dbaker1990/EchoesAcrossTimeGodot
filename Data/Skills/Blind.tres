@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://bp15uvryiyaxh"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_3xw8w"]
+
+[resource]
+script = ExtResource("1_3xw8w")
+SkillId = "blind"
+DisplayName = "Blind"
+Description = "Shroud the target in darkness, blinding them with high success."
+MPCost = 7
+DamageFormula = 1
+DamageType = 1
+Element = 8
+BasePower = 10
+Accuracy = 95
+InflictsStatuses = Array[int]([6])
+StatusChances = Array[int]([90])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

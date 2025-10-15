@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://8kkko54qy6y2"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_07sav"]
+
+[resource]
+script = ExtResource("1_07sav")
+SkillId = "flare"
+DisplayName = "Flare"
+Description = "Unleash pure magical energy. Ignores all elemental resistances."
+MPCost = 22
+DamageFormula = 1
+DamageType = 1
+Element = 9
+BasePower = 180
+Accuracy = 95
+CriticalBonus = 5
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

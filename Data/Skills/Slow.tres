@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://wb8knesajsic"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_c8cef"]
+
+[resource]
+script = ExtResource("1_c8cef")
+SkillId = "slow"
+DisplayName = "Slow"
+Description = "Slow the enemy's movements, reducing Speed by 50% for 3 turns."
+Type = 1
+MPCost = 10
+DamageFormula = 1
+DamageType = 4
+Element = 8
+BasePower = 50
+Accuracy = 80
+InflictsStatuses = Array[int]([28])
+StatusChances = Array[int]([100])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

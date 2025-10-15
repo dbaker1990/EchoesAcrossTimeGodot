@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://cgxyorjdreh6b"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_3mm04"]
+
+[resource]
+script = ExtResource("1_3mm04")
+SkillId = "ultima"
+DisplayName = "Ultima"
+Description = "The ultimate destructive spell. Pure magical force that ignores all resistances."
+MPCost = 38
+DamageFormula = 1
+DamageType = 1
+Element = 9
+BasePower = 250
+Accuracy = 95
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

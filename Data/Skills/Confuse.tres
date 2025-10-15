@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://dwuy2h7uan1mk"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_yk3j1"]
+
+[resource]
+script = ExtResource("1_yk3j1")
+SkillId = "confuse"
+DisplayName = "Confuse"
+Description = "Scramble the target's mind, causing confusion."
+MPCost = 10
+DamageFormula = 1
+DamageType = 1
+Element = 8
+BasePower = 10
+Accuracy = 95
+InflictsStatuses = Array[int]([4])
+StatusChances = Array[int]([80])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

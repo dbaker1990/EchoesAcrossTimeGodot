@@ -354,6 +354,17 @@ namespace EchoesAcrossTime.Combat
             await Task.Delay(300);
             PlayAnimation(sprite, GetAnimationName(target, "idle"));
         }
+        
+        public async Task ShowDrainEffect(BattleMember drainer, BattleMember target)
+        {
+            // Visual effect showing energy being drained from target to caster
+            // You can implement a particle effect or animation here
+    
+            GD.Print($"[Visual] Drain effect from {target.Stats.CharacterName} to {drainer.Stats.CharacterName}");
+    
+            // Placeholder: just wait a moment
+            await ToSignal(GetTree().CreateTimer(0.3), SceneTreeTimer.SignalName.Timeout);
+        }
 
         /// <summary>
         /// Show miss effect

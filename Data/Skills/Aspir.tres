@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://kuxmvxovme4q"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_ydyc4"]
+
+[resource]
+script = ExtResource("1_ydyc4")
+SkillId = "aspir"
+DisplayName = "Aspir"
+Description = "Steal MP from the enemy. Drains target's MP and restores your own."
+MPCost = 8
+DamageFormula = 1
+Element = 7
+BasePower = 40
+Accuracy = 90
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+DrainsMP = true
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

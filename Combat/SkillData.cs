@@ -99,6 +99,9 @@ namespace EchoesAcrossTime.Combat
         
         [ExportGroup("Special Effects")]
         [Export] public bool DrainHP { get; set; } = false;  // User heals for damage dealt
+        
+        [Export] public bool DrainsHP { get; set; } = false;
+        [Export] public bool DrainsMP { get; set; } = false;
         [Export] public float DrainPercent { get; set; } = 0.5f;
         [Export] public bool SelfDestruct { get; set; } = false;
         [Export] public bool EscapeBattle { get; set; } = false;

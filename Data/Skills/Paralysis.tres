@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://dyqfbs2myw81b"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_tvab6"]
+
+[resource]
+script = ExtResource("1_tvab6")
+SkillId = "paralyze"
+DisplayName = "Paralyze"
+Description = "Paralyze the target's muscles with dark magic."
+MPCost = 9
+DamageFormula = 1
+DamageType = 1
+Element = 8
+BasePower = 15
+Accuracy = 95
+InflictsStatuses = Array[int]([3])
+StatusChances = Array[int]([85])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

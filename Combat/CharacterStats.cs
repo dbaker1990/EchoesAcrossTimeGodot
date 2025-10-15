@@ -34,6 +34,16 @@ namespace EchoesAcrossTime.Combat
         
         public int Luck { get; set; } = 10;
         
+        // Add base stat tracking
+        private int baseMaxHP;
+        private int baseMaxMP;
+        private int baseAttack;
+        private int baseDefense;
+        private int baseMagicAttack;
+        private int baseMagicDefense;
+        private int baseSpeed;
+        private int baseLuck;
+        
         public BattleStats BattleStats { get; set; }
         
         public float TemporaryAttackMultiplier { get; set; } = 1.0f;
@@ -63,6 +73,16 @@ namespace EchoesAcrossTime.Combat
         public float MagicDefenseGrowthRate { get; set; } = 0.03f;
         public float SpeedGrowthRate { get; set; } = 0.02f;
         public float LuckGrowthRate { get; set; } = 0.03f;
+        
+        // Add variance properties (near where HPGrowthRate is defined)
+        public int HPGrowthVariance { get; set; } = 2;
+        public int MPGrowthVariance { get; set; } = 2;
+        public int AttackGrowthVariance { get; set; } = 1;
+        public int DefenseGrowthVariance { get; set; } = 1;
+        public int MagicAttackGrowthVariance { get; set; } = 1;
+        public int MagicDefenseGrowthVariance { get; set; } = 1;
+        public int SpeedGrowthVariance { get; set; } = 1;
+        public int LuckGrowthVariance { get; set; } = 1;
         
         public CharacterSkills Skills { get; set; }
         
@@ -107,6 +127,24 @@ namespace EchoesAcrossTime.Combat
         public float HPPercent => MaxHP > 0 ? (float)CurrentHP / MaxHP : 0f;
         public float MPPercent => MaxMP > 0 ? (float)CurrentMP / MaxMP : 0f;
         public float ExpPercent => ExpToNextLevel > 0 ? (float)CurrentExp / ExpToNextLevel : 0f;
+        
+        /// <summary>
+        /// Initialize base stats - call this once when character is created
+        /// </summary>
+        public void InitializeBaseStats()
+        {
+            baseMaxHP = MaxHP;
+            baseMaxMP = MaxMP;
+            baseAttack = Attack;
+            baseDefense = Defense;
+            baseMagicAttack = MagicAttack;
+            baseMagicDefense = MagicDefense;
+            baseSpeed = Speed;
+            baseLuck = Luck;
+    
+            GD.Print($"Base stats initialized for {CharacterName}");
+        }
+
         
         /// <summary>
         /// Apply damage with element consideration
@@ -247,30 +285,49 @@ namespace EchoesAcrossTime.Combat
         }
         
         /// <summary>
-        /// Increase stats on level up
-        /// </summary>
-        private void IncreaseStatsOnLevelUp()
-        {
-            int hpGrowth = Mathf.Max(1, Mathf.RoundToInt(MaxHP * HPGrowthRate) + 5);
-            int mpGrowth = Mathf.Max(1, Mathf.RoundToInt(MaxMP * MPGrowthRate) + 3);
-            int attackGrowth = Mathf.Max(1, Mathf.RoundToInt(Attack * AttackGrowthRate) + 1);
-            int defenseGrowth = Mathf.Max(1, Mathf.RoundToInt(Defense * DefenseGrowthRate) + 1);
-            int magicAttackGrowth = Mathf.Max(1, Mathf.RoundToInt(MagicAttack * MagicAttackGrowthRate) + 1);
-            int magicDefenseGrowth = Mathf.Max(1, Mathf.RoundToInt(MagicDefense * MagicDefenseGrowthRate) + 1);
-            int speedGrowth = Mathf.Max(1, Mathf.RoundToInt(Speed * SpeedGrowthRate));
-            int luckGrowth = Mathf.Max(1, Mathf.RoundToInt(Luck * LuckGrowthRate));
-            
-            MaxHP += hpGrowth;
-            MaxMP += mpGrowth;
-            Attack += attackGrowth;
-            Defense += defenseGrowth;
-            MagicAttack += magicAttackGrowth;
-            MagicDefense += magicDefenseGrowth;
-            Speed += speedGrowth;
-            Luck += luckGrowth;
-            
-            GD.Print($"Stats increased - HP+{hpGrowth}, MP+{mpGrowth}, ATK+{attackGrowth}, DEF+{defenseGrowth}, MATK+{magicAttackGrowth}, MDEF+{magicDefenseGrowth}, SPD+{speedGrowth}");
-        }
+/// Increase stats on level up with variance
+/// </summary>
+private void IncreaseStatsOnLevelUp()
+{
+    var rng = new RandomNumberGenerator();
+    
+    // Calculate base growth from STARTING stats (not current!)
+    int baseHPGrowth = Mathf.Max(1, Mathf.RoundToInt(baseMaxHP * HPGrowthRate));
+    int baseMPGrowth = Mathf.Max(1, Mathf.RoundToInt(baseMaxMP * MPGrowthRate));
+    int baseAttackGrowth = Mathf.RoundToInt(baseAttack * AttackGrowthRate);
+    int baseDefenseGrowth = Mathf.RoundToInt(baseDefense * DefenseGrowthRate);
+    int baseMagicAttackGrowth = Mathf.RoundToInt(baseMagicAttack * MagicAttackGrowthRate);
+    int baseMagicDefenseGrowth = Mathf.RoundToInt(baseMagicDefense * MagicDefenseGrowthRate);
+    int baseSpeedGrowth = Mathf.RoundToInt(baseSpeed * SpeedGrowthRate);
+    int baseLuckGrowth = Mathf.RoundToInt(baseLuck * LuckGrowthRate);
+    
+    // Add random variance for unpredictability
+    int hpGrowth = Mathf.Max(1, baseHPGrowth + rng.RandiRange(-HPGrowthVariance, HPGrowthVariance));
+    int mpGrowth = Mathf.Max(1, baseMPGrowth + rng.RandiRange(-MPGrowthVariance, MPGrowthVariance));
+    int attackGrowth = Mathf.Max(0, baseAttackGrowth + rng.RandiRange(-AttackGrowthVariance, AttackGrowthVariance));
+    int defenseGrowth = Mathf.Max(0, baseDefenseGrowth + rng.RandiRange(-DefenseGrowthVariance, DefenseGrowthVariance));
+    int magicAttackGrowth = Mathf.Max(0, baseMagicAttackGrowth + rng.RandiRange(-MagicAttackGrowthVariance, MagicAttackGrowthVariance));
+    int magicDefenseGrowth = Mathf.Max(0, baseMagicDefenseGrowth + rng.RandiRange(-MagicDefenseGrowthVariance, MagicDefenseGrowthVariance));
+    int speedGrowth = Mathf.Max(0, baseSpeedGrowth + rng.RandiRange(-SpeedGrowthVariance, SpeedGrowthVariance));
+    int luckGrowth = Mathf.Max(0, baseLuckGrowth + rng.RandiRange(-LuckGrowthVariance, LuckGrowthVariance));
+    
+    // Apply growth
+    MaxHP += hpGrowth;
+    MaxMP += mpGrowth;
+    Attack += attackGrowth;
+    Defense += defenseGrowth;
+    MagicAttack += magicAttackGrowth;
+    MagicDefense += magicDefenseGrowth;
+    Speed += speedGrowth;
+    Luck += luckGrowth;
+    
+    GD.Print($"✨ Level Up! {CharacterName} stats increased:");
+    GD.Print($"   HP+{hpGrowth} (base {baseHPGrowth}±{HPGrowthVariance})");
+    GD.Print($"   MP+{mpGrowth} (base {baseMPGrowth}±{MPGrowthVariance})");
+    GD.Print($"   ATK+{attackGrowth}, DEF+{defenseGrowth}");
+    GD.Print($"   MATK+{magicAttackGrowth}, MDEF+{magicDefenseGrowth}");
+    GD.Print($"   SPD+{speedGrowth}, LCK+{luckGrowth}");
+}
         
         /// <summary>
         /// Set character to specific level with appropriate stats

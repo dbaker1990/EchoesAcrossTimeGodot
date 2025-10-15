@@ -90,6 +90,16 @@ namespace EchoesAcrossTime.Database
         [Export(PropertyHint.Range, "0,1,0.01")] public float SpeedGrowthRate { get; set; } = 0.02f;
         [Export(PropertyHint.Range, "0,1,0.01")] public float LuckGrowthRate { get; set; } = 0.02f;
         
+        [ExportGroup("Stat Growth Variance")]
+        [Export] public int HPGrowthVariance { get; set; } = 2;
+        [Export] public int MPGrowthVariance { get; set; } = 2;
+        [Export] public int AttackGrowthVariance { get; set; } = 1;
+        [Export] public int DefenseGrowthVariance { get; set; } = 1;
+        [Export] public int MagicAttackGrowthVariance { get; set; } = 1;
+        [Export] public int MagicDefenseGrowthVariance { get; set; } = 1;
+        [Export] public int SpeedGrowthVariance { get; set; } = 1;
+        [Export] public int LuckGrowthVariance { get; set; } = 1;
+        
         [ExportGroup("Combat System")]
         [Export] public ElementAffinityData ElementAffinities { get; set; }
         [Export] public ExperienceCurve ExpCurve { get; set; }
@@ -310,7 +320,7 @@ namespace EchoesAcrossTime.Database
         public CharacterStats CreateStatsInstance()
         {
             int validLevel = Mathf.Clamp(Level, CharacterStats.MIN_LEVEL, CharacterStats.MAX_LEVEL);
-            
+    
             var stats = new CharacterStats
             {
                 CharacterName = this.DisplayName,
@@ -333,9 +343,19 @@ namespace EchoesAcrossTime.Database
                 MagicAttackGrowthRate = this.MagicAttackGrowthRate,
                 MagicDefenseGrowthRate = this.MagicDefenseGrowthRate,
                 SpeedGrowthRate = this.SpeedGrowthRate,
-                LuckGrowthRate = this.LuckGrowthRate
+                LuckGrowthRate = this.LuckGrowthRate,
+        
+                // Add variance values (can customize per character if needed)
+                HPGrowthVariance = 2,
+                MPGrowthVariance = 2,
+                AttackGrowthVariance = 1,
+                DefenseGrowthVariance = 1,
+                MagicAttackGrowthVariance = 1,
+                MagicDefenseGrowthVariance = 1,
+                SpeedGrowthVariance = 1,
+                LuckGrowthVariance = 1
             };
-            
+    
             if (ExpCurve != null)
             {
                 stats.ExperienceCurve = ExpCurve;
@@ -344,45 +364,17 @@ namespace EchoesAcrossTime.Database
             {
                 stats.ExperienceCurve = ExperienceCurve.GetRecommendedCurve(Type);
             }
-            
+    
             stats.ExpToNextLevel = stats.ExperienceCurve.GetExpForLevelUp(validLevel);
-            
+    
             if (this.ElementAffinities != null)
             {
                 stats.ElementAffinities = this.ElementAffinities.DuplicateData();
             }
-            else
-            {
-                stats.ElementAffinities = new ElementAffinityData();
-            }
-            
-            if (this.BattleStats != null)
-            {
-                stats.BattleStats = this.BattleStats.Clone();
-            }
-            else
-            {
-                stats.BattleStats = new BattleStats();
-            }
-            
-            stats.AIPattern = this.AIBehavior;
-            
-            // Initialize skills
-            stats.Skills = new CharacterSkills(this.CharacterId);
-            
-            // Learn starting skills
-            if (StartingSkills != null)
-            {
-                foreach (var skill in StartingSkills)
-                {
-                    if (skill != null)
-                    {
-                        stats.Skills.LearnSkill(skill);
-                    }
-                }
-            }
-            stats.AIPattern = GetAIPattern();
-            
+    
+            // ADD THIS LINE - Initialize base stats!
+            stats.InitializeBaseStats();
+    
             return stats;
         }
         

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterDatabase" load_steps=29 format=3 uid="uid://7nnsth8dj7jj"]
+[gd_resource type="Resource" script_class="CharacterDatabase" load_steps=43 format=3 uid="uid://7nnsth8dj7jj"]
 
 [ext_resource type="Resource" uid="uid://dj6vgrbs78vf4" path="res://Data/Skills/Steal.tres" id="1_nwlej"]
 [ext_resource type="Script" uid="uid://c6fwhavejbuqu" path="res://Database/CharacterDatabase.cs" id="1_script"]
@@ -28,9 +28,23 @@
 [ext_resource type="Resource" uid="uid://bwiohh4gaw7kx" path="res://Data/Skills/Gravira.tres" id="25_alu56"]
 [ext_resource type="Resource" uid="uid://dat06r3ouhggf" path="res://Data/Skills/Focus.tres" id="26_wdv0s"]
 [ext_resource type="Resource" uid="uid://cx3emw3qmkgpv" path="res://Data/Skills/Enlighten.tres" id="27_fa2k2"]
+[ext_resource type="Resource" uid="uid://byrsrygmkrhqq" path="res://Data/Skills/Drain.tres" id="28_0bpkk"]
+[ext_resource type="Resource" uid="uid://kuxmvxovme4q" path="res://Data/Skills/Aspir.tres" id="29_wjnft"]
+[ext_resource type="Resource" uid="uid://dg7uakie8c0ah" path="res://Data/Skills/Enervate.tres" id="30_2nmdn"]
+[ext_resource type="Resource" uid="uid://d02m0l3icsdji" path="res://Data/Skills/Breach.tres" id="31_bevly"]
+[ext_resource type="Resource" uid="uid://b33s4o1j5sav5" path="res://Data/Skills/Silence.tres" id="32_2w4qe"]
+[ext_resource type="Resource" uid="uid://we6wqvw68ike" path="res://Data/Skills/Expose.tres" id="33_g2my1"]
+[ext_resource type="Resource" uid="uid://wb8knesajsic" path="res://Data/Skills/Slow.tres" id="34_alu56"]
+[ext_resource type="Resource" uid="uid://bjjyplt87r11x" path="res://Data/Skills/PoisonCloud.tres" id="35_7krtn"]
+[ext_resource type="Resource" uid="uid://cvh356to2qm2q" path="res://Data/Skills/DeepSleep.tres" id="36_juvvc"]
+[ext_resource type="Resource" uid="uid://dyqfbs2myw81b" path="res://Data/Skills/Paralysis.tres" id="37_73fok"]
+[ext_resource type="Resource" uid="uid://bp15uvryiyaxh" path="res://Data/Skills/Blind.tres" id="38_wb28k"]
+[ext_resource type="Resource" uid="uid://dwuy2h7uan1mk" path="res://Data/Skills/Confuse.tres" id="39_njy7q"]
+[ext_resource type="Resource" uid="uid://8kkko54qy6y2" path="res://Data/Skills/Flare.tres" id="40_73fok"]
+[ext_resource type="Resource" uid="uid://cgxyorjdreh6b" path="res://Data/Skills/Ultima.tres" id="41_wb28k"]
 
 [resource]
 script = ExtResource("1_script")
 Characters = null
-Skills = Array[Object]([ExtResource("1_nwlej"), ExtResource("2_o33u2"), ExtResource("3_dn0qv"), ExtResource("4_ftcsv"), ExtResource("5_nafxu"), ExtResource("6_nafxu"), ExtResource("7_6755j"), ExtResource("8_6755j"), ExtResource("9_thsg7"), ExtResource("10_qnyql"), ExtResource("11_uuy82"), ExtResource("12_bey25"), ExtResource("13_xlcqw"), ExtResource("14_wdv0s"), ExtResource("15_fa2k2"), ExtResource("16_0bpkk"), ExtResource("17_wjnft"), ExtResource("18_bl43h"), ExtResource("19_dxdnd"), ExtResource("20_udfaq"), ExtResource("21_2nmdn"), ExtResource("22_bevly"), ExtResource("23_2w4qe"), ExtResource("24_g2my1"), ExtResource("25_alu56"), ExtResource("26_wdv0s"), ExtResource("27_fa2k2")])
+Skills = Array[Object]([ExtResource("1_nwlej"), ExtResource("2_o33u2"), ExtResource("3_dn0qv"), ExtResource("4_ftcsv"), ExtResource("5_nafxu"), ExtResource("6_nafxu"), ExtResource("7_6755j"), ExtResource("8_6755j"), ExtResource("9_thsg7"), ExtResource("10_qnyql"), ExtResource("11_uuy82"), ExtResource("12_bey25"), ExtResource("13_xlcqw"), ExtResource("14_wdv0s"), ExtResource("15_fa2k2"), ExtResource("16_0bpkk"), ExtResource("17_wjnft"), ExtResource("18_bl43h"), ExtResource("19_dxdnd"), ExtResource("20_udfaq"), ExtResource("21_2nmdn"), ExtResource("22_bevly"), ExtResource("23_2w4qe"), ExtResource("24_g2my1"), ExtResource("25_alu56"), ExtResource("26_wdv0s"), ExtResource("27_fa2k2"), ExtResource("28_0bpkk"), ExtResource("29_wjnft"), ExtResource("30_2nmdn"), ExtResource("31_bevly"), ExtResource("32_2w4qe"), ExtResource("33_g2my1"), ExtResource("34_alu56"), ExtResource("35_7krtn"), ExtResource("36_juvvc"), ExtResource("37_73fok"), ExtResource("38_wb28k"), ExtResource("39_njy7q"), ExtResource("40_73fok"), ExtResource("41_wb28k")])
 AllItems = null

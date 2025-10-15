@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://b33s4o1j5sav5"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_hx378"]
+
+[resource]
+script = ExtResource("1_hx378")
+SkillId = "silence"
+DisplayName = "Silence"
+Description = "Disrupt the enemy's magic, reducing Magic Attack by 30% for 3 turns."
+Type = 1
+MPCost = 10
+DamageFormula = 1
+DamageType = 4
+Element = 8
+BasePower = 30
+InflictsStatuses = Array[int]([24])
+StatusChances = Array[int]([100])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

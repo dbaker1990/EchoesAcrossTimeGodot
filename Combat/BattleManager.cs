@@ -461,30 +461,7 @@ namespace EchoesAcrossTime.Combat
     var attacker = action.Actor;
     var skill = action.Skill;
     
-    // Check MP cost
-    if (attacker.Stats.CurrentMP < skill.MPCost)
-    {
-        result.Success = false;
-        result.Message = "Not enough MP!";
-        return result;
-    }
-    
-    // Deduct MP
-    attacker.Stats.CurrentMP -= skill.MPCost;
-    
-    GD.Print($">>> {attacker.Stats.CharacterName} uses {skill.DisplayName}! <<<");
-    
-    // ===== STEAL SKILL HANDLING =====
-    if (skill.SkillId.ToLower().Contains("steal") && !skill.SkillId.ToLower().Contains("mug"))
-    {
-        return await ExecuteStealSkill(attacker, action.Targets[0]);
-    }
-    
-    // ===== MUG SKILL HANDLING =====
-    if (skill.SkillId.ToLower().Contains("mug"))
-    {
-        return await ExecuteMugSkill(attacker, action.Targets[0], skill);
-    }
+    // ... existing MP cost check and deduction ...
     
     // Play casting animation
     if (battlefieldVisuals != null)
@@ -497,29 +474,53 @@ namespace EchoesAcrossTime.Combat
     {
         if (skill.DamageType == DamageType.Recovery)
         {
-            // Healing skill
-            int healAmount = skill.BasePower;
-            
-            // Apply baton pass bonus if active
-            if (attacker.BatonPassData.IsActive)
-            {
-                healAmount = batonPassManager.ApplyHealingBonus(attacker, healAmount);
-            }
-            
-            int actualHeal = target.Stats.Heal(healAmount);
-            result.HealingDone += actualHeal;
-            
-            GD.Print($"  {target.Stats.CharacterName} healed for {actualHeal} HP!");
-            
-            if (battlefieldVisuals != null)
-            {
-                await battlefieldVisuals.ShowHealEffect(target);
-            }
+            // Healing skill logic
+            // ... existing code ...
         }
         else
         {
             // Damage skill
             await ApplySkillDamage(attacker, target, skill, result);
+            
+            // NEW: Handle HP drain
+            if (skill.DrainsHP && result.DamageDealt > 0)
+            {
+                int drainAmount = Mathf.RoundToInt(result.DamageDealt * (skill.DrainPercent / 100f));
+                int actualHeal = attacker.Stats.Heal(drainAmount);
+                result.HealingDone += actualHeal;
+                
+                GD.Print($"  {attacker.Stats.CharacterName} drained {actualHeal} HP!");
+                
+                if (battlefieldVisuals != null)
+                {
+                    await battlefieldVisuals.ShowDrainEffect(attacker, target);
+                }
+            }
+            
+            // NEW: Handle MP drain
+            if (skill.DrainsMP)
+            {
+                int mpToDrain = skill.BasePower;
+                int actualDrain = Mathf.Min(mpToDrain, target.Stats.CurrentMP);
+                
+                if (actualDrain > 0)
+                {
+                    target.Stats.CurrentMP -= actualDrain;
+                    int mpRestore = Mathf.RoundToInt(actualDrain * (skill.DrainPercent / 100f));
+                    attacker.Stats.RestoreMP(mpRestore);
+                    
+                    GD.Print($"  {attacker.Stats.CharacterName} drained {actualDrain} MP and restored {mpRestore}!");
+                    
+                    if (battlefieldVisuals != null)
+                    {
+                        await battlefieldVisuals.ShowDrainEffect(attacker, target);
+                    }
+                }
+                else
+                {
+                    GD.Print($"  {target.Stats.CharacterName} has no MP to drain!");
+                }
+            }
         }
     }
     

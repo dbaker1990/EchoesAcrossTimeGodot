@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://dg7uakie8c0ah"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_hb0ld"]
+
+[resource]
+script = ExtResource("1_hb0ld")
+SkillId = "enervate"
+DisplayName = "Enervate"
+Description = "Sap the enemy's strength, reducing Attack by 30% for 3 turns."
+Type = 1
+MPCost = 10
+DamageFormula = 1
+DamageType = 4
+Element = 8
+InflictsStatuses = Array[int]([20])
+StatusChances = Array[int]([100])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"
