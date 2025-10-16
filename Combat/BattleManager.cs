@@ -107,6 +107,20 @@ namespace EchoesAcrossTime.Combat
             itemSystem = new BattleItemSystem(statusManager);
             escapeSystem = new EscapeSystem();
             
+            // Register battle VFX pools
+            if (ObjectPool.Instance != null)
+            {
+                // Register your common battle effects
+                // ObjectPool.Instance.RegisterPool(id, scenePath, preWarmCount)
+        
+                // Example - adjust paths to match your project:
+                ObjectPool.Instance.RegisterPool("damage_number", "res://Combat/UI/DamageNumber.tscn", 20);
+                ObjectPool.Instance.RegisterPool("hit_particle", "res://VFX/HitParticle.tscn", 15);
+                ObjectPool.Instance.RegisterPool("status_icon", "res://Combat/UI/StatusIcon.tscn", 10);
+        
+                GD.Print("[BattleManager] Object pools initialized");
+            }
+            
             InitializeSupportSystems();
             
             // Get BattlefieldVisuals reference
@@ -1592,13 +1606,22 @@ namespace EchoesAcrossTime.Combat
         }
         
         /// <summary>
-        /// Helper method to show damage numbers (add this if you don't have it)
+        /// Helper method to show damage numbers
         /// </summary>
-        private void ShowDamageNumber(BattleMember target, int damage, bool isCritical)
+        private void ShowDamageNumber(BattleMember target, int damage, bool isCritical, bool isWeakness = false)
         {
-            GD.Print($"[DAMAGE] {target.Stats.CharacterName} took {damage} damage{(isCritical ? " (CRITICAL!)" : "")}");
-            // TODO: Show floating damage number in your battle UI
-            // Example: battlefieldVisuals?.ShowDamageNumber(target, damage, isCritical);
+            string damageType = isCritical ? " (CRITICAL!)" : (isWeakness ? " (WEAKNESS!)" : "");
+            GD.Print($"[DAMAGE] {target.Stats.CharacterName} took {damage} damage{damageType}");
+    
+            // Show floating damage number on battlefield
+            if (isWeakness || isCritical)
+            {
+                battlefieldVisuals?.ShowDamageNumber(target, damage, isCritical, isWeakness);
+            }
+            else
+            {
+                battlefieldVisuals?.ShowDamageNumber(target, damage, isCritical);
+            }
         }
 
         /// <summary>

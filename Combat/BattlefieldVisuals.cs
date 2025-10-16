@@ -117,6 +117,70 @@ namespace EchoesAcrossTime.Combat
                 sprite.FlipH = false;
             }
         }
+        
+        /// <summary>
+        /// Show floating damage number at target's position
+        /// </summary>
+        public void ShowDamageNumber(BattleMember target, int damage, bool isCritical)
+        {
+            var sprite = GetSpriteForMember(target);
+            if (sprite == null) 
+            {
+                GD.PrintErr($"Cannot show damage number - sprite not found for {target.Stats.CharacterName}");
+                return;
+            }
+
+            // Create damage label
+            var damageLabel = new Label();
+            damageLabel.Text = damage.ToString();
+            damageLabel.ZIndex = 200; // Ensure it's above everything
+            
+            // Position at sprite location (slightly above)
+            damageLabel.GlobalPosition = sprite.GlobalPosition + new Vector2(-20, -60);
+            
+            // Add outline for visibility
+            damageLabel.AddThemeColorOverride("font_outline_color", Colors.Black);
+            damageLabel.AddThemeConstantOverride("outline_size", 4);
+            
+            // Style based on damage type
+            if (isCritical)
+            {
+                damageLabel.AddThemeColorOverride("font_color", Colors.Red);
+                damageLabel.AddThemeFontSizeOverride("font_size", 56);
+                damageLabel.Text = $"{damage}!"; // Add exclamation for crits
+            }
+            else
+            {
+                damageLabel.AddThemeColorOverride("font_color", Colors.White);
+                damageLabel.AddThemeFontSizeOverride("font_size", 40);
+            }
+            
+            // Add to scene
+            AddChild(damageLabel);
+            
+            // Animate the damage number
+            var tween = CreateTween();
+            tween.SetParallel(true);
+            
+            // Float upward
+            tween.TweenProperty(damageLabel, "global_position:y", 
+                damageLabel.GlobalPosition.Y - 100, 1.2f)
+                .SetEase(Tween.EaseType.Out);
+            
+            // Scale punch effect for criticals
+            if (isCritical)
+            {
+                tween.TweenProperty(damageLabel, "scale", Vector2.One * 1.5f, 0.15f);
+                tween.TweenProperty(damageLabel, "scale", Vector2.One, 0.15f).SetDelay(0.15f);
+            }
+            
+            // Fade out
+            tween.TweenProperty(damageLabel, "modulate:a", 0.0f, 0.5f)
+                .SetDelay(0.7f);
+            
+            // Clean up after animation
+            tween.Chain().TweenCallback(Callable.From(() => damageLabel.QueueFree()));
+        }
 
         private void ClearSprites(List<AnimatedSprite2D> spriteList, Dictionary<BattleMember, AnimatedSprite2D> map)
         {
@@ -168,6 +232,97 @@ namespace EchoesAcrossTime.Combat
             }
             
             return sprite;
+        }
+        
+        /// <summary>
+        /// Show floating damage number with weakness indicator
+        /// </summary>
+        public void ShowDamageNumber(BattleMember target, int damage, bool isCritical, bool isWeakness)
+        {
+            var sprite = GetSpriteForMember(target);
+            if (sprite == null) 
+            {
+                GD.PrintErr($"Cannot show damage number - sprite not found for {target.Stats.CharacterName}");
+                return;
+            }
+
+            // Create damage label
+            var damageLabel = new Label();
+            damageLabel.Text = damage.ToString();
+            damageLabel.ZIndex = 200;
+            damageLabel.GlobalPosition = sprite.GlobalPosition + new Vector2(-20, -60);
+            
+            // Add outline
+            damageLabel.AddThemeColorOverride("font_outline_color", Colors.Black);
+            damageLabel.AddThemeConstantOverride("outline_size", 4);
+            
+            // Style based on damage type (priority: critical > weakness > normal)
+            if (isCritical)
+            {
+                damageLabel.AddThemeColorOverride("font_color", Colors.Red);
+                damageLabel.AddThemeFontSizeOverride("font_size", 56);
+                damageLabel.Text = $"{damage}!!"; // Double exclamation for crits
+            }
+            else if (isWeakness)
+            {
+                damageLabel.AddThemeColorOverride("font_color", Colors.Yellow);
+                damageLabel.AddThemeFontSizeOverride("font_size", 48);
+                damageLabel.Text = $"{damage}!"; // Single exclamation for weakness
+            }
+            else
+            {
+                damageLabel.AddThemeColorOverride("font_color", Colors.White);
+                damageLabel.AddThemeFontSizeOverride("font_size", 40);
+            }
+            
+            AddChild(damageLabel);
+            
+            // Animate
+            var tween = CreateTween();
+            tween.SetParallel(true);
+            
+            tween.TweenProperty(damageLabel, "global_position:y", 
+                damageLabel.GlobalPosition.Y - 100, 1.2f)
+                .SetEase(Tween.EaseType.Out);
+            
+            // Scale effect for crits and weakness
+            if (isCritical || isWeakness)
+            {
+                float scaleAmount = isCritical ? 1.5f : 1.3f;
+                tween.TweenProperty(damageLabel, "scale", Vector2.One * scaleAmount, 0.15f);
+                tween.TweenProperty(damageLabel, "scale", Vector2.One, 0.15f).SetDelay(0.15f);
+            }
+            
+            tween.TweenProperty(damageLabel, "modulate:a", 0.0f, 0.5f).SetDelay(0.7f);
+            tween.Chain().TweenCallback(Callable.From(() => damageLabel.QueueFree()));
+        }
+        
+        /// <summary>
+        /// Show healing number (green with + prefix)
+        /// </summary>
+        public void ShowHealingNumber(BattleMember target, int healAmount)
+        {
+            var sprite = GetSpriteForMember(target);
+            if (sprite == null) return;
+
+            var healLabel = new Label();
+            healLabel.Text = $"+{healAmount}";
+            healLabel.ZIndex = 200;
+            healLabel.GlobalPosition = sprite.GlobalPosition + new Vector2(-20, -60);
+    
+            healLabel.AddThemeColorOverride("font_outline_color", Colors.Black);
+            healLabel.AddThemeConstantOverride("outline_size", 4);
+            healLabel.AddThemeColorOverride("font_color", Colors.Green);
+            healLabel.AddThemeFontSizeOverride("font_size", 44);
+    
+            AddChild(healLabel);
+    
+            var tween = CreateTween();
+            tween.SetParallel(true);
+            tween.TweenProperty(healLabel, "global_position:y", 
+                healLabel.GlobalPosition.Y - 80, 1.0f);
+            tween.TweenProperty(healLabel, "modulate:a", 0.0f, 0.4f).SetDelay(0.6f);
+            tween.Chain().TweenCallback(Callable.From(() => healLabel.QueueFree()));
         }
 
         private void CreatePlaceholderSprite(AnimatedSprite2D sprite, BattleMember member)
