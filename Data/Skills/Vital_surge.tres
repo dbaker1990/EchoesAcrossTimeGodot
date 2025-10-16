@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://gcm6feamyoh7"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_yaii3"]
+
+[resource]
+script = ExtResource("1_yaii3")
+SkillId = "vital_surge"
+DisplayName = "Vital Surge"
+Description = "Channel a massive surge of healing energy to restore an ally."
+Target = 3
+MPCost = 30
+DamageFormula = 1
+DamageType = 1
+Element = 7
+BasePower = 0
+HealPercent = 0.5
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://by8x5qj0qt5k4"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_3qepv"]
+
+[resource]
+script = ExtResource("1_3qepv")
+SkillId = "heavens_wrath"
+DisplayName = "Heaven's Wrath"
+Description = "Call down divine judgment upon a single foe."
+MPCost = 22
+DamageFormula = 1
+DamageType = 1
+Element = 7
+BasePower = 140
+Accuracy = 95
+CriticalBonus = 10
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

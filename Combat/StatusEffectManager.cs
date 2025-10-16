@@ -43,16 +43,15 @@ namespace EchoesAcrossTime.Combat
                     StatusEffect.Stun or StatusEffect.Burn or StatusEffect.Freeze or
                     StatusEffect.Shock or StatusEffect.Curse or StatusEffect.Petrify or
                     StatusEffect.Doom or
-                    // NEW debuffs
                     StatusEffect.AttackDown or StatusEffect.DefenseDown or
                     StatusEffect.MagicAttackDown or StatusEffect.MagicDefenseDown or
                     StatusEffect.SpeedDown or StatusEffect.LuckDown => StatusCategory.Debuff,
 
                 StatusEffect.Regen or StatusEffect.Haste or StatusEffect.Barrier or
-                    // NEW buffs
                     StatusEffect.AttackUp or StatusEffect.DefenseUp or
                     StatusEffect.MagicAttackUp or StatusEffect.MagicDefenseUp or
-                    StatusEffect.SpeedUp or StatusEffect.LuckUp => StatusCategory.Buff,
+                    StatusEffect.SpeedUp or StatusEffect.LuckUp or
+                    StatusEffect.MagicReflect => StatusCategory.Buff,
 
                 StatusEffect.Berserk or StatusEffect.Charm => StatusCategory.Neutral,
 
@@ -437,6 +436,14 @@ namespace EchoesAcrossTime.Combat
                     case StatusEffect.Petrify:
                         // These prevent actions - handled by battle system
                         break;
+                    
+                    case StatusEffect.MagicReflect:
+                        // Mirror Ward just needs to exist - reflection is handled by MagicReflectionSystem
+                        if (isTurnStart)
+                        {
+                            GD.Print($"🪞 {target.CharacterName}'s Mirror Ward is active! ({status.Duration} turns remaining)");
+                        }
+                        break;
 
                     case StatusEffect.Doom:
                         if (isTurnStart && status.Duration == 1)
@@ -534,6 +541,7 @@ namespace EchoesAcrossTime.Combat
                     StatusEffect.Regen => new Color(0.2f, 1.0f, 0.3f), // Green
                     StatusEffect.Haste => new Color(1.0f, 0.8f, 0.2f), // Gold
                     StatusEffect.Doom => new Color(0.1f, 0.1f, 0.1f), // Black
+                    StatusEffect.MagicReflect => new Color(0.6f, 0.8f, 1.0f), // Light Blue/Silver
                     _ => Colors.White
                 };
             }

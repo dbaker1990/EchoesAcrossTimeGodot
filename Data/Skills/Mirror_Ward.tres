@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://dgu7riw306aw3"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_o0s2d"]
+
+[resource]
+script = ExtResource("1_o0s2d")
+SkillId = "mirror_ward"
+DisplayName = "Mirror Ward"
+Description = "Conjure a reflective barrier that bounces magic back at attackers."
+Type = 1
+Target = 3
+MPCost = 20
+DamageFormula = 1
+DamageType = 1
+Element = 7
+BasePower = 0
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

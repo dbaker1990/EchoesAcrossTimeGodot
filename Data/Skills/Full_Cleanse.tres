@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://teeeiolxrflb"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_iraar"]
+
+[resource]
+script = ExtResource("1_iraar")
+SkillId = "full_cleanse"
+DisplayName = "Full Cleanse"
+Description = "Purge all negative effects from the entire party."
+Target = 4
+MPCost = 28
+DamageFormula = 1
+DamageType = 1
+Element = 7
+BasePower = 0
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = Array[int]([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 22, 24, 26, 28, 30])
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

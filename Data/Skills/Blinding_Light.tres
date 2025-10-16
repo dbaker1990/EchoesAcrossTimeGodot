@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://d0nkxt8fwtsun"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_qo8sh"]
+
+[resource]
+script = ExtResource("1_qo8sh")
+SkillId = "blinding_light"
+DisplayName = "Blinding Light"
+Description = "Flash brilliant light to damage and potentially blind a foe."
+MPCost = 12
+DamageFormula = 1
+DamageType = 1
+Element = 7
+BasePower = 70
+Accuracy = 95
+CriticalBonus = 5
+InflictsStatuses = Array[int]([6])
+StatusChances = Array[int]([40])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://cievbih6x8gft"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_h5lpu"]
+
+[resource]
+script = ExtResource("1_h5lpu")
+SkillId = "circle_of_healing"
+DisplayName = "Circle of Healing"
+Description = "Create a healing circle that restores all allies."
+Target = 4
+MPCost = 45
+DamageFormula = 1
+DamageType = 1
+Element = 7
+BasePower = 0
+HealPercent = 0.35
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

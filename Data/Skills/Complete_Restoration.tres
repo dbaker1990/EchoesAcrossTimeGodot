@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://c6ewy6035c6jv"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_3crwr"]
+
+[resource]
+script = ExtResource("1_3crwr")
+SkillId = "complete_restoration"
+DisplayName = "Complete Restoration"
+Description = "Fully restore an ally's health."
+Target = 3
+MPCost = 40
+DamageFormula = 1
+DamageType = 1
+Element = 7
+BasePower = 0
+HealPercent = 1.0
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

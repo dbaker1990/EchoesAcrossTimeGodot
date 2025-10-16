@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://cdfa513774mgt"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_jopdt"]
+
+[resource]
+script = ExtResource("1_jopdt")
+SkillId = "purify"
+DisplayName = "Purify"
+Description = "Cleanse all negative effects from an ally."
+Target = 3
+MPCost = 15
+DamageFormula = 1
+DamageType = 1
+Element = 7
+BasePower = 0
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = Array[int]([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 22, 24, 26, 28, 30])
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

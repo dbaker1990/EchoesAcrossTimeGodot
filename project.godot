@@ -32,6 +32,8 @@ LoreCodexManager="*res://LoreCodex/LoreCodexManager.cs"
 HudManager="*res://UI/HUDManager.cs"
 RetroEffectsManager="*res://UI/RetroEffectsManager.cs"
 FPSCounter="*res://UI/FPSCounter.cs"
+BattleAnalysisSystem="*res://Combat/BattleAnalysisSystem.cs"
+MagicReflectionSystem="*res://Combat/MagicReflectionSystem.cs"
 
 [display]
 

@@ -32,6 +32,7 @@
         SpeedUp,
         SpeedDown,
         LuckUp,
-        LuckDown
+        LuckDown,
+        MagicReflect
     }
 }

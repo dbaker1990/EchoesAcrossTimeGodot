@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://b2srt77b07nnj"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_6b1wd"]
+
+[resource]
+script = ExtResource("1_6b1wd")
+SkillId = "resurrect"
+DisplayName = "Resurrect"
+Description = "Bring a fallen ally back from death."
+Target = 7
+MPCost = 25
+DamageFormula = 1
+DamageType = 1
+Element = 7
+BasePower = 0
+HealPercent = 0.3
+RevivesTarget = true
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

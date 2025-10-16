@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://1wkujxrit2hl"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_1w2sm"]
+
+[resource]
+script = ExtResource("1_1w2sm")
+SkillId = "petrify"
+DisplayName = "Petrify"
+Description = "Turn an enemy to stone with earth magic."
+Type = 1
+MPCost = 18
+DamageFormula = 1
+DamageType = 1
+Element = 5
+BasePower = 0
+Accuracy = 85
+InflictsStatuses = Array[int]([14])
+StatusChances = Array[int]([60])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

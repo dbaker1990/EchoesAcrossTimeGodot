@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://os0temvpkvfj"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_iq77y"]
+
+[resource]
+script = ExtResource("1_iq77y")
+SkillId = "revealing_light"
+DisplayName = "Revealing Light"
+Description = "Illuminate the battlefield to reveal enemy weaknesses and strengths."
+MPCost = 8
+DamageFormula = 1
+DamageType = 1
+Element = 7
+BasePower = 0
+InflictsStatuses = null
+StatusChances = null
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

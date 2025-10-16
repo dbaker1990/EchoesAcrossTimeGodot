@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://dhnqnelwjqjlw"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_hamdb"]
+
+[resource]
+script = ExtResource("1_hamdb")
+SkillId = "stone_ward"
+DisplayName = "Stone Ward"
+Description = "Invoke the earth's strength to bolster an ally's defenses."
+Target = 3
+MPCost = 14
+DamageFormula = 1
+DamageType = 1
+Element = 5
+BasePower = 0
+InflictsStatuses = Array[int]([21])
+StatusChances = Array[int]([100])
+RemovesStatuses = null
+BuffDuration = 4
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

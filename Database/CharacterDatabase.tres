@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterDatabase" load_steps=43 format=3 uid="uid://7nnsth8dj7jj"]
+[gd_resource type="Resource" script_class="CharacterDatabase" load_steps=68 format=3 uid="uid://7nnsth8dj7jj"]
 
 [ext_resource type="Resource" uid="uid://dj6vgrbs78vf4" path="res://Data/Skills/Steal.tres" id="1_nwlej"]
 [ext_resource type="Script" uid="uid://c6fwhavejbuqu" path="res://Database/CharacterDatabase.cs" id="1_script"]
@@ -42,9 +42,34 @@
 [ext_resource type="Resource" uid="uid://dwuy2h7uan1mk" path="res://Data/Skills/Confuse.tres" id="39_njy7q"]
 [ext_resource type="Resource" uid="uid://8kkko54qy6y2" path="res://Data/Skills/Flare.tres" id="40_73fok"]
 [ext_resource type="Resource" uid="uid://cgxyorjdreh6b" path="res://Data/Skills/Ultima.tres" id="41_wb28k"]
+[ext_resource type="Resource" uid="uid://bfvtn1apkvyxr" path="res://Data/Skills/Soothe.tres" id="42_ltorw"]
+[ext_resource type="Resource" uid="uid://crddj1uofnyk8" path="res://Data/Skills/Lifebond.tres" id="43_nvfyr"]
+[ext_resource type="Resource" uid="uid://gcm6feamyoh7" path="res://Data/Skills/Vital_surge.tres" id="44_lqphv"]
+[ext_resource type="Resource" uid="uid://cpes4xutwdtah" path="res://Data/Skills/Mending_Aura.tres" id="45_ivqe4"]
+[ext_resource type="Resource" uid="uid://b2srt77b07nnj" path="res://Data/Skills/Resurrect.tres" id="46_8smuv"]
+[ext_resource type="Resource" uid="uid://c6ewy6035c6jv" path="res://Data/Skills/Complete_Restoration.tres" id="47_vtfyp"]
+[ext_resource type="Resource" uid="uid://cievbih6x8gft" path="res://Data/Skills/Circle_Of_Healing.tres" id="48_ictwf"]
+[ext_resource type="Resource" uid="uid://b7ip4guljj6ar" path="res://Data/Skills/Luminous_Blast.tres" id="49_8smuv"]
+[ext_resource type="Resource" uid="uid://by8x5qj0qt5k4" path="res://Data/Skills/Heavens_Wrath.tres" id="50_vtfyp"]
+[ext_resource type="Resource" uid="uid://d0nkxt8fwtsun" path="res://Data/Skills/Blinding_Light.tres" id="51_ictwf"]
+[ext_resource type="Resource" uid="uid://eilnaao61y7b" path="res://Data/Skills/Stellar_Beam.tres" id="52_0uumt"]
+[ext_resource type="Resource" uid="uid://bttiwisikr30e" path="res://Data/Skills/Cleanse.tres" id="53_wq6rk"]
+[ext_resource type="Resource" uid="uid://cnd8vcs6vsvmr" path="res://Data/Skills/Remedy.tres" id="54_ggio4"]
+[ext_resource type="Resource" uid="uid://cdfa513774mgt" path="res://Data/Skills/Purify.tres" id="55_jaes8"]
+[ext_resource type="Resource" uid="uid://teeeiolxrflb" path="res://Data/Skills/Full_Cleanse.tres" id="56_mcrpt"]
+[ext_resource type="Resource" uid="uid://dhnqnelwjqjlw" path="res://Data/Skills/Stone_Ward.tres" id="57_hkayq"]
+[ext_resource type="Resource" uid="uid://db2tfv6rpqgno" path="res://Data/Skills/Sacred_Shield.tres" id="58_4e1ab"]
+[ext_resource type="Resource" uid="uid://1sy22gvo3hvh" path="res://Data/Skills/Earthen_Wall.tres" id="59_wk3n6"]
+[ext_resource type="Resource" uid="uid://btydvyd6ulkjn" path="res://Data/Skills/Blessing.tres" id="60_4j5b7"]
+[ext_resource type="Resource" uid="uid://ce4wvhxmkrn77" path="res://Data/Skills/Sanctuary.tres" id="61_4jjtn"]
+[ext_resource type="Resource" uid="uid://ciuvvig2r6ms2" path="res://Data/Skills/Fortify.tres" id="62_7wrwj"]
+[ext_resource type="Resource" uid="uid://os0temvpkvfj" path="res://Data/Skills/Revealing_Light.tres" id="63_4jjtn"]
+[ext_resource type="Resource" uid="uid://daw6vq43c0xhc" path="res://Data/Skills/Quicken.tres" id="64_7wrwj"]
+[ext_resource type="Resource" uid="uid://dgu7riw306aw3" path="res://Data/Skills/Mirror_Ward.tres" id="65_wawyb"]
+[ext_resource type="Resource" uid="uid://1wkujxrit2hl" path="res://Data/Skills/Petrify.tres" id="66_ywqv7"]
 
 [resource]
 script = ExtResource("1_script")
 Characters = null
-Skills = Array[Object]([ExtResource("1_nwlej"), ExtResource("2_o33u2"), ExtResource("3_dn0qv"), ExtResource("4_ftcsv"), ExtResource("5_nafxu"), ExtResource("6_nafxu"), ExtResource("7_6755j"), ExtResource("8_6755j"), ExtResource("9_thsg7"), ExtResource("10_qnyql"), ExtResource("11_uuy82"), ExtResource("12_bey25"), ExtResource("13_xlcqw"), ExtResource("14_wdv0s"), ExtResource("15_fa2k2"), ExtResource("16_0bpkk"), ExtResource("17_wjnft"), ExtResource("18_bl43h"), ExtResource("19_dxdnd"), ExtResource("20_udfaq"), ExtResource("21_2nmdn"), ExtResource("22_bevly"), ExtResource("23_2w4qe"), ExtResource("24_g2my1"), ExtResource("25_alu56"), ExtResource("26_wdv0s"), ExtResource("27_fa2k2"), ExtResource("28_0bpkk"), ExtResource("29_wjnft"), ExtResource("30_2nmdn"), ExtResource("31_bevly"), ExtResource("32_2w4qe"), ExtResource("33_g2my1"), ExtResource("34_alu56"), ExtResource("35_7krtn"), ExtResource("36_juvvc"), ExtResource("37_73fok"), ExtResource("38_wb28k"), ExtResource("39_njy7q"), ExtResource("40_73fok"), ExtResource("41_wb28k")])
+Skills = Array[Object]([ExtResource("1_nwlej"), ExtResource("2_o33u2"), ExtResource("3_dn0qv"), ExtResource("4_ftcsv"), ExtResource("5_nafxu"), ExtResource("6_nafxu"), ExtResource("7_6755j"), ExtResource("8_6755j"), ExtResource("9_thsg7"), ExtResource("10_qnyql"), ExtResource("11_uuy82"), ExtResource("12_bey25"), ExtResource("13_xlcqw"), ExtResource("14_wdv0s"), ExtResource("15_fa2k2"), ExtResource("16_0bpkk"), ExtResource("17_wjnft"), ExtResource("18_bl43h"), ExtResource("19_dxdnd"), ExtResource("20_udfaq"), ExtResource("21_2nmdn"), ExtResource("22_bevly"), ExtResource("23_2w4qe"), ExtResource("24_g2my1"), ExtResource("25_alu56"), ExtResource("26_wdv0s"), ExtResource("27_fa2k2"), ExtResource("28_0bpkk"), ExtResource("29_wjnft"), ExtResource("30_2nmdn"), ExtResource("31_bevly"), ExtResource("32_2w4qe"), ExtResource("33_g2my1"), ExtResource("34_alu56"), ExtResource("35_7krtn"), ExtResource("36_juvvc"), ExtResource("37_73fok"), ExtResource("38_wb28k"), ExtResource("39_njy7q"), ExtResource("40_73fok"), ExtResource("41_wb28k"), ExtResource("42_ltorw"), ExtResource("43_nvfyr"), ExtResource("44_lqphv"), ExtResource("45_ivqe4"), ExtResource("46_8smuv"), ExtResource("47_vtfyp"), ExtResource("48_ictwf"), ExtResource("49_8smuv"), ExtResource("50_vtfyp"), ExtResource("51_ictwf"), ExtResource("52_0uumt"), ExtResource("53_wq6rk"), ExtResource("54_ggio4"), ExtResource("55_jaes8"), ExtResource("56_mcrpt"), ExtResource("57_hkayq"), ExtResource("58_4e1ab"), ExtResource("59_wk3n6"), ExtResource("60_4j5b7"), ExtResource("61_4jjtn"), ExtResource("62_7wrwj"), ExtResource("63_4jjtn"), ExtResource("64_7wrwj"), ExtResource("65_wawyb"), ExtResource("66_ywqv7")])
 AllItems = null

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3 uid="uid://db2tfv6rpqgno"]
+
+[ext_resource type="Script" uid="uid://omwb8pems8vo" path="res://Combat/SkillData.cs" id="1_y8n16"]
+
+[resource]
+script = ExtResource("1_y8n16")
+SkillId = "sacred_shield"
+DisplayName = "Sacred Shield"
+Description = "Summon a protective barrier of holy light around an ally."
+Target = 3
+MPCost = 16
+DamageFormula = 1
+DamageType = 1
+Element = 7
+Accuracy = 0
+InflictsStatuses = Array[int]([18])
+StatusChances = Array[int]([100])
+RemovesStatuses = null
+AllowedClasses = null
+PassiveStatusImmunity = null
+metadata/_custom_type_script = "uid://omwb8pems8vo"

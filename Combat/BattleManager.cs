@@ -46,6 +46,8 @@ namespace EchoesAcrossTime.Combat
         private BattleRewardsManager rewardsManager;
         private SummonManager summonManager;
         private StealMugSystem stealMugSystem;
+        private BattleAnalysisSystem analysisSystem;
+        private MagicReflectionSystem reflectionSystem;
         [Export] public SummonManager SummonManager { get; set; }
         
         private class PendingAction
@@ -104,6 +106,8 @@ namespace EchoesAcrossTime.Combat
             guardSystem = new GuardSystem();
             itemSystem = new BattleItemSystem(statusManager);
             escapeSystem = new EscapeSystem();
+            
+            InitializeSupportSystems();
             
             // Get BattlefieldVisuals reference
             battlefieldVisuals = GetNode<BattlefieldVisuals>("BattlefieldVisuals");
@@ -367,6 +371,8 @@ namespace EchoesAcrossTime.Combat
                 _ => new BattleActionResult { Success = false, Message = "Not implemented" }
             };
             
+            
+            
             // Handle One More system
             if (result.Success && (result.HitWeakness || result.WasCritical))
             {
@@ -428,6 +434,45 @@ namespace EchoesAcrossTime.Combat
             
         }
         
+        private bool CheckMagicReflection(BattleMember attacker, BattleMember target, SkillData skill, int damage)
+        {
+            if (reflectionSystem == null) return false;
+
+            // Check if target can reflect this magic attack
+            if (reflectionSystem.TryReflectMagic(attacker.Stats, target.Stats, skill, damage))
+            {
+                // Magic was reflected - don't apply damage to target
+                // The reflection system already dealt damage to the attacker
+                return true;
+            }
+
+            return false;
+        }
+        
+        private void CleanupBattleSystems()
+        {
+            if (analysisSystem != null)
+            {
+                analysisSystem.ClearAnalyzedEnemies();
+            }
+        }
+        
+        private void HandleSpecialSkills(BattleMember user, BattleMember target, SkillData skill)
+        {
+            // Handle Revealing Light
+            if (skill.SkillId == "revealing_light")
+            {
+                if (analysisSystem != null && target != null)
+                {
+                    analysisSystem.AnalyzeEnemy(target.Stats);
+                }
+                return; // Revealing Light doesn't do damage
+            }
+
+            // Handle Mirror Ward - status is applied through normal skill system
+            // The reflection itself is handled in the damage calculation
+        }
+        
         /// <summary>
         /// Execute a basic attack
         /// </summary>
@@ -451,6 +496,52 @@ namespace EchoesAcrossTime.Combat
             return result;
         }
         
+        private int CalculateSkillDamage(CharacterStats attacker, CharacterStats target, SkillData skill)
+        {
+            if (skill.BasePower == 0) return 0;
+
+            // Get the appropriate attack stat
+            int attackPower = skill.DamageType == DamageType.Physical 
+                ? attacker.Attack 
+                : attacker.MagicAttack;
+
+            // Get the appropriate defense stat
+            int defensePower = skill.DamageType == DamageType.Physical 
+                ? target.Defense 
+                : target.MagicDefense;
+
+            // Base damage calculation
+            float baseDamage = (float)(attackPower * 2 - defensePower) * skill.BasePower / 100f;
+
+            // Apply elemental multiplier
+            float elementMultiplier = target.ElementAffinities?.GetDamageMultiplier(skill.Element) ?? 1f;
+            
+            int finalDamage = Mathf.Max(1, Mathf.RoundToInt(baseDamage * elementMultiplier));
+            
+            return finalDamage;
+        }
+        
+        private void InitializeSupportSystems()
+        {
+            // Get or create analysis system
+            analysisSystem = GetNodeOrNull<BattleAnalysisSystem>("/root/BattleAnalysisSystem");
+            if (analysisSystem == null)
+            {
+                analysisSystem = new BattleAnalysisSystem();
+                analysisSystem.Name = "BattleAnalysisSystem";
+                GetTree().Root.AddChild(analysisSystem);
+            }
+
+            // Get or create reflection system
+            reflectionSystem = GetNodeOrNull<MagicReflectionSystem>("/root/MagicReflectionSystem");
+            if (reflectionSystem == null)
+            {
+                reflectionSystem = new MagicReflectionSystem();
+                reflectionSystem.Name = "MagicReflectionSystem";
+                GetTree().Root.AddChild(reflectionSystem);
+            }
+        }
+        
         
         /// <summary>
         /// Execute a skill
@@ -471,6 +562,12 @@ namespace EchoesAcrossTime.Combat
             // Deduct MP
             attacker.Stats.CurrentMP -= skill.MPCost;
             GD.Print($">>> {attacker.Stats.CharacterName} uses {skill.DisplayName}! (MP: {attacker.Stats.CurrentMP}/{attacker.Stats.MaxMP}) <<<");
+            
+            HandleSpecialSkills(attacker, action.Targets[0], skill);
+            if (skill.SkillId == "revealing_light")
+            {
+                return result; // Revealing Light doesn't do damage, just return
+            }
             
             // ===== MODIFIED: Pass skill to PlayCastSequence =====
             if (battlefieldVisuals != null)
@@ -1262,6 +1359,13 @@ namespace EchoesAcrossTime.Combat
                 GD.Print($"  → Guard blocked {baseDamage - finalDamage} damage!");
             }
             
+            
+            if (CheckMagicReflection(attacker, target, skill, finalDamage))
+            {
+                GD.Print("  🪞 Magic was reflected! No damage to target.");
+                return; // Skip normal damage application
+            }
+            
             // Deal damage
             target.Stats.TakeDamage(finalDamage, skill.Element);
             result.DamageDealt += finalDamage;
@@ -1712,6 +1816,8 @@ namespace EchoesAcrossTime.Combat
         {
             GD.Print("=== BATTLE VICTORY ===");
             
+            CleanupBattleSystems();
+            
             if (SummonManager != null)
             {
                 SummonManager.ClearAllSummons();
@@ -1764,6 +1870,8 @@ namespace EchoesAcrossTime.Combat
         private void OnBattleEscape()
         {
             GD.Print("=== BATTLE ESCAPED ===");
+            
+            CleanupBattleSystems();
         
             if (EventCommandExecutor.Instance != null)
             {
@@ -1783,6 +1891,8 @@ namespace EchoesAcrossTime.Combat
         private void OnBattleDefeat()
         {
             GD.Print("=== BATTLE DEFEAT ===");
+            
+            CleanupBattleSystems();
             
             if (battlefieldVisuals != null)
             {
