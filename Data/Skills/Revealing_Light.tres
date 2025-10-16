@@ -7,6 +7,7 @@ script = ExtResource("1_iq77y")
 SkillId = "revealing_light"
 DisplayName = "Revealing Light"
 Description = "Illuminate the battlefield to reveal enemy weaknesses and strengths."
+Type = 1
 MPCost = 8
 DamageFormula = 1
 DamageType = 1
