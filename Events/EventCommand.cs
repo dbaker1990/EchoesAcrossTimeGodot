@@ -61,6 +61,7 @@ namespace EchoesAcrossTime.Events
     [GlobalClass]
     public partial class ShowTextCommand : EventCommand
     {
+        [ExportGroup("Show Text Settings")]
         [Export] public DialogueData Dialogue { get; set; }
         [Export] public string DialogueTableId { get; set; } = "";
         [Export] public int DialogueIndex { get; set; } = 0;

@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=2 format=3 uid="uid://cvw6so5movhsm"]
+
+[ext_resource type="Script" uid="uid://c8v1ycgmto6fa" path="res://Events/DialogueData.cs" id="1_nn4qg"]
+
+[resource]
+script = ExtResource("1_nn4qg")
+metadata/_custom_type_script = "uid://c8v1ycgmto6fa"

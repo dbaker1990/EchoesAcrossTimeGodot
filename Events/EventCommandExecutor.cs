@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using EchoesAcrossTime.UI;
 using EchoesAcrossTime.Items;
 using EchoesAcrossTime.Combat;
+using System.Linq;
 using EchoesAcrossTime.Managers;
 
 namespace EchoesAcrossTime.Events
@@ -718,22 +719,52 @@ namespace EchoesAcrossTime.Events
 
         public async Task ProcessNameInput(string characterId, int maxLength)
         {
-            if (NameInputScreenScene == null) return;
+            if (NameInputScreenScene == null)
+            {
+                GD.PrintErr("NameInputScreenScene not assigned in EventCommandExecutor");
+                return;
+            }
 
-            // Create an instance of the name input screen and add it to the scene
-            var screen = NameInputScreenScene.Instantiate<Control>(); // Assuming the root is a Control node
-            AddChild(screen);
-
-            // Call a method on the screen to initialize it and wait for it to finish
-            // The screen scene must emit a "name_confirmed" signal with the final name
-            var result = await ToSignal(screen, "name_confirmed");
-            var newName = result[0].AsString(); // Godot signals pass arguments in an array
-
-            // Update the character's name in your database/manager
-            // Example: CharacterDatabase.GetCharacter(characterId).Name = newName;
-            GD.Print($"Character {characterId} is now named {newName}.");
+            var nameInputUI = NameInputScreenScene.Instantiate<NameInputUI>();
+            AddChild(nameInputUI);
     
-            // The screen should handle queue_free() on its own after confirming.
+            var gameManager = GetNode<GameManager>("/root/GameManager");
+            if (gameManager?.Database != null)
+            {
+                nameInputUI.Database = gameManager.Database;
+            }
+            else
+            {
+                GD.PrintErr("GameManager or Database not found");
+            }
+    
+            nameInputUI.Initialize(characterId, maxLength);
+    
+            var result = await ToSignal(nameInputUI, NameInputUI.SignalName.NameConfirmed);
+    
+            // ✅ BEST PRACTICE: Use Any() instead of Count() > 0
+            if (result != null && result.Any())
+            {
+                string newName = result[0].AsString();
+        
+                var character = gameManager?.Database?.GetCharacter(characterId);
+                if (character != null)
+                {
+                    character.DisplayName = newName;
+                    GD.Print($"Character '{characterId}' renamed to '{newName}'");
+                }
+        
+                var partyMenuManager = PartyMenuManager.Instance;
+                if (partyMenuManager != null)
+                {
+                    var mainParty = partyMenuManager.GetMainParty();
+                    var partyMember = mainParty.FirstOrDefault(m => m.CharacterId == characterId);
+                    if (partyMember?.Stats != null)
+                    {
+                        GD.Print($"Party member '{characterId}' name updated in party");
+                    }
+                }
+            }
         }
 
         public async Task ShowBalloonIcon(NodePath characterPath, TransferMapCommand.ShowBalloonIconCommand.BalloonType icon, bool wait)

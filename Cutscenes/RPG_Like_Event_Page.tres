@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="EventPage" load_steps=2 format=3 uid="uid://cgp4yi28lleyn"]
+
+[ext_resource type="Script" uid="uid://bpc3wgta1ic2n" path="res://Events/EventPage.cs" id="1_ejjn2"]
+
+[resource]
+script = ExtResource("1_ejjn2")
+Commands = Array[Object]([null])
+metadata/_custom_type_script = "uid://bpc3wgta1ic2n"

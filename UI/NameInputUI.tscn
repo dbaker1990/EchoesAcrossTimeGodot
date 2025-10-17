@@ -1,0 +1,93 @@
+[gd_scene load_steps=2 format=3 uid="uid://ceb1pn6gxmaee"]
+
+[ext_resource type="Script" uid="uid://drcfp5ht8fruh" path="res://UI/NameInputUI.cs" id="1_a1cqc"]
+
+[node name="NameInputUI" type="Control" node_paths=PackedStringArray("characterPortrait", "instructionLabel", "currentNameLabel", "nameDisplay", "confirmButton", "cancelButton", "keyboardContainer")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_a1cqc")
+characterPortrait = NodePath("VBoxContainer/MarginContainer/VBoxContainer/CharacterPortrait")
+instructionLabel = NodePath("VBoxContainer/MarginContainer/VBoxContainer/InstructionLabel")
+currentNameLabel = NodePath("VBoxContainer/MarginContainer/VBoxContainer/CurrentNameLabel")
+nameDisplay = NodePath("VBoxContainer/MarginContainer/VBoxContainer/CharacterNameDisplay")
+confirmButton = NodePath("VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer/ConfirmButton")
+cancelButton = NodePath("VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer/CancelButton")
+keyboardContainer = NodePath("VBoxContainer/MarginContainer/VBoxContainer/KeyboardContainer")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.8)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(600, 500)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -250.0
+offset_right = 300.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="CharacterPortrait" type="TextureRect" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+expand_mode = 3
+stretch_mode = 5
+
+[node name="InstructionLabel" type="Label" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+text = "Please enter a name for this character"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="CurrentNameLabel" type="Label" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Current Name: [Character Name]"
+horizontal_alignment = 1
+
+[node name="CharacterNameDisplay" type="LineEdit" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Enter name here..."
+alignment = 1
+max_length = 10
+editable = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ConfirmButton" type="Button" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Confirm"
+
+[node name="CancelButton" type="Button" parent="VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Cancel"
+
+[node name="KeyboardContainer" type="GridContainer" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 10
