@@ -131,11 +131,11 @@ namespace EchoesAcrossTime.Skits
             return true;
         }
         
-        private void PlaySkit()
+        private async void PlaySkit()
         {
             if (SkitManager.Instance != null)
             {
-                SkitManager.Instance.PlaySkit(SkitToPlay);
+                await SkitManager.Instance.PlaySkit(SkitToPlay);  // ← Now properly awaited
                 hasTriggered = true;
             }
             else
